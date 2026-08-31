@@ -6,6 +6,7 @@ import {
   Activity,
   BarChart3,
   Brain,
+  Database,
   Boxes,
   Building2,
   ChevronDown,
@@ -33,6 +34,11 @@ const navigation = [
     label: "Analytics",
     href: "/analytics",
     icon: BarChart3,
+  },
+  {
+    label: "Data Hub",
+    href: "/data-hub",
+    icon: Database,
   },
 ]
 
