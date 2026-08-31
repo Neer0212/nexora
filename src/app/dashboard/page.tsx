@@ -96,11 +96,11 @@ export default async function DashboardPage() {
 
   const { data: storedRows, error: rowsError } = datasetIds.length
     ? await supabase
-        .from("dataset_rows")
-        .select("dataset_id, row_number, row_data")
-        .eq("business_id", membership.business_id)
-        .in("dataset_id", datasetIds)
-        .order("row_number", { ascending: true })
+      .from("dataset_rows")
+      .select("dataset_id, row_number, row_data")
+      .eq("business_id", membership.business_id)
+      .in("dataset_id", datasetIds)
+      .order("row_number", { ascending: true })
     : { data: [], error: null }
 
   if (rowsError) throw new Error(rowsError.message)
@@ -160,12 +160,6 @@ export default async function DashboardPage() {
     .slice(0, 5)
     .map(([name, value]) => ({ name, value }))
 
-  const customerCount = new Set(
-    completedRows
-      .map(({ row }) => customerKey ? textValue(row[customerKey]) : "")
-      .filter(Boolean)
-  ).size
-
   const returnsCount = orderRows.length - completedRows.length
   const topProductShare = revenue && topProducts[0] ? topProducts[0].value / revenue : 0
 
@@ -183,26 +177,148 @@ export default async function DashboardPage() {
   const insight = revenue
     ? topProductShare >= 0.35
       ? {
-          title: "Revenue is concentrated in a small number of products.",
-          description: `${topProducts[0]?.name ?? "Your top product"} contributes ${Math.round(topProductShare * 100)}% of connected revenue. This is a concentration signal worth watching.`,
-          evidence: `${formatLabel(endDate)} · ${Math.round(topProductShare * 100)}% of revenue`,
-        }
+        title: "Revenue is concentrated in a small number of products.",
+        description: `${topProducts[0]?.name ?? "Your top product"} contributes ${Math.round(topProductShare * 100)}% of connected revenue. This is a concentration signal worth watching.`,
+        evidence: `${formatLabel(endDate)} · ${Math.round(topProductShare * 100)}% of revenue`,
+      }
       : returnsCount
         ? {
-            title: "Returns are visible in the connected order data.",
-            description: `${returnsCount} of ${orderRows.length} connected order rows are marked as returned, cancelled, or refunded.`,
-            evidence: `${returnsCount} returned / cancelled rows`,
-          }
+          title: "Returns are visible in the connected order data.",
+          description: `${returnsCount} of ${orderRows.length} connected order rows are marked as returned, cancelled, or refunded.`,
+          evidence: `${returnsCount} returned / cancelled rows`,
+        }
         : {
-            title: "Your connected orders are ready for analysis.",
-            description: `${ordersCount.toLocaleString("en-IN")} completed order rows currently contribute to the dashboard.`,
-            evidence: `${ordersCount.toLocaleString("en-IN")} completed orders`,
-          }
+          title: "Your connected orders are ready for analysis.",
+          description: `${ordersCount.toLocaleString("en-IN")} completed order rows currently contribute to the dashboard.`,
+          evidence: `${ordersCount.toLocaleString("en-IN")} completed orders`,
+        }
     : {
-        title: "Connect an orders dataset to unlock the overview.",
-        description: "Nexora will calculate revenue, orders, trends and business signals directly from connected data.",
-        evidence: "No compatible order dataset detected",
-      }
+      title: "Connect an orders dataset to unlock the overview.",
+      description: "Nexora will calculate revenue, orders, trends and business signals directly from connected data.",
+      evidence: "No compatible order dataset detected",
+    }
+
+  const datasetName = (datasetId: string) => {
+    const dataset = readyDatasets.find((item) => item.id === datasetId)
+    return `${dataset?.name ?? ""} ${dataset?.file_name ?? ""}`.toLowerCase()
+  }
+
+  const rowsFor = (terms: string[]) =>
+    rows.filter(({ datasetId, row }) => {
+      const name = datasetName(datasetId)
+      const keys = Object.keys(row).join(" ").toLowerCase()
+      return terms.some((term) => name.includes(term) || keys.includes(term))
+    })
+
+  const inventoryRows = rowsFor(["inventory", "stock", "warehouse"])
+  const supplierRows = rowsFor(["supplier", "vendor"])
+  const customerRows = rowsFor(["customer", "account"])
+  const productRows = rowsFor(["product", "catalog", "sku"])
+  const financeRows = rowsFor(["finance", "expense", "invoice", "profit"])
+
+  const firstRow = (items: typeof rows) => items[0]?.row ?? null
+  const keyFrom = (items: typeof rows, aliases: string[]) => {
+    const sample = firstRow(items)
+    return sample ? findKey(sample, aliases) : null
+  }
+
+  const inventoryQtyKey = keyFrom(inventoryRows, [
+    "quantity",
+    "stock_qty",
+    "stock",
+    "available_qty",
+    "on_hand",
+  ])
+  const inventoryValueKey = keyFrom(inventoryRows, [
+    "inventory_value",
+    "stock_value",
+    "value",
+    "amount",
+  ])
+  const reorderKey = keyFrom(inventoryRows, [
+    "reorder_point",
+    "reorder_level",
+    "minimum_stock",
+    "min_stock",
+  ])
+
+  const inventoryValue = inventoryRows.reduce(
+    (sum, item) =>
+      sum + (inventoryValueKey ? numberValue(item.row[inventoryValueKey]) : 0),
+    0
+  )
+  const inventoryCount = inventoryRows.length
+  const lowStockCount = inventoryRows.filter(({ row }) => {
+    if (!inventoryQtyKey || !reorderKey) return false
+    return numberValue(row[inventoryQtyKey]) <= numberValue(row[reorderKey])
+  }).length
+
+  const supplierStatusKey = keyFrom(supplierRows, ["status", "supplier_status"])
+  const supplierLeadKey = keyFrom(supplierRows, [
+    "lead_time",
+    "lead_time_days",
+    "delivery_days",
+  ])
+  const atRiskSuppliers = supplierRows.filter(({ row }) => {
+    const status = supplierStatusKey
+      ? textValue(row[supplierStatusKey]).toLowerCase()
+      : ""
+    const leadTime = supplierLeadKey ? numberValue(row[supplierLeadKey]) : 0
+    return ["watch", "at risk", "risk", "delayed", "poor"].some((term) =>
+      status.includes(term)
+    ) || leadTime >= 10
+  }).length
+
+  const supplierCount = supplierRows.length
+  const customerIdKey = keyFrom(customerRows, [
+    "customer_id",
+    "customer",
+    "account_id",
+    "account",
+  ])
+  const customersFromOrders = new Set(
+    completedRows
+      .map(({ row }) => (customerKey ? textValue(row[customerKey]) : ""))
+      .filter(Boolean)
+  ).size
+  const customerCount = customerRows.length
+    ? new Set(
+      customerRows
+        .map(({ row }) => (customerIdKey ? textValue(row[customerIdKey]) : ""))
+        .filter(Boolean)
+    ).size || customerRows.length
+    : customersFromOrders
+
+  const financeRevenueKey = keyFrom(financeRows, ["revenue", "sales", "income"])
+  const cogsKey = keyFrom(financeRows, ["cogs", "cost_of_goods", "cost_of_sales"])
+  const expenseKey = keyFrom(financeRows, [
+    "operating_expenses",
+    "operating_expense",
+    "expenses",
+    "expense",
+  ])
+  const financeRevenue = financeRows.reduce(
+    (sum, item) => sum + (financeRevenueKey ? numberValue(item.row[financeRevenueKey]) : 0),
+    0
+  )
+  const cogs = financeRows.reduce(
+    (sum, item) => sum + (cogsKey ? numberValue(item.row[cogsKey]) : 0),
+    0
+  )
+  const operatingExpenses = financeRows.reduce(
+    (sum, item) =>
+      sum + (expenseKey ? numberValue(item.row[expenseKey]) : 0),
+    0
+  )
+  const financeGrossProfit = financeRevenue - cogs
+
+  const connected = {
+    products: productRows.length > 0,
+    inventory: inventoryRows.length > 0,
+    suppliers: supplierRows.length > 0,
+    customers: customerRows.length > 0 || customersFromOrders > 0,
+    finance: financeRows.length > 0,
+  }
 
   const data = {
     currencyCode: business.currency_code || "INR",
@@ -211,10 +327,10 @@ export default async function DashboardPage() {
     ordersCount,
     unitsSold,
     averageOrderValue,
-    inventoryValue: 0,
-    inventoryCount: 0,
-    lowStockCount: 0,
-    suppliersCount: 0,
+    inventoryValue,
+    inventoryCount,
+    lowStockCount,
+    suppliersCount: supplierCount,
     customersCount: customerCount,
     datasetCount: readyDatasets.length,
     readyDatasetCount: readyDatasets.length,
@@ -223,6 +339,12 @@ export default async function DashboardPage() {
     events: [],
     topProducts,
     returnsCount,
+    atRiskSuppliers,
+    financeRevenue,
+    cogs,
+    operatingExpenses,
+    grossProfit: financeRows.length ? financeGrossProfit : 0,
+    connected,
     insight,
   }
 
