@@ -77,36 +77,36 @@ export default function OnboardingPage() {
 
     if (loading) {
         return (
-            <main className="flex min-h-screen items-center justify-center bg-slate-50">
-                <p className="text-sm text-slate-500">Loading...</p>
+            <main className="flex min-h-screen items-center justify-center bg-[#F1F0F8]">
+                <p className="text-sm text-[#68647A]">Loading...</p>
             </main>
         )
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-12">
+        <main className="flex min-h-screen items-center justify-center bg-[#F1F0F8] px-6 py-12">
             <div className="w-full max-w-xl">
                 <div className="mb-8">
                     <p className="text-sm font-semibold tracking-wide text-blue-600">
                         NEXORA
                     </p>
 
-                    <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
+                    <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#17153B]">
                         Tell us about your business
                     </h1>
 
-                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                    <p className="mt-2 text-sm leading-6 text-[#68647A]">
                         This helps us set up your Nexora workspace. You can change these
                         details later.
                     </p>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <div className="rounded-2xl border border-[#E7E4EF] bg-[#FFFFFF] p-6 shadow-sm sm:p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label
                                 htmlFor="business-name"
-                                className="mb-2 block text-sm font-medium text-slate-700"
+                                className="mb-2 block text-sm font-medium text-[#433D8B]"
                             >
                                 Business name
                             </label>
@@ -118,14 +118,14 @@ export default function OnboardingPage() {
                                 value={businessName}
                                 onChange={(event) => setBusinessName(event.target.value)}
                                 placeholder="e.g. Acme Manufacturing"
-                                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full rounded-lg border border-[#E7E4EF] px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             />
                         </div>
 
                         <div>
                             <label
                                 htmlFor="business-type"
-                                className="mb-2 block text-sm font-medium text-slate-700"
+                                className="mb-2 block text-sm font-medium text-[#433D8B]"
                             >
                                 Business type
                             </label>
@@ -134,7 +134,7 @@ export default function OnboardingPage() {
                                 id="business-type"
                                 value={businessType}
                                 onChange={(event) => setBusinessType(event.target.value)}
-                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full rounded-lg border border-[#E7E4EF] bg-[#FFFFFF] px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             >
                                 <option value="">Select a type</option>
                                 <option value="Manufacturing">Manufacturing</option>
@@ -150,7 +150,7 @@ export default function OnboardingPage() {
                         <div>
                             <label
                                 htmlFor="industry"
-                                className="mb-2 block text-sm font-medium text-slate-700"
+                                className="mb-2 block text-sm font-medium text-[#433D8B]"
                             >
                                 Industry
                             </label>
@@ -161,7 +161,7 @@ export default function OnboardingPage() {
                                 value={industry}
                                 onChange={(event) => setIndustry(event.target.value)}
                                 placeholder="e.g. Industrial manufacturing"
-                                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full rounded-lg border border-[#E7E4EF] px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             />
                         </div>
 
@@ -174,14 +174,14 @@ export default function OnboardingPage() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="w-full rounded-lg bg-[#17153B] px-4 py-2.5 text-sm font-medium text-[#FFFFFF] transition hover:bg-[#2E236C] disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {submitting ? "Setting up workspace..." : "Create workspace"}
                         </button>
                     </form>
                 </div>
 
-                <p className="mt-5 text-center text-xs text-slate-400">
+                <p className="mt-5 text-center text-xs text-[#9A94A8]">
                     You can update your business information later in Settings.
                 </p>
             </div>

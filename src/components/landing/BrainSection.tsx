@@ -69,34 +69,34 @@ export default function BrainSection() {
   return (
     <section
       id="intelligence"
-      className="relative scroll-mt-24 overflow-hidden bg-[#2D232E] py-16 text-[#F1F0EA] sm:py-20"
+      className="relative overflow-hidden bg-[#17153B] py-16 text-[#F1F0F8] sm:py-20"
     >
       {/* Ambient background */}
-      <div className="pointer-events-none absolute -left-64 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-[#534B52]/25 blur-3xl" />
+      <div className="pointer-events-none absolute -left-64 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-[#433D8B]/25 blur-3xl" />
 
-      <div className="pointer-events-none absolute -right-64 -top-40 h-[500px] w-[500px] rounded-full bg-[#474448]/25 blur-3xl" />
+      <div className="pointer-events-none absolute -right-64 -top-40 h-[500px] w-[500px] rounded-full bg-[#2E236C]/25 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-6">
         {/* Section heading */}
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-xl border border-[#F1F0EA]/10 bg-[#F1F0EA]/5 px-3 py-2">
-              <Sparkles className="h-3.5 w-3.5 text-[#E0DDCF]" />
+            <div className="inline-flex items-center gap-2 rounded-xl border border-[#F1F0F8]/10 bg-[#F1F0F8]/5 px-3 py-2">
+              <Sparkles className="h-3.5 w-3.5 text-[#C8ACD6]" />
 
-              <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#E0DDCF]/65">
+              <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#C8ACD6]/65">
                 Business intelligence
               </span>
             </div>
 
             <h2 className="mt-6 text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:text-6xl">
               From data to
-              <span className="block text-[#E0DDCF]">
+              <span className="block text-[#C8ACD6]">
                 decisions.
               </span>
             </h2>
           </div>
 
-          <p className="max-w-xl text-sm leading-6 text-[#E0DDCF]/60 sm:text-base">
+          <p className="max-w-xl text-sm leading-6 text-[#C8ACD6]/60 sm:text-base">
             Nexora doesn&apos;t just show you numbers. It helps you understand
             what they mean, what caused them, what could happen next, and
             where to go from there.
@@ -104,11 +104,11 @@ export default function BrainSection() {
         </div>
 
         {/* Interactive intelligence panel */}
-        <div className="mt-10 overflow-hidden rounded-[30px] border border-[#F1F0EA]/10 bg-[#F1F0EA]/[0.035] backdrop-blur-sm sm:mt-12">
+        <div className="mt-10 overflow-hidden rounded-[30px] border border-[#F1F0F8]/10 bg-[#F1F0F8]/[0.035] backdrop-blur-sm sm:mt-12">
           <div className="grid lg:grid-cols-[0.72fr_1.28fr]">
             {/* Stage selector */}
-            <div className="border-b border-[#F1F0EA]/10 p-4 sm:p-6 lg:border-b-0 lg:border-r">
-              <p className="mb-3 px-2 text-[9px] font-medium uppercase tracking-[0.16em] text-[#E0DDCF]/35">
+            <div className="border-b border-[#F1F0F8]/10 p-4 sm:p-6 lg:border-b-0 lg:border-r">
+              <p className="mb-3 px-2 text-[9px] font-medium uppercase tracking-[0.16em] text-[#C8ACD6]/35">
                 How Nexora thinks
               </p>
 
@@ -125,8 +125,8 @@ export default function BrainSection() {
                       className={[
                         "group w-full rounded-2xl border p-4 text-left transition-all duration-200",
                         isActive
-                          ? "border-[#F1F0EA]/15 bg-[#F1F0EA]/10"
-                          : "border-transparent hover:border-[#F1F0EA]/10 hover:bg-[#F1F0EA]/[0.06]",
+                          ? "border-[#F1F0F8]/15 bg-[#F1F0F8]/10"
+                          : "border-transparent hover:border-[#F1F0F8]/10 hover:bg-[#F1F0F8]/[0.06]",
                       ].join(" ")}
                     >
                       <div className="flex items-start gap-3">
@@ -134,8 +134,8 @@ export default function BrainSection() {
                           className={[
                             "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors",
                             isActive
-                              ? "border-[#E0DDCF]/15 bg-[#E0DDCF]/10 text-[#E0DDCF]"
-                              : "border-[#F1F0EA]/10 bg-[#F1F0EA]/5 text-[#E0DDCF]/50 group-hover:bg-[#E0DDCF]/10 group-hover:text-[#E0DDCF]",
+                              ? "border-[#C8ACD6]/15 bg-[#C8ACD6]/10 text-[#C8ACD6]"
+                              : "border-[#F1F0F8]/10 bg-[#F1F0F8]/5 text-[#C8ACD6]/50 group-hover:bg-[#C8ACD6]/10 group-hover:text-[#C8ACD6]",
                           ].join(" ")}
                         >
                           <Icon className="h-4 w-4" />
@@ -147,19 +147,19 @@ export default function BrainSection() {
                               className={[
                                 "text-sm font-medium transition-colors",
                                 isActive
-                                  ? "text-[#F1F0EA]"
-                                  : "text-[#E0DDCF]/65 group-hover:text-[#F1F0EA]",
+                                  ? "text-[#F1F0F8]"
+                                  : "text-[#C8ACD6]/65 group-hover:text-[#F1F0F8]",
                               ].join(" ")}
                             >
                               {stage.title}
                             </span>
 
-                            <span className="text-[9px] tracking-[0.12em] text-[#E0DDCF]/30">
+                            <span className="text-[9px] tracking-[0.12em] text-[#C8ACD6]/30">
                               {stage.number}
                             </span>
                           </div>
 
-                          <p className="mt-1 text-[10px] text-[#E0DDCF]/40">
+                          <p className="mt-1 text-[10px] text-[#C8ACD6]/40">
                             {stage.question}
                           </p>
                         </div>
@@ -175,87 +175,87 @@ export default function BrainSection() {
               {/* Small header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#E0DDCF]" />
+                  <span className="h-2 w-2 rounded-full bg-[#C8ACD6]" />
 
-                  <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#E0DDCF]/50">
+                  <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#C8ACD6]/50">
                     Live business context
                   </span>
                 </div>
 
-                <span className="text-[9px] uppercase tracking-[0.16em] text-[#E0DDCF]/25">
+                <span className="text-[9px] uppercase tracking-[0.16em] text-[#C8ACD6]/25">
                   Nexora
                 </span>
               </div>
 
               {/* Main content */}
-              <div key={active.id} className="mt-12 max-w-2xl nexora-content-enter">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#F1F0EA]/10 bg-[#F1F0EA]/5">
-                  <ActiveIcon className="h-5 w-5 text-[#E0DDCF]" />
+              <div className="mt-12 max-w-2xl">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#F1F0F8]/10 bg-[#F1F0F8]/5">
+                  <ActiveIcon className="h-5 w-5 text-[#C8ACD6]" />
                 </div>
 
-                <p className="mt-7 text-[10px] font-medium uppercase tracking-[0.18em] text-[#E0DDCF]/40">
+                <p className="mt-7 text-[10px] font-medium uppercase tracking-[0.18em] text-[#C8ACD6]/40">
                   {active.question}
                 </p>
 
-                <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#F1F0EA] sm:text-4xl">
+                <h3 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#F1F0F8] sm:text-4xl">
                   {active.title}.
                 </h3>
 
-                <p className="mt-4 max-w-xl text-sm leading-6 text-[#E0DDCF]/55 sm:text-base">
+                <p className="mt-4 max-w-xl text-sm leading-6 text-[#C8ACD6]/55 sm:text-base">
                   {active.description}
                 </p>
               </div>
 
               {/* Insight card */}
-              <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-[#F1F0EA]/10 bg-[#F1F0EA]/[0.055] p-5 sm:bottom-8 sm:left-8 sm:right-8">
+              <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-[#F1F0F8]/10 bg-[#F1F0F8]/[0.055] p-5 sm:bottom-8 sm:left-8 sm:right-8">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E0DDCF]/10">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#C8ACD6]/10">
                     {activeStage === "understand" && (
-                      <Search className="h-4 w-4 text-[#E0DDCF]" />
+                      <Search className="h-4 w-4 text-[#C8ACD6]" />
                     )}
 
                     {activeStage === "explain" && (
-                      <Brain className="h-4 w-4 text-[#E0DDCF]" />
+                      <Brain className="h-4 w-4 text-[#C8ACD6]" />
                     )}
 
                     {activeStage === "predict" && (
-                      <TrendingUp className="h-4 w-4 text-[#E0DDCF]" />
+                      <TrendingUp className="h-4 w-4 text-[#C8ACD6]" />
                     )}
 
                     {activeStage === "decide" && (
-                      <Target className="h-4 w-4 text-[#E0DDCF]" />
+                      <Target className="h-4 w-4 text-[#C8ACD6]" />
                     )}
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-[9px] font-medium uppercase tracking-[0.15em] text-[#E0DDCF]/40">
+                    <p className="text-[9px] font-medium uppercase tracking-[0.15em] text-[#C8ACD6]/40">
                       Nexora noticed
                     </p>
 
-                    <p className="mt-1 text-sm leading-5 text-[#F1F0EA]/85">
+                    <p className="mt-1 text-sm leading-5 text-[#F1F0F8]/85">
                       {active.insight}
                     </p>
                   </div>
 
-                  <ArrowRight className="ml-auto mt-1 h-4 w-4 shrink-0 text-[#E0DDCF]/35" />
+                  <ArrowRight className="ml-auto mt-1 h-4 w-4 shrink-0 text-[#C8ACD6]/35" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Bottom status */}
-          <div className="flex flex-col gap-3 border-t border-[#F1F0EA]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+          <div className="flex flex-col gap-3 border-t border-[#F1F0F8]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
             <div className="flex items-center gap-2">
-              <CircleAlert className="h-3.5 w-3.5 text-[#E0DDCF]/45" />
+              <CircleAlert className="h-3.5 w-3.5 text-[#C8ACD6]/45" />
 
-              <span className="text-[10px] text-[#E0DDCF]/45">
+              <span className="text-[10px] text-[#C8ACD6]/45">
                 Nexora continuously connects signals across your business.
               </span>
             </div>
 
             <a
               href="#business-types"
-              className="group inline-flex items-center gap-2 text-[10px] font-medium text-[#E0DDCF]/65 transition hover:text-[#F1F0EA]"
+              className="group inline-flex items-center gap-2 text-[10px] font-medium text-[#C8ACD6]/65 transition hover:text-[#F1F0F8]"
             >
               Explore connected business areas
 
@@ -273,9 +273,9 @@ export default function BrainSection() {
           ].map((item) => (
             <div
               key={item}
-              className="flex items-center gap-2 text-xs text-[#E0DDCF]/55"
+              className="flex items-center gap-2 text-xs text-[#C8ACD6]/55"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#E0DDCF]/50" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#C8ACD6]/50" />
 
               {item}
             </div>

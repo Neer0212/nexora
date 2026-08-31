@@ -1,25 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --nexora-shadow: #2D232E;
-  --nexora-gunmetal: #474448;
-  --nexora-taupe: #534B52;
-  --nexora-bone: #E0DDCF;
-  --nexora-parchment: #F1F0EA;
+  --nexora-ink: #17153B;
+  --nexora-indigo: #2E236C;
+  --nexora-accent: #433D8B;
+  --nexora-lavender: #C8ACD6;
+  --nexora-background: #F1F0F8;
+  --nexora-surface: #FFFFFF;
+  --nexora-border: #E7E4EF;
+  --nexora-muted: #68647A;
+  --nexora-success: #3C8F70;
+  --nexora-warning: #C58A3A;
+  --nexora-danger: #B85454;
 
-  --background: var(--nexora-parchment);
-  --foreground: var(--nexora-shadow);
+  --background: var(--nexora-background);
+  --foreground: var(--nexora-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --color-nexora-shadow: var(--nexora-shadow);
-  --color-nexora-gunmetal: var(--nexora-gunmetal);
-  --color-nexora-taupe: var(--nexora-taupe);
-  --color-nexora-bone: var(--nexora-bone);
-  --color-nexora-parchment: var(--nexora-parchment);
+  --color-nexora-ink: var(--nexora-ink);
+  --color-nexora-indigo: var(--nexora-indigo);
+  --color-nexora-accent: var(--nexora-accent);
+  --color-nexora-lavender: var(--nexora-lavender);
+  --color-nexora-background: var(--nexora-background);
+  --color-nexora-surface: var(--nexora-surface);
+  --color-nexora-border: var(--nexora-border);
+  --color-nexora-muted: var(--nexora-muted);
+  --color-nexora-success: var(--nexora-success);
+  --color-nexora-warning: var(--nexora-warning);
+  --color-nexora-danger: var(--nexora-danger);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -30,10 +42,11 @@ html {
 }
 
 body {
-  background: var(--nexora-parchment);
-  color: var(--nexora-shadow);
+  background: var(--nexora-background);
+  color: var(--nexora-ink);
   margin: 0;
 }
+
 .nexora-content-enter {
   animation: nexora-content-enter 220ms ease-out;
 }

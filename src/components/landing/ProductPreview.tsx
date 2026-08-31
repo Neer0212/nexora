@@ -12,31 +12,31 @@ export default function ProductPreview() {
             id="product"
             className="mx-auto max-w-7xl px-6 pt-20"
         >
-            <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-slate-50 p-2 shadow-2xl shadow-slate-900/10">
-                <div className="rounded-[22px] border border-slate-200 bg-white">
-                    <div className="flex h-12 items-center justify-between border-b border-slate-200 px-5">
+            <div className="relative overflow-hidden rounded-[28px] border border-[#E7E4EF] bg-[#F1F0F8] p-2 shadow-2xl shadow-[#17153B]/10">
+                <div className="rounded-[22px] border border-[#E7E4EF] bg-[#FFFFFF]">
+                    <div className="flex h-12 items-center justify-between border-b border-[#E7E4EF] px-5">
                         <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-slate-300" />
-                            <span className="text-xs font-medium text-slate-500">
+                            <div className="h-2 w-2 rounded-full bg-[#D9D5E4]" />
+                            <span className="text-xs font-medium text-[#68647A]">
                                 Business Overview
                             </span>
                         </div>
 
-                        <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
+                        <span className="text-[10px] font-medium uppercase tracking-wider text-[#9A94A8]">
                             Nexora
                         </span>
                     </div>
 
                     <div className="grid lg:grid-cols-[190px_1fr]">
-                        <aside className="hidden border-r border-slate-200 p-4 lg:block">
+                        <aside className="hidden border-r border-[#E7E4EF] p-4 lg:block">
                             <div className="mb-5 flex items-center gap-2">
-                                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-950">
-                                    <span className="text-[10px] font-semibold text-white">
+                                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#12102F]">
+                                    <span className="text-[10px] font-semibold text-[#FFFFFF]">
                                         N
                                     </span>
                                 </div>
 
-                                <span className="text-xs font-semibold text-slate-900">
+                                <span className="text-xs font-semibold text-[#17153B]">
                                     nexora
                                 </span>
                             </div>
@@ -55,8 +55,8 @@ export default function ProductPreview() {
                                         className={[
                                             "rounded-md px-2.5 py-2 text-[10px]",
                                             index === 0
-                                                ? "bg-slate-100 font-medium text-slate-900"
-                                                : "text-slate-400",
+                                                ? "bg-[#F0EEF6] font-medium text-[#17153B]"
+                                                : "text-[#9A94A8]",
                                         ].join(" ")}
                                     >
                                         {item}
@@ -68,17 +68,17 @@ export default function ProductPreview() {
                         <div className="p-5 sm:p-7">
                             <div className="flex items-end justify-between">
                                 <div>
-                                    <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                                    <p className="text-[10px] uppercase tracking-wider text-[#9A94A8]">
                                         BUSINESS OVERVIEWs
                                     </p>
 
-                                    <h3 className="mt-1 text-xl font-semibold tracking-tight text-slate-950">
+                                    <h3 className="mt-1 text-xl font-semibold tracking-tight text-[#12102F]">
                                         Good morning.
                                     </h3>
                                 </div>
 
-                                <div className="hidden items-center gap-1.5 rounded-md border border-slate-200 px-2.5 py-1.5 sm:flex">
-                                    <span className="text-[10px] text-slate-500">
+                                <div className="hidden items-center gap-1.5 rounded-md border border-[#E7E4EF] px-2.5 py-1.5 sm:flex">
+                                    <span className="text-[10px] text-[#68647A]">
                                         Last 30 days
                                     </span>
                                 </div>
@@ -95,13 +95,13 @@ export default function ProductPreview() {
                                 ).map(([label, value, change, positive]) => (
                                     <div
                                         key={label}
-                                        className="rounded-xl border border-slate-200 p-4"
+                                        className="rounded-xl border border-[#E7E4EF] p-4"
                                     >
-                                        <p className="text-[10px] text-slate-400">
+                                        <p className="text-[10px] text-[#9A94A8]">
                                             {label}
                                         </p>
 
-                                        <p className="mt-2 text-lg font-semibold tracking-tight text-slate-950">
+                                        <p className="mt-2 text-lg font-semibold tracking-tight text-[#12102F]">
                                             {value}
                                         </p>
 
@@ -112,7 +112,7 @@ export default function ProductPreview() {
                                                 <ArrowDownRight className="h-3 w-3 text-amber-600" />
                                             )}
 
-                                            <span className="text-[10px] font-medium text-slate-500">
+                                            <span className="text-[10px] font-medium text-[#68647A]">
                                                 {change}
                                             </span>
                                         </div>
@@ -121,18 +121,18 @@ export default function ProductPreview() {
                             </div>
 
                             <div className="mt-3 grid gap-3 lg:grid-cols-[1.45fr_0.8fr]">
-                                <div className="rounded-xl border border-slate-200 p-4">
+                                <div className="rounded-xl border border-[#E7E4EF] p-4">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-xs font-medium text-slate-900">
+                                            <p className="text-xs font-medium text-[#17153B]">
                                                 Revenue trend
                                             </p>
-                                            <p className="mt-0.5 text-[10px] text-slate-400">
+                                            <p className="mt-0.5 text-[10px] text-[#9A94A8]">
                                                 Compared with previous period
                                             </p>
                                         </div>
 
-                                        <BarChart3 className="h-4 w-4 text-slate-300" />
+                                        <BarChart3 className="h-4 w-4 text-[#D9D5E4]" />
                                     </div>
 
                                     <div className="mt-5 flex h-32 items-end gap-1.5">
@@ -140,7 +140,7 @@ export default function ProductPreview() {
                                             (height, index) => (
                                                 <div
                                                     key={index}
-                                                    className="flex-1 rounded-t-sm bg-slate-200"
+                                                    className="flex-1 rounded-t-sm bg-[#E7E4EF]"
                                                     style={{ height: `${height}%` }}
                                                 />
                                             )
@@ -148,21 +148,21 @@ export default function ProductPreview() {
                                     </div>
                                 </div>
 
-                                <div className="rounded-xl border border-slate-200 p-4">
+                                <div className="rounded-xl border border-[#E7E4EF] p-4">
                                     <div className="flex items-center gap-2">
                                         <Sparkles className="h-4 w-4 text-blue-600" />
 
-                                        <p className="text-xs font-medium text-slate-900">
+                                        <p className="text-xs font-medium text-[#17153B]">
                                             Nexora noticed
                                         </p>
                                     </div>
 
-                                    <p className="mt-4 text-sm font-medium leading-5 text-slate-900">
+                                    <p className="mt-4 text-sm font-medium leading-5 text-[#17153B]">
                                         Inventory exposure has fallen 4.2% while revenue is
                                         growing.
                                     </p>
 
-                                    <p className="mt-2 text-[10px] leading-4 text-slate-400">
+                                    <p className="mt-2 text-[10px] leading-4 text-[#9A94A8]">
                                         Driven primarily by faster movement in three high-value
                                         products.
                                     </p>
@@ -174,16 +174,16 @@ export default function ProductPreview() {
                                 </div>
                             </div>
 
-                            <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <div className="mt-3 rounded-xl border border-[#E7E4EF] bg-[#F1F0F8] p-4">
                                 <div className="flex items-start gap-3">
                                     <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
 
                                     <div>
-                                        <p className="text-xs font-medium text-slate-900">
+                                        <p className="text-xs font-medium text-[#17153B]">
                                             One thing worth watching
                                         </p>
 
-                                        <p className="mt-1 text-[10px] leading-4 text-slate-500">
+                                        <p className="mt-1 text-[10px] leading-4 text-[#68647A]">
                                             Supplier lead time increased by 2.4 days this week,
                                             affecting two products with low remaining stock.
                                         </p>
