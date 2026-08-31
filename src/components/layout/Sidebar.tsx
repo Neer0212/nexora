@@ -35,12 +35,22 @@ const navigation = [
     href: "/analytics",
     icon: BarChart3,
   },
-  {
+    {
     label: "Finance",
     href: "/finance",
     icon: TrendingUp,
   },
   {
+    label: "Operations",
+    href: "/operations",
+    icon: Activity,
+  },
+  {
+    label: "Intelligence",
+    href: "/intelligence",
+    icon: Sparkles,
+  },
+{
     label: "Data Hub",
     href: "/data-hub",
     icon: Database,
