@@ -36,6 +36,11 @@ const navigation = [
     icon: BarChart3,
   },
   {
+    label: "Finance",
+    href: "/finance",
+    icon: TrendingUp,
+  },
+  {
     label: "Data Hub",
     href: "/data-hub",
     icon: Database,
