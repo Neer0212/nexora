@@ -3,42 +3,29 @@
 import Link from "next/link"
 import {
   ArrowRight,
+  BarChart3,
   Brain,
   CircleAlert,
-  Clock3,
   Database,
   Package,
+  RotateCcw,
   ShoppingCart,
   Sparkles,
-  Truck,
   Users,
 } from "lucide-react"
 
-type TrendPoint = {
-  label: string
-  value: number
-}
-
-type RecentOrder = {
-  orderNumber: string
-  customer: string
-  amount: number
-  status: string
-  date: string
-}
-
-type EventItem = {
-  title: string
-  description: string | null
-  severity: string | null
-  occurredAt: string
-}
+type TrendPoint = { label: string; value: number }
+type RecentOrder = { orderNumber: string; customer: string; amount: number; status: string; date: string }
+type ProductPoint = { name: string; value: number }
+type Insight = { title: string; description: string; evidence: string }
 
 type DashboardData = {
   currencyCode: string
   hasData: boolean
   revenue: number
   ordersCount: number
+  unitsSold: number
+  averageOrderValue: number
   inventoryValue: number
   inventoryCount: number
   lowStockCount: number
@@ -48,548 +35,157 @@ type DashboardData = {
   readyDatasetCount: number
   trend: TrendPoint[]
   recentOrders: RecentOrder[]
-  events: EventItem[]
+  events: never[]
+  topProducts: ProductPoint[]
+  returnsCount: number
+  insight: Insight
 }
 
-function formatCurrency(value: number, currency: string) {
+function currency(value: number, code: string) {
   try {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(value)
+    return new Intl.NumberFormat("en-IN", { style: "currency", currency: code, maximumFractionDigits: 0 }).format(value)
   } catch {
-    return `${currency} ${Math.round(value).toLocaleString("en-IN")}`
+    return `${code} ${Math.round(value).toLocaleString("en-IN")}`
   }
 }
 
-function formatCompactCurrency(value: number, currency: string) {
-  const symbol = currency === "INR" ? "₹" : `${currency} `
-
-  if (Math.abs(value) >= 10000000) {
-    return `${symbol}${(value / 10000000).toFixed(1)}Cr`
-  }
-
-  if (Math.abs(value) >= 100000) {
-    return `${symbol}${(value / 100000).toFixed(1)}L`
-  }
-
-  if (Math.abs(value) >= 1000) {
-    return `${symbol}${(value / 1000).toFixed(1)}K`
-  }
-
+function compactCurrency(value: number, code: string) {
+  const symbol = code === "INR" ? "₹" : `${code} `
+  if (Math.abs(value) >= 10000000) return `${symbol}${(value / 10000000).toFixed(1)}Cr`
+  if (Math.abs(value) >= 100000) return `${symbol}${(value / 100000).toFixed(1)}L`
+  if (Math.abs(value) >= 1000) return `${symbol}${(value / 1000).toFixed(1)}K`
   return `${symbol}${Math.round(value).toLocaleString("en-IN")}`
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-IN", {
-    day: "2-digit",
-    month: "short",
-  }).format(new Date(`${value}T00:00:00`))
+function dateLabel(value: string) {
+  return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short" }).format(new Date(`${value}T00:00:00`))
 }
 
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-IN", {
-    day: "2-digit",
-    month: "short",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(value))
-}
-
-function StatusPill({ status }: { status: string }) {
-  const normalized = status.toLowerCase()
-
+function Metric({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: React.ElementType }) {
   return (
-    <span className="rounded-full bg-[#E0DDCF]/60 px-2 py-1 text-[9px] font-medium capitalize text-[#474448]">
-      {normalized}
-    </span>
+    <div className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] transition hover:-translate-y-0.5">
+      <div className="flex items-center justify-between">
+        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">{label}</p>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F0F8] text-[#433D8B]"><Icon className="h-4 w-4" /></div>
+      </div>
+      <p className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-[#17153B]">{value}</p>
+      <p className="mt-1 text-[10px] text-[#68647A]">{detail}</p>
+    </div>
   )
 }
 
 export default function DashboardOverview({ data }: { data: DashboardData }) {
   const maxTrend = Math.max(...data.trend.map((point) => point.value), 1)
+  const maxProduct = Math.max(...data.topProducts.map((product) => product.value), 1)
 
   return (
-    <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      {/* Page heading */}
+    <div className="w-full">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#534B52]" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#534B52]/55">
-              Business overview
-            </p>
-          </div>
-
-          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-[#2D232E] sm:text-4xl">
-            See what&apos;s happening.
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#534B52]/65">
-            A connected view of the signals currently available across your
-            business.
-          </p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">Live business intelligence</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#17153B] sm:text-4xl">See what&apos;s happening.</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#68647A]">These numbers are calculated from the business data connected to Nexora.</p>
         </div>
-
-        <Link
-          href="/brain"
-          className="group inline-flex w-fit items-center gap-2 rounded-xl bg-[#2D232E] px-4 py-2.5 text-xs font-medium text-[#F1F0EA] transition hover:bg-[#474448]"
-        >
-          Open Business Brain
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+        <Link href="/data-hub" className="group inline-flex w-fit items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#2E236C]">
+          Connect more data <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
 
-      {/* Empty-state / data status */}
       {!data.hasData && (
-        <section className="mt-7 rounded-2xl border border-[#534B52]/12 bg-white p-5 shadow-[0_12px_35px_rgba(45,35,46,0.04)] sm:p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E0DDCF]/65">
-              <Database className="h-5 w-5 text-[#474448]" />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-[#2D232E]">
-                Your workspace is ready for data.
-              </p>
-
-              <p className="mt-1 max-w-2xl text-xs leading-5 text-[#534B52]/60">
-                These numbers are connected directly to your Supabase business
-                data. Once orders, inventory, customers, suppliers, or datasets
-                are added, the overview will populate automatically.
-              </p>
-            </div>
-
-            <div className="shrink-0 rounded-xl border border-[#534B52]/10 bg-[#F1F0EA]/60 px-3 py-2 text-[10px] text-[#534B52]/60">
-              No demo data
+        <section className="mt-7 rounded-2xl border border-[#C8ACD6]/40 bg-white p-6">
+          <div className="flex gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C8ACD6]/25 text-[#433D8B]"><Database className="h-5 w-5" /></div>
+            <div>
+              <p className="text-sm font-semibold text-[#17153B]">Your workspace is waiting for its first dataset.</p>
+              <p className="mt-1 text-xs leading-5 text-[#68647A]">Connect an orders, inventory, customer or supplier dataset and Nexora will start calculating business signals.</p>
             </div>
           </div>
         </section>
       )}
 
-      {/* KPI cards */}
       <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          label="Revenue · 60 days"
-          value={
-            data.revenue
-              ? formatCompactCurrency(data.revenue, data.currencyCode)
-              : "—"
-          }
-          detail={
-            data.ordersCount
-              ? `${data.ordersCount.toLocaleString("en-IN")} orders`
-              : "Waiting for orders"
-          }
-          icon={ShoppingCart}
-        />
-
-        <MetricCard
-          label="Inventory value"
-          value={
-            data.inventoryValue
-              ? formatCompactCurrency(data.inventoryValue, data.currencyCode)
-              : "—"
-          }
-          detail={
-            data.inventoryCount
-              ? `${data.inventoryCount.toLocaleString("en-IN")} stock records`
-              : "Waiting for inventory"
-          }
-          icon={Package}
-        />
-
-        <MetricCard
-          label="Suppliers"
-          value={data.suppliersCount ? data.suppliersCount.toLocaleString("en-IN") : "—"}
-          detail={
-            data.suppliersCount
-              ? `${data.lowStockCount} low-stock items need attention`
-              : "Waiting for suppliers"
-          }
-          icon={Truck}
-        />
-
-        <MetricCard
-          label="Customers"
-          value={data.customersCount ? data.customersCount.toLocaleString("en-IN") : "—"}
-          detail={
-            data.datasetCount
-              ? `${data.readyDatasetCount} of ${data.datasetCount} datasets ready`
-              : "Waiting for customer data"
-          }
-          icon={Users}
-        />
+        <Metric label="Revenue" value={data.revenue ? compactCurrency(data.revenue, data.currencyCode) : "—"} detail={data.ordersCount ? `${data.ordersCount.toLocaleString("en-IN")} completed orders` : "Waiting for order data"} icon={ShoppingCart} />
+        <Metric label="Units sold" value={data.unitsSold ? data.unitsSold.toLocaleString("en-IN") : "—"} detail={data.unitsSold ? "From connected order rows" : "Waiting for quantity data"} icon={BarChart3} />
+        <Metric label="Average order value" value={data.averageOrderValue ? currency(data.averageOrderValue, data.currencyCode) : "—"} detail={data.ordersCount ? "Revenue ÷ completed orders" : "Waiting for orders"} icon={Sparkles} />
+        <Metric label="Customers" value={data.customersCount ? data.customersCount.toLocaleString("en-IN") : "—"} detail={data.customersCount ? "Unique customers in orders" : "Waiting for customer data"} icon={Users} />
       </section>
 
-      {/* Main grid */}
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.45fr_0.75fr]">
-        {/* Revenue trend */}
-        <section className="overflow-hidden rounded-2xl border border-[#534B52]/10 bg-white shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="flex items-start justify-between border-b border-[#534B52]/10 px-5 py-5 sm:px-6">
-            <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#534B52]/45">
-                Revenue movement
-              </p>
-              <h2 className="mt-1 text-sm font-semibold text-[#2D232E]">
-                Last 30 days
-              </h2>
-            </div>
-
-            <div className="rounded-lg bg-[#F1F0EA] px-2.5 py-1.5 text-[9px] text-[#534B52]/55">
-              Live from orders
-            </div>
+        <section className="overflow-hidden rounded-2xl border border-[#E7E4EF] bg-white shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+          <div className="flex items-start justify-between border-b border-[#E7E4EF] px-5 py-5 sm:px-6">
+            <div><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">Revenue movement</p><h2 className="mt-1 text-sm font-semibold text-[#17153B]">Last 30 days</h2></div>
+            <span className="rounded-lg bg-[#F1F0F8] px-2.5 py-1.5 text-[9px] text-[#433D8B]">Live</span>
           </div>
-
           <div className="px-5 pb-5 pt-7 sm:px-6 sm:pb-6">
             {data.trend.some((point) => point.value > 0) ? (
               <>
                 <div className="flex h-52 items-end gap-1 sm:gap-1.5">
-                  {data.trend.map((point, index) => {
-                    const height = Math.max((point.value / maxTrend) * 100, 3)
-
-                    return (
-                      <div
-                        key={`${point.label}-${index}`}
-                        className="group flex h-full min-w-0 flex-1 flex-col justify-end"
-                        title={`${point.label}: ${formatCurrency(point.value, data.currencyCode)}`}
-                      >
-                        <div
-                          className="w-full rounded-t-md bg-[#534B52]/30 transition-colors group-hover:bg-[#2D232E]"
-                          style={{ height: `${height}%` }}
-                        />
-                      </div>
-                    )
-                  })}
+                  {data.trend.map((point, index) => (
+                    <div key={`${point.label}-${index}`} className="group flex h-full min-w-0 flex-1 flex-col justify-end" title={`${point.label}: ${currency(point.value, data.currencyCode)}`}>
+                      <div className="w-full rounded-t-md bg-[#433D8B]/55 transition group-hover:bg-[#2E236C]" style={{ height: `${Math.max((point.value / maxTrend) * 100, 3)}%` }} />
+                    </div>
+                  ))}
                 </div>
-
-                <div className="mt-3 flex justify-between text-[8px] uppercase tracking-[0.12em] text-[#534B52]/35">
-                  <span>{data.trend[0]?.label}</span>
-                  <span>{data.trend[data.trend.length - 1]?.label}</span>
-                </div>
+                <div className="mt-3 flex justify-between text-[8px] uppercase tracking-[0.12em] text-[#68647A]"><span>{data.trend[0]?.label}</span><span>{data.trend.at(-1)?.label}</span></div>
               </>
             ) : (
-              <EmptyPanel
-                icon={ShoppingCart}
-                title="No revenue movement yet"
-                description="Add orders to start seeing the business trend here."
-              />
+              <div className="flex min-h-52 items-center justify-center rounded-xl border border-dashed border-[#E7E4EF] bg-[#F1F0F8]/60 text-center"><p className="text-xs text-[#68647A]">Connect an orders dataset to see revenue movement.</p></div>
             )}
           </div>
         </section>
 
-        {/* Attention */}
-        <section className="rounded-2xl border border-[#534B52]/10 bg-white shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="border-b border-[#534B52]/10 px-5 py-5 sm:px-6">
-            <div className="flex items-center gap-2">
-              <CircleAlert className="h-4 w-4 text-[#534B52]" />
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#534B52]/45">
-                Needs attention
-              </p>
+        <section className="rounded-2xl border border-[#E7E4EF] bg-white shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+          <div className="border-b border-[#E7E4EF] px-5 py-5"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">Nexora&apos;s read</p><h2 className="mt-1 text-sm font-semibold text-[#17153B]">What stands out</h2></div>
+          <div className="p-5">
+            <div className="rounded-xl bg-[#17153B] p-5 text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#C8ACD6]/20 text-[#C8ACD6]"><Brain className="h-4 w-4" /></div>
+              <h3 className="mt-4 text-sm font-semibold leading-5">{data.insight.title}</h3>
+              <p className="mt-2 text-[10px] leading-5 text-white/65">{data.insight.description}</p>
+              <div className="mt-4 border-t border-white/10 pt-3 text-[9px] text-[#C8ACD6]">{data.insight.evidence}</div>
             </div>
-            <h2 className="mt-1 text-sm font-semibold text-[#2D232E]">
-              Signals worth watching
-            </h2>
-          </div>
-
-          <div className="p-5 sm:p-6">
-            <AttentionItem
-              icon={Package}
-              title="Low stock"
-              value={data.lowStockCount.toLocaleString("en-IN")}
-              description={
-                data.lowStockCount
-                  ? "Inventory records are at or below their reorder level."
-                  : "No low-stock records detected."
-              }
-              href="/inventory"
-            />
-
-            <AttentionItem
-              icon={Truck}
-              title="Suppliers"
-              value={data.suppliersCount.toLocaleString("en-IN")}
-              description={
-                data.suppliersCount
-                  ? "Supplier records available for analysis."
-                  : "No supplier records yet."
-              }
-              href="/suppliers"
-            />
-
-            <AttentionItem
-              icon={Database}
-              title="Data readiness"
-              value={`${data.readyDatasetCount}/${data.datasetCount}`}
-              description={
-                data.datasetCount
-                  ? "Datasets marked ready in your workspace."
-                  : "No datasets have been connected yet."
-              }
-              href="/dashboard"
-              last
-            />
           </div>
         </section>
       </div>
 
-      {/* Lower grid */}
-      <div className="mt-5 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-        {/* Recent orders */}
-        <section className="overflow-hidden rounded-2xl border border-[#534B52]/10 bg-white shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="flex items-center justify-between border-b border-[#534B52]/10 px-5 py-5 sm:px-6">
-            <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#534B52]/45">
-                Activity
-              </p>
-              <h2 className="mt-1 text-sm font-semibold text-[#2D232E]">
-                Recent orders
-              </h2>
+      <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr]">
+        <section className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+          <div className="flex items-center justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">Products</p><h2 className="mt-1 text-sm font-semibold text-[#17153B]">Top revenue drivers</h2></div><Package className="h-4 w-4 text-[#433D8B]" /></div>
+          {data.topProducts.length ? (
+            <div className="mt-5 space-y-4">
+              {data.topProducts.map((product, index) => (
+                <div key={product.name}>
+                  <div className="flex items-center justify-between gap-3 text-xs"><span className="min-w-0 truncate font-medium text-[#17153B]">{index + 1}. {product.name}</span><span className="shrink-0 text-[#68647A]">{compactCurrency(product.value, data.currencyCode)}</span></div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F1F0F8]"><div className="h-full rounded-full bg-[#433D8B]" style={{ width: `${(product.value / maxProduct) * 100}%` }} /></div>
+                </div>
+              ))}
             </div>
-
-            <Link
-              href="/analytics"
-              className="group flex items-center gap-1 text-[10px] font-medium text-[#534B52] hover:text-[#2D232E]"
-            >
-              View all
-              <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-
-          {data.recentOrders.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[620px] text-left">
-                <thead>
-                  <tr className="border-b border-[#534B52]/10 text-[9px] uppercase tracking-[0.12em] text-[#534B52]/40">
-                    <th className="px-5 py-3 font-medium sm:px-6">Order</th>
-                    <th className="px-5 py-3 font-medium">Customer</th>
-                    <th className="px-5 py-3 font-medium">Date</th>
-                    <th className="px-5 py-3 text-right font-medium">Amount</th>
-                    <th className="px-5 py-3 text-right font-medium">Status</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {data.recentOrders.map((order) => (
-                    <tr
-                      key={order.orderNumber}
-                      className="border-b border-[#534B52]/[0.06] last:border-0"
-                    >
-                      <td className="px-5 py-4 text-xs font-medium text-[#2D232E] sm:px-6">
-                        {order.orderNumber}
-                      </td>
-                      <td className="px-5 py-4 text-xs text-[#534B52]/70">
-                        {order.customer}
-                      </td>
-                      <td className="px-5 py-4 text-xs text-[#534B52]/55">
-                        {formatDate(order.date)}
-                      </td>
-                      <td className="px-5 py-4 text-right text-xs font-medium text-[#2D232E]">
-                        {formatCurrency(order.amount, data.currencyCode)}
-                      </td>
-                      <td className="px-5 py-4 text-right">
-                        <StatusPill status={order.status} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="p-6">
-              <EmptyPanel
-                icon={ShoppingCart}
-                title="No orders yet"
-                description="Once orders are connected, recent activity will appear here."
-              />
-            </div>
-          )}
+          ) : <Empty text="Product-level revenue will appear when Nexora detects a product field." />}
         </section>
 
-        {/* Business activity */}
-        <section className="rounded-2xl border border-[#534B52]/10 bg-white shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="border-b border-[#534B52]/10 px-5 py-5 sm:px-6">
-            <div className="flex items-center gap-2">
-              <Clock3 className="h-4 w-4 text-[#534B52]" />
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#534B52]/45">
-                Business events
-              </p>
-            </div>
-            <h2 className="mt-1 text-sm font-semibold text-[#2D232E]">
-              What&apos;s changing
-            </h2>
-          </div>
-
-          <div className="p-5 sm:p-6">
-            {data.events.length > 0 ? (
-              <div className="space-y-4">
-                {data.events.map((event, index) => (
-                  <div key={`${event.occurredAt}-${index}`} className="flex gap-3">
-                    <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E0DDCF]/55">
-                      <Sparkles className="h-3.5 w-3.5 text-[#534B52]" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-[#2D232E]">
-                        {event.title}
-                      </p>
-
-                      {event.description && (
-                        <p className="mt-1 text-[10px] leading-5 text-[#534B52]/55">
-                          {event.description}
-                        </p>
-                      )}
-
-                      <p className="mt-1 text-[9px] text-[#534B52]/35">
-                        {formatDateTime(event.occurredAt)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <EmptyPanel
-                icon={Sparkles}
-                title="No business events yet"
-                description="Nexora will surface meaningful events here as your business data grows."
-              />
-            )}
-          </div>
+        <section className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+          <div className="flex items-center justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">Order activity</p><h2 className="mt-1 text-sm font-semibold text-[#17153B]">Recent connected orders</h2></div><ShoppingCart className="h-4 w-4 text-[#433D8B]" /></div>
+          {data.recentOrders.length ? (
+            <div className="mt-4 overflow-x-auto"><table className="w-full min-w-[560px] text-left"><thead><tr className="border-b border-[#E7E4EF] text-[9px] uppercase tracking-[0.12em] text-[#68647A]"><th className="py-3">Order</th><th className="py-3">Customer</th><th className="py-3">Date</th><th className="py-3 text-right">Amount</th></tr></thead><tbody>{data.recentOrders.map((order) => <tr key={order.orderNumber} className="border-b border-[#E7E4EF]/60 last:border-0"><td className="py-3 text-xs font-medium text-[#17153B]">{order.orderNumber}</td><td className="py-3 text-xs text-[#68647A]">{order.customer}</td><td className="py-3 text-xs text-[#68647A]">{dateLabel(order.date)}</td><td className="py-3 text-right text-xs font-medium text-[#17153B]">{currency(order.amount, data.currencyCode)}</td></tr>)}</tbody></table></div>
+          ) : <Empty text="Recent orders will appear after an orders dataset is connected." />}
         </section>
       </div>
 
-      {/* Brain teaser */}
-      <section className="mt-5 overflow-hidden rounded-2xl bg-[#2D232E] p-5 text-[#F1F0EA] shadow-[0_18px_50px_rgba(45,35,46,0.12)] sm:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F1F0EA]/10">
-              <Brain className="h-5 w-5 text-[#E0DDCF]" />
-            </div>
-
-            <div>
-              <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-[#E0DDCF]/45">
-                Business Brain
-              </p>
-
-              <p className="mt-1 text-sm font-medium">
-                The more context Nexora has, the more useful its answers become.
-              </p>
-
-              <p className="mt-1 max-w-2xl text-[10px] leading-5 text-[#E0DDCF]/50">
-                Your dashboard shows the signals. Business Brain will connect
-                those signals and explain what they mean together.
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/brain"
-            className="group inline-flex shrink-0 items-center gap-2 rounded-xl border border-[#F1F0EA]/15 px-4 py-2.5 text-xs font-medium text-[#F1F0EA]/80 transition hover:bg-[#F1F0EA]/5 hover:text-[#F1F0EA]"
-          >
-            Explore Business Brain
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-          </Link>
+      <section className="mt-5 rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+        <div className="flex items-center gap-2"><CircleAlert className="h-4 w-4 text-[#433D8B]" /><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">Data signals</p></div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <Signal icon={Database} title="Connected datasets" value={String(data.datasetCount)} detail="Ready datasets in this workspace" />
+          <Signal icon={RotateCcw} title="Returns / cancellations" value={String(data.returnsCount)} detail="Rows excluded from revenue totals" />
+          <Signal icon={Brain} title="Business Brain" value="Ready" detail="Uses the same connected data context" />
         </div>
       </section>
     </div>
   )
 }
 
-function MetricCard({
-  label,
-  value,
-  detail,
-  icon: Icon,
-}: {
-  label: string
-  value: string
-  detail: string
-  icon: React.ElementType
-}) {
-  return (
-    <div className="rounded-2xl border border-[#534B52]/10 bg-white p-5 shadow-[0_12px_35px_rgba(45,35,46,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(45,35,46,0.07)]">
-      <div className="flex items-center justify-between">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#534B52]/45">
-          {label}
-        </p>
-
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E0DDCF]/55">
-          <Icon className="h-3.5 w-3.5 text-[#534B52]" />
-        </div>
-      </div>
-
-      <p className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-[#2D232E]">
-        {value}
-      </p>
-
-      <p className="mt-1 text-[10px] text-[#534B52]/50">{detail}</p>
-    </div>
-  )
+function Signal({ icon: Icon, title, value, detail }: { icon: React.ElementType; title: string; value: string; detail: string }) {
+  return <div className="rounded-xl border border-[#E7E4EF] bg-[#F1F0F8]/60 p-4"><div className="flex items-center gap-2 text-[#433D8B]"><Icon className="h-3.5 w-3.5" /><span className="text-[9px] font-semibold uppercase tracking-[0.12em]">{title}</span></div><p className="mt-3 text-lg font-semibold text-[#17153B]">{value}</p><p className="mt-1 text-[10px] leading-5 text-[#68647A]">{detail}</p></div>
 }
 
-function AttentionItem({
-  icon: Icon,
-  title,
-  value,
-  description,
-  href,
-  last = false,
-}: {
-  icon: React.ElementType
-  title: string
-  value: string
-  description: string
-  href: string
-  last?: boolean
-}) {
-  return (
-    <Link
-      href={href}
-      className={`group flex gap-3 py-4 transition hover:opacity-80 ${
-        last ? "" : "border-b border-[#534B52]/10"
-      }`}
-    >
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F1F0EA]">
-        <Icon className="h-3.5 w-3.5 text-[#534B52]" />
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-medium text-[#2D232E]">{title}</p>
-          <span className="text-sm font-semibold text-[#2D232E]">{value}</span>
-        </div>
-
-        <p className="mt-1 text-[10px] leading-5 text-[#534B52]/50">
-          {description}
-        </p>
-      </div>
-
-      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-[#534B52]/25 transition-transform group-hover:translate-x-0.5" />
-    </Link>
-  )
-}
-
-function EmptyPanel({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: React.ElementType
-  title: string
-  description: string
-}) {
-  return (
-    <div className="flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-[#534B52]/10 bg-[#F1F0EA]/35 px-5 text-center">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E0DDCF]/60">
-        <Icon className="h-3.5 w-3.5 text-[#534B52]" />
-      </div>
-
-      <p className="mt-3 text-xs font-medium text-[#2D232E]">{title}</p>
-
-      <p className="mt-1 max-w-xs text-[10px] leading-5 text-[#534B52]/50">
-        {description}
-      </p>
-    </div>
-  )
+function Empty({ text }: { text: string }) {
+  return <div className="mt-5 flex min-h-28 items-center justify-center rounded-xl border border-dashed border-[#E7E4EF] bg-[#F1F0F8]/55 px-5 text-center"><p className="text-[10px] leading-5 text-[#68647A]">{text}</p></div>
 }
