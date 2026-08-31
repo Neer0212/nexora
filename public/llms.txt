@@ -1,0 +1,19 @@
+# Nexora
+
+> Nexora is a business intelligence platform that connects business data, explains what is changing, and helps teams decide what to do next.
+
+## Product
+
+- Business overview: connected metrics and business signals.
+- Business Brain: explainable signals, risks, opportunities, and business context.
+- Data Hub: designed for importing business data and mapping it into useful business context.
+
+## Public pages
+
+- / — Product overview
+- /about — About Nexora
+- /contact — Contact Nexora
+
+## Product status
+
+Nexora is in product development. Public claims should be based only on information published on the Nexora website.

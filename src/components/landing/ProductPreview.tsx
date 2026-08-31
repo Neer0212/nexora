@@ -69,7 +69,7 @@ export default function ProductPreview() {
                             <div className="flex items-end justify-between">
                                 <div>
                                     <p className="text-[10px] uppercase tracking-wider text-[#9A94A8]">
-                                        BUSINESS OVERVIEWs
+                                        BUSINESS OVERVIEW
                                     </p>
 
                                     <h3 className="mt-1 text-xl font-semibold tracking-tight text-[#12102F]">

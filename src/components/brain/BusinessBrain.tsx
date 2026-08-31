@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
+import Breadcrumbs from "@/components/layout/Breadcrumbs"
 import {
   AlertTriangle,
   ArrowRight,
@@ -350,7 +351,9 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
   return (
     <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       {/* Header */}
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <Breadcrumbs items={[{ label: "Business overview", href: "/dashboard" }, { label: "Business Brain" }]} />
+
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[#433D8B]" />

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/server"
+import Breadcrumbs from "@/components/layout/Breadcrumbs"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -49,9 +50,9 @@ export default async function DashboardPage() {
               NEXORA
             </p>
 
-            <h1 className="mt-1 text-xl font-semibold text-[#17153B]">
+            <p className="mt-1 text-xl font-semibold text-[#17153B]">
               {business.name}
-            </h1>
+            </p>
           </div>
 
           <div className="text-right">
@@ -65,14 +66,16 @@ export default async function DashboardPage() {
       </header>
 
       <div className="mx-auto max-w-7xl px-6 py-10">
+        <Breadcrumbs items={[{ label: "Business overview" }]} />
+
         <div className="mb-10">
           <p className="text-sm font-medium text-blue-600">
             Business workspace
           </p>
 
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#17153B]">
-            Good to have you here.
-          </h2>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#17153B]">
+            Business overview
+          </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#68647A]">
             Nexora will turn your business data into a clearer picture of

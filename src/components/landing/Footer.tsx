@@ -8,8 +8,8 @@ const productLinks = [
 ]
 
 const companyLinks = [
-  { label: "About", href: "#" },
-  { label: "Contact", href: "#" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ]
 
 const accountLinks = [
@@ -77,14 +77,14 @@ export default function Footer() {
 
           <div className="flex items-center gap-5">
             <Link
-              href="#"
+              href="/privacy"
               className="text-[10px] text-[#C8ACD6]/35 transition hover:text-[#C8ACD6]/65"
             >
               Privacy
             </Link>
 
             <Link
-              href="#"
+              href="/terms"
               className="text-[10px] text-[#C8ACD6]/35 transition hover:text-[#C8ACD6]/65"
             >
               Terms

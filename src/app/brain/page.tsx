@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import type { Metadata } from "next"
 
 import BusinessBrain from "@/components/brain/BusinessBrain"
 import { createClient } from "@/lib/supabase/server"
@@ -82,6 +83,14 @@ function daysAgo(days: number) {
 
 function isCancelled(status: string) {
   return status.toLowerCase() === "cancelled"
+}
+
+export const metadata: Metadata = {
+  title: "Business Brain",
+  description:
+    "Understand the signals, risks, opportunities, and business context Nexora has identified from your connected data.",
+  alternates: { canonical: "/brain" },
+  robots: { index: false, follow: false },
 }
 
 export default async function BusinessBrainPage() {
