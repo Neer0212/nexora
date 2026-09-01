@@ -3,16 +3,15 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  Activity, BarChart3, Bell, Brain, Boxes, Building2, ChevronDown,
-  ClipboardCheck, Database, FileSearch, FileText, FolderKanban, Lightbulb,
-  MessageCircleQuestion, PackageSearch, Settings, Sparkles, Target, TrendingUp,
-  Users, Package, LineChart,
+  Activity, Bell, Brain, Boxes, Building2, ChevronDown,
+  ClipboardCheck, Database, FileSearch, FileText, FolderKanban,
+  MessageCircleQuestion, PackageSearch, Sparkles, Target, TrendingUp,
+  User, Users, Package, LineChart,
 } from "lucide-react"
 
 const navigation = [
   { label: "Overview", href: "/dashboard", icon: Activity },
   { label: "Business Brain", href: "/brain", icon: Brain },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Finance", href: "/finance", icon: TrendingUp },
   { label: "Operations", href: "/operations", icon: Activity },
   { label: "Intelligence", href: "/intelligence", icon: Sparkles },
@@ -33,8 +32,6 @@ const decide = [
   { label: "Alerts", href: "/alerts", icon: Bell },
   { label: "Ask Nexora", href: "/ask", icon: MessageCircleQuestion },
   { label: "Reports", href: "/reports", icon: FileText },
-  { label: "Simulator", href: "/simulator", icon: Sparkles },
-  { label: "Recommendations", href: "/recommendations", icon: Lightbulb },
 ]
 
 const intelligence = [
@@ -67,6 +64,6 @@ export default function Sidebar() {
       <Section label="Intelligence" items={intelligence} pathname={pathname} />
       <Section label="Decide" items={decide} pathname={pathname} />
     </div>
-    <div className="border-t border-[#E7E4EF] p-3"><NavItem href="/settings" label="Settings" icon={Settings} pathname={pathname} /></div>
+    <div className="border-t border-[#E7E4EF] p-3"><NavItem href="/profile" label="Profile" icon={User} pathname={pathname} /></div>
   </aside>
 }

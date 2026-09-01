@@ -174,7 +174,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
         icon: BarChart3,
         priority: "medium",
         evidence: ["No non-cancelled orders in the last 30 days"],
-        href: "/dashboard",
+        href: "/autopsy",
       })
     } else if (data.revenueChange !== null) {
       const direction = data.revenueChange >= 0 ? "up" : "down"
@@ -197,7 +197,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
           `Previous 30-day revenue: ${formatCurrency(data.previousRevenue, data.currencyCode)}`,
           `Current orders: ${data.currentOrdersCount.toLocaleString("en-IN")}`,
         ],
-        href: "/dashboard",
+        href: "/autopsy",
       })
     } else {
       result.push({
@@ -213,7 +213,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
           `Current 30-day revenue: ${formatCurrency(data.currentRevenue, data.currencyCode)}`,
           `Current orders: ${data.currentOrdersCount.toLocaleString("en-IN")}`,
         ],
-        href: "/dashboard",
+        href: "/autopsy",
       })
     }
 
@@ -303,7 +303,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
           `Quantity sold: ${topProduct.quantity.toLocaleString("en-IN")}`,
           topProduct.lowStock ? "Current inventory is at or below reorder level" : "No low-stock flag for this product",
         ],
-        href: "/inventory",
+        href: "/entities",
       })
     }
 
@@ -325,7 +325,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
             : "Confidence not recorded",
           recommendation.reason || "No reason recorded",
         ],
-        href: "/recommendations",
+        href: "/changes",
       })
     }
 

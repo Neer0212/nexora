@@ -1,9 +1,18 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import { CheckCircle2, Clock3, Lightbulb, RotateCcw } from "lucide-react"
 
 type Signal = { id: string; priority: "high" | "medium" | "low"; title: string; why: string; action: string; evidence: string }
+
+function getInvestigateLink(id: string) {
+  if (id.includes("inventory")) return "/inventory"
+  if (id.includes("supplier")) return "/suppliers"
+  if (id.includes("revenue")) return "/autopsy"
+  if (id.includes("returns")) return "/changes"
+  return "/changes"
+}
 type Props = { signals: Signal[]; businessName: string }
 
 export default function ActionsOverview({ signals, businessName }: Props) {
@@ -24,7 +33,7 @@ export default function ActionsOverview({ signals, businessName }: Props) {
             return <article key={signal.id} className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex gap-4"><div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${signal.priority === "high" ? "bg-[#17153B] text-white" : "bg-[#F0EEF6] text-[#433D8B]"}`}><Lightbulb className="h-5 w-5" /></div>
-                  <div><div className="flex flex-wrap items-center gap-2"><h2 className="text-base font-semibold text-[#17153B]">{signal.title}</h2><span className="rounded-full bg-[#F1F0F8] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-[#68647A]">{signal.priority}</span></div><p className="mt-2 text-sm leading-6 text-[#68647A]">{signal.why}</p><p className="mt-3 text-xs font-medium text-[#433D8B]">Evidence · {signal.evidence}</p></div>
+                  <div><div className="flex flex-wrap items-center gap-2"><h2 className="text-base font-semibold text-[#17153B]">{signal.title}</h2><span className="rounded-full bg-[#F1F0F8] px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-[#68647A]">{signal.priority}</span></div><p className="mt-2 text-sm leading-6 text-[#68647A]">{signal.why}</p><div className="mt-3 text-xs font-medium text-[#433D8B]">Evidence · {signal.evidence}</div><div className="mt-2"><Link href={getInvestigateLink(signal.id)} className="text-[13px] font-medium text-[#433D8B] hover:underline">Investigate →</Link></div></div>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
                   {current === "done" ? <button onClick={() => setStatus((v) => ({...v, [signal.id]: "new"}))} className="inline-flex items-center gap-2 rounded-lg border border-[#E7E4EF] px-3 py-2 text-xs text-[#68647A]"><RotateCcw className="h-3.5 w-3.5" /> Reopen</button> : <button onClick={() => setStatus((v) => ({...v, [signal.id]: "done"}))} className="inline-flex items-center gap-2 rounded-lg bg-[#17153B] px-3 py-2 text-xs font-medium text-white hover:bg-[#2E236C]"><CheckCircle2 className="h-3.5 w-3.5" /> Mark done</button>}

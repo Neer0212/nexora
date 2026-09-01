@@ -1,7 +1,31 @@
-import type { Metadata } from "next"
 import { redirect } from "next/navigation"
-import AppShell from "@/components/layout/AppShell"
-import InvestigateOverview from "@/components/investigate/InvestigateOverview"
-import { getInvestigateData } from "@/lib/investigate"
-export const metadata:Metadata={title:"Inventory",description:"Investigate inventory records and stock activity from connected business data.",robots:{index:false,follow:false}}
-export default async function Page(){let d;try{d=await getInvestigateData()}catch(e){if(e instanceof Error&&e.message==="AUTH_REQUIRED")redirect("/login");if(e instanceof Error&&e.message==="BUSINESS_REQUIRED")redirect("/onboarding");throw e}return <AppShell><InvestigateOverview kind="inventory" rows={d.rows} columns={d.columns} currencyCode={d.currencyCode}/></AppShell>}
+import { getWorkspaceData } from "@/lib/workspace-data"
+import { rowsForDomain } from "@/lib/dataset-utils"
+import { computeInventoryMetrics, computePeriodComparison } from "@/lib/business-metrics"
+import InventoryView from "@/components/investigate/InventoryView"
+
+export default async function InventoryPage() {
+  let result;
+  try {
+    result = await getWorkspaceData()
+  } catch (e: unknown) {
+    if (e instanceof Error && e.message === "AUTH_REQUIRED") redirect("/login")
+    if (e instanceof Error && e.message === "BUSINESS_REQUIRED") redirect("/onboarding")
+    throw e
+  }
+
+  const inventoryRows = rowsForDomain(result.rows, "inventory")
+  const salesRows = rowsForDomain(result.rows, "sales")
+  const inventoryMetrics = computeInventoryMetrics(inventoryRows)
+  const comparison = computePeriodComparison(salesRows)
+
+  const data = {
+    businessName: result.context.businessName,
+    currencyCode: result.context.currencyCode,
+    latestDate: comparison.latestDate,
+    datasets: result.datasets.map(d => d.name),
+    metrics: inventoryMetrics
+  }
+
+  return <InventoryView {...data} />
+}

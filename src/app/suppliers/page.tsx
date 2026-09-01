@@ -1,7 +1,43 @@
-import type { Metadata } from "next"
 import { redirect } from "next/navigation"
-import AppShell from "@/components/layout/AppShell"
-import InvestigateOverview from "@/components/investigate/InvestigateOverview"
-import { getInvestigateData } from "@/lib/investigate"
-export const metadata:Metadata={title:"Suppliers",description:"Investigate supplier-linked records and operational performance.",robots:{index:false,follow:false}}
-export default async function Page(){let d;try{d=await getInvestigateData()}catch(e){if(e instanceof Error&&e.message==="AUTH_REQUIRED")redirect("/login");if(e instanceof Error&&e.message==="BUSINESS_REQUIRED")redirect("/onboarding");throw e}return <AppShell><InvestigateOverview kind="suppliers" rows={d.rows} columns={d.columns} currencyCode={d.currencyCode}/></AppShell>}
+import { getWorkspaceData } from "@/lib/workspace-data"
+import { rowsForDomain } from "@/lib/dataset-utils"
+import { computeSupplierMetrics } from "@/lib/business-metrics"
+import SuppliersView from "@/components/investigate/SuppliersView"
+import Breadcrumbs from "@/components/layout/Breadcrumbs"
+
+export default async function SuppliersPage() {
+  let result
+  try {
+    result = await getWorkspaceData()
+  } catch (e: unknown) {
+    if (e instanceof Error && e.message === "AUTH_REQUIRED") redirect("/login")
+    if (e instanceof Error && e.message === "BUSINESS_REQUIRED") redirect("/onboarding")
+    throw e
+  }
+
+  const supplierRows = rowsForDomain(result.rows, "suppliers")
+  const metrics = computeSupplierMetrics(supplierRows)
+
+  const viewData = {
+    businessName: result.context.businessName,
+    currencyCode: result.context.currencyCode,
+    latestDate: null,
+    datasets: result.datasets.map((d) => d.name),
+    metrics,
+  }
+
+  return (
+    <div className="p-8 max-w-[1500px] mx-auto w-full">
+      <div className="mb-8">
+        <Breadcrumbs items={[{ label: "Investigate", href: "/dashboard" }, { label: "Suppliers", href: "/suppliers" }]} />
+      </div>
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-[#17153B] tracking-tight">Suppliers & Vendors</h1>
+        <p className="text-[#68647A] mt-2">Monitor supplier lead times, reliability, and risk across your supply chain.</p>
+      </div>
+
+      <SuppliersView data={viewData} />
+    </div>
+  )
+}
