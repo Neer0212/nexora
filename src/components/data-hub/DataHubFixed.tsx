@@ -1,15 +1,15 @@
 "use client"
 
 import { useCallback, useMemo, useRef, useState, useTransition } from "react"
-import { AlertCircle, Check, CheckCircle2, ChevronRight, FileSpreadsheet, Loader2, Upload, X, Trash2, LayoutGrid, Plus, Database } from "lucide-react"
+import { AlertCircle, Check, CheckCircle2, ChevronRight, FileSpreadsheet, Loader2, Upload, X, Trash2, LayoutGrid, Plus, Database, ShieldCheck } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { deleteDataset } from "@/app/data-hub/actions"
 import { useRouter } from "next/navigation"
 
 type Business = { id: string; name: string; currencyCode: string }
-type Dataset = { id: string; name: string; file_name: string | null; row_count: number | null; column_count: number | null; status: string; created_at: string; schema_definition?: any }
+type Dataset = { id: string; name: string; file_name: string | null; row_count: number | null; column_count: number | null; status: string; created_at: string; schema_definition?: any; quality_metrics?: any }
 type DatasetKind = "sales" | "products" | "inventory" | "suppliers" | "customers" | "finance" | "other"
-type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unknown>[]; rowCount: number; columnCount: number; kind: DatasetKind; included: boolean }
+type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unknown>[]; rowCount: number; columnCount: number; kind: DatasetKind; included: boolean; quality: any }
 
 const kinds: { value: DatasetKind; label: string; description: string }[] = [
   { value: "sales", label: "Sales / orders", description: "Orders, revenue and transactions" },
@@ -43,14 +43,30 @@ function shouldIncludeByDefault(sheetName: string) {
   return !/^(readme|read me|instructions|notes?)$/i.test(sheetName.trim())
 }
 
-function excelValue(value: unknown, header: string, XLSX: typeof import("xlsx")) {
-  if (typeof value !== "number") return value ?? null
-  const h = header.toLowerCase().replace(/[_-]+/g, " ")
-  if (/\b(date|order date|invoice date|transaction date|created at|updated at)\b/.test(h)) {
-    const decoded = XLSX.SSF.parse_date_code(value)
-    if (decoded?.y && decoded?.m && decoded?.d) return `${decoded.y}-${String(decoded.m).padStart(2, "0")}-${String(decoded.d).padStart(2, "0")}`
-  }
-  return value
+function calculateQuality(rows: Record<string, unknown>[], headers: string[]) {
+  if (rows.length === 0) return { validPercent: 0, missingRows: 0, warnings: ["No data rows found"] };
+  let missingCount = 0;
+  let emptyCells = 0;
+  let totalCells = rows.length * headers.length;
+  
+  rows.forEach(row => {
+    let rowHasMissing = false;
+    headers.forEach(h => {
+      if (!isFilled(row[h])) {
+        emptyCells++;
+        rowHasMissing = true;
+      }
+    });
+    if (rowHasMissing) missingCount++;
+  });
+  
+  const validPercent = totalCells > 0 ? Math.max(0, 100 - (emptyCells / totalCells * 100)) : 0;
+  
+  return {
+    validPercent: validPercent.toFixed(1),
+    missingRows: missingCount,
+    warnings: missingCount > 0 ? [`${missingCount} rows have missing data fields.`] : [],
+  };
 }
 
 export default function DataHub({ business, datasets }: { business: Business; datasets: Dataset[] }) {
@@ -79,28 +95,87 @@ export default function DataHub({ business, datasets }: { business: Business; da
     }
     setBusy(true); setError(null); setSuccess(null)
     try {
-      const XLSX = await import("xlsx")
-      const buffer = await file.arrayBuffer()
-      const workbook = XLSX.read(buffer, { type: "buffer", cellDates: false })
-
-      if (!workbook.SheetNames.length) throw new Error("The workbook appears to be empty.")
-
       const parsed: ParsedSheet[] = []
-      for (const name of workbook.SheetNames) {
-        const worksheet = workbook.Sheets[name]
-        const raw = XLSX.utils.sheet_to_json<unknown[]>(worksheet, { header: 1, defval: null })
-        if (raw.length < 2) continue
-
-        const headers = (raw[0] || []).map(normaliseHeader)
-        const rows = raw.slice(1).map(row => {
-          const obj: Record<string, unknown> = {}
-          headers.forEach((h, i) => { obj[h] = excelValue(row[i], h, XLSX) })
-          return obj
-        }).filter(r => Object.values(r).some(isFilled))
-
-        if (rows.length > 0) {
-          parsed.push({ name, headers, rows, rowCount: rows.length, columnCount: headers.length, kind: suggestKind(name, headers), included: shouldIncludeByDefault(name) })
+      
+      if (file.name.toLowerCase().endsWith('.csv')) {
+        const Papa = (await import("papaparse")).default;
+        const text = await file.text();
+        const result = Papa.parse<Record<string, unknown>>(text, { header: true, skipEmptyLines: true });
+        
+        if (result.data.length > 0) {
+          const headers = (result.meta.fields || []).map((h, i) => normaliseHeader(h, i));
+          const rows = result.data;
+          
+          const quality = calculateQuality(rows, headers);
+          parsed.push({
+            name: file.name,
+            headers,
+            rows,
+            rowCount: rows.length,
+            columnCount: headers.length,
+            kind: suggestKind(file.name, headers),
+            included: true,
+            quality
+          })
         }
+      } else {
+        const ExcelJS = (await import("exceljs")).default;
+        const buffer = await file.arrayBuffer();
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buffer);
+
+        if (workbook.worksheets.length === 0) throw new Error("The workbook appears to be empty.");
+
+        workbook.eachSheet((worksheet) => {
+          const name = worksheet.name;
+          const headerRow = worksheet.getRow(1);
+          if (!headerRow || !headerRow.values) return;
+          
+          const rawHeaders = Array.isArray(headerRow.values) ? headerRow.values.slice(1) : [];
+          const headers = rawHeaders.map((h, i) => normaliseHeader(h, i));
+          
+          if (headers.length === 0) return;
+          
+          const rows: Record<string, unknown>[] = [];
+          worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber === 1) return; // skip header
+            const obj: Record<string, unknown> = {};
+            const rowVals = Array.isArray(row.values) ? row.values.slice(1) : [];
+            
+            headers.forEach((h, i) => {
+              let val = rowVals[i];
+              // Handle rich text or formulas
+              if (val && typeof val === 'object') {
+                if ('result' in val) val = (val as any).result;
+                else if ('text' in val) val = (val as any).text;
+              }
+              // Handle dates properly
+              if (val instanceof Date) {
+                obj[h] = val.toISOString().split('T')[0];
+              } else {
+                obj[h] = val ?? null;
+              }
+            });
+            
+            if (Object.values(obj).some(isFilled)) {
+              rows.push(obj);
+            }
+          });
+          
+          if (rows.length > 0) {
+            const quality = calculateQuality(rows, headers);
+            parsed.push({
+              name,
+              headers,
+              rows,
+              rowCount: rows.length,
+              columnCount: headers.length,
+              kind: suggestKind(name, headers),
+              included: shouldIncludeByDefault(name),
+              quality
+            });
+          }
+        });
       }
 
       if (!parsed.length) throw new Error("We couldn’t find any data rows in this workbook.")
@@ -160,6 +235,7 @@ export default function DataHub({ business, datasets }: { business: Business; da
           row_count: sheet.rowCount,
           column_count: sheet.columnCount,
           status: "processing",
+          quality_metrics: sheet.quality,
           schema_definition: {
             dataset_type: sheet.kind,
             sheet_name: sheet.name,
@@ -167,7 +243,7 @@ export default function DataHub({ business, datasets }: { business: Business; da
             workbook_sheet_count: workbookSheetCount,
             columns: sheet.headers,
             preview_rows: sheet.rows.slice(0, 5),
-            parser: "xlsx",
+            parser: "exceljs",
           },
           created_by: user.id,
         }).select("id").single()
@@ -202,7 +278,7 @@ export default function DataHub({ business, datasets }: { business: Business; da
         setSuccess("Dataset successfully deleted.")
         router.refresh()
       } else {
-        setError(res.error || "Failed to delete dataset.")
+        setError(res.error || "Failed to delete dataset. You might not have owner permissions.")
       }
     })
   }
@@ -278,10 +354,18 @@ export default function DataHub({ business, datasets }: { business: Business; da
                           <span className="text-[#68647A]">Rows</span>
                           <span className="font-medium text-[#17153B]">{dataset.row_count?.toLocaleString() || "—"}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-[#68647A]">Columns</span>
-                          <span className="font-medium text-[#17153B]">{dataset.column_count?.toLocaleString() || "—"}</span>
-                        </div>
+                        {dataset.quality_metrics?.validPercent && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-[#68647A] flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-[#286B54]" /> Quality</span>
+                            <span className="font-medium text-[#17153B]">{dataset.quality_metrics.validPercent}% valid</span>
+                          </div>
+                        )}
+                        {dataset.quality_metrics?.missingRows > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-[#B85454]">Missing data</span>
+                            <span className="font-medium text-[#B85454]">{dataset.quality_metrics.missingRows} rows</span>
+                          </div>
+                        )}
                         <div className="flex justify-between text-sm">
                           <span className="text-[#68647A]">Added</span>
                           <span className="font-medium text-[#17153B]">{new Date(dataset.created_at).toLocaleDateString()}</span>
@@ -317,17 +401,23 @@ export default function DataHub({ business, datasets }: { business: Business; da
             {step === 1 && <section className="mt-7 grid gap-5 lg:grid-cols-[1fr_330px]">
               <button type="button" onClick={() => inputRef.current?.click()} onDragEnter={e => { e.preventDefault(); setDragging(true) }} onDragOver={e => e.preventDefault()} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); const file = e.dataTransfer.files?.[0]; if (file) void parseFile(file) }} className={["min-h-[360px] rounded-3xl border-2 border-dashed p-8 text-center transition-all", dragging ? "border-[#433D8B] bg-[#C8ACD6]/15" : "border-[#D9D5E4] bg-white hover:border-[#433D8B]/50"].join(" ")}>
                 <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={e => { const file = e.target.files?.[0]; if (file) void parseFile(file); e.currentTarget.value = "" }} />
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F0EEF6] text-[#433D8B]"><Upload className="h-7 w-7" /></div><h2 className="mt-6 text-xl font-semibold text-[#17153B]">Drop your spreadsheet here</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#68647A]">CSV, XLSX and XLS files are supported. Excel workbooks are read sheet-by-sheet in your browser before anything is imported.</p><span className="mt-6 inline-flex rounded-xl bg-[#17153B] px-5 py-3 text-sm font-medium text-white">Browse files</span><p className="mt-4 text-xs text-[#9A94A8]">Maximum 20 MB for this import.</p>{busy && <div className="mt-5 flex items-center justify-center gap-2 text-xs text-[#433D8B]"><Loader2 className="h-4 w-4 animate-spin" /> Reading workbook…</div>}
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F0EEF6] text-[#433D8B]"><Upload className="h-7 w-7" /></div><h2 className="mt-6 text-xl font-semibold text-[#17153B]">Drop your spreadsheet here</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#68647A]">CSV, XLSX and XLS files are supported. Workbooks are read securely sheet-by-sheet in your browser using our modern parsing engine.</p><span className="mt-6 inline-flex rounded-xl bg-[#17153B] px-5 py-3 text-sm font-medium text-white">Browse files</span><p className="mt-4 text-xs text-[#9A94A8]">Maximum 20 MB for this import.</p>{busy && <div className="mt-5 flex items-center justify-center gap-2 text-xs text-[#433D8B]"><Loader2 className="h-4 w-4 animate-spin" /> Reading workbook…</div>}
               </button>
-              <aside className="rounded-3xl border border-[#E7E4EF] bg-white p-6"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0EEF6] text-[#433D8B]"><FileSpreadsheet className="h-5 w-5" /></div><h2 className="mt-5 text-lg font-semibold text-[#17153B]">What happens next?</h2><div className="mt-5 space-y-5">{[["01", "We inspect every sheet", "Columns and previews are calculated separately."], ["02", "You confirm the context", "Nexora suggests how each sheet should be used."], ["03", "We connect each sheet", "Every worksheet becomes its own dataset." ]].map(([number, title, description]) => <div key={number} className="flex gap-3"><span className="text-[10px] font-semibold tracking-[0.15em] text-[#C8ACD6]">{number}</span><div><p className="text-sm font-medium text-[#17153B]">{title}</p><p className="mt-1 text-xs leading-5 text-[#68647A]">{description}</p></div></div>)}</div></aside>
+              <aside className="rounded-3xl border border-[#E7E4EF] bg-white p-6"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0EEF6] text-[#433D8B]"><FileSpreadsheet className="h-5 w-5" /></div><h2 className="mt-5 text-lg font-semibold text-[#17153B]">What happens next?</h2><div className="mt-5 space-y-5">{[["01", "We inspect every sheet", "Columns, previews, and data quality metrics are calculated."], ["02", "You confirm the context", "Nexora suggests how each sheet should be used."], ["03", "We connect each sheet", "Every worksheet becomes its own protected dataset." ]].map(([number, title, description]) => <div key={number} className="flex gap-3"><span className="text-[10px] font-semibold tracking-[0.15em] text-[#C8ACD6]">{number}</span><div><p className="text-sm font-medium text-[#17153B]">{title}</p><p className="mt-1 text-xs leading-5 text-[#68647A]">{description}</p></div></div>)}</div></aside>
             </section>}
 
             {step === 2 && current && <section className="mt-7 space-y-5">
               <div className="rounded-3xl border border-[#E7E4EF] bg-white p-5 sm:p-7">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div className="flex items-center gap-3"><FileSpreadsheet className="h-5 w-5 text-[#433D8B]" /><div><p className="text-sm font-semibold text-[#17153B]">{fileName}</p><p className="text-xs text-[#9A94A8]">{sheets.length} sheets · {totalRows.toLocaleString()} rows · {(fileSize / 1024 / 1024).toFixed(2)} MB</p></div></div><p className="mt-2 text-xs text-[#68647A]"><span className="font-medium text-[#17153B]">{includedSheets.length} of {sheets.length}</span> sheets selected · {includedRows.toLocaleString()} rows will be connected</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={() => setAllIncluded(true)} className="rounded-xl border border-[#E7E4EF] bg-white px-3 py-2 text-xs font-medium text-[#68647A] hover:border-[#BEB8D0]">Select all</button><button type="button" onClick={() => setAllIncluded(false)} className="rounded-xl border border-[#E7E4EF] bg-white px-3 py-2 text-xs font-medium text-[#68647A] hover:border-[#BEB8D0]">Deselect all</button><button type="button" onClick={reset} className="rounded-xl border border-[#E7E4EF] bg-white px-4 py-2 text-sm font-medium text-[#68647A]">Choose another</button><button type="button" onClick={() => void importData()} disabled={busy || includedSheets.length === 0} className="inline-flex items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">{busy && <Loader2 className="h-4 w-4 animate-spin" />}Connect {includedSheets.length} {includedSheets.length === 1 ? "sheet" : "sheets"}</button></div></div>
                 <div className="mt-7 grid gap-5 lg:grid-cols-[230px_1fr]">
-                  <div className="space-y-2">{sheets.map((sheet, index) => <div key={sheet.name} className={["rounded-2xl border p-3 transition", selected === index ? "border-[#433D8B] bg-[#F0EEF6]" : "border-[#E7E4EF] bg-white", !sheet.included ? "opacity-70" : ""].join(" ")}><div className="flex items-start gap-3"><button type="button" onClick={() => toggleSheet(index)} aria-pressed={sheet.included} aria-label={`${sheet.included ? "Exclude" : "Include"} ${sheet.name}`} className={["mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition", sheet.included ? "border-[#17153B] bg-[#17153B] text-white" : "border-[#CFC9DC] bg-white text-transparent"].join(" ")}>{sheet.included && <Check className="h-3.5 w-3.5" />}</button><button type="button" onClick={() => setSelected(index)} className="min-w-0 flex-1 text-left"><p className="truncate text-sm font-medium text-[#17153B]">{sheet.name}</p><p className="mt-1 text-xs text-[#9A94A8]">{sheet.rowCount.toLocaleString()} rows · {sheet.columnCount} columns</p><span className={["mt-2 inline-flex rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-wide", sheet.included ? "bg-white text-[#433D8B]" : "bg-[#F3F1F6] text-[#8F899D]"].join(" ")}>{sheet.included ? sheet.kind : "Skipped"}</span></button></div></div>)}</div>
+                  <div className="space-y-2">{sheets.map((sheet, index) => <div key={sheet.name} className={["rounded-2xl border p-3 transition", selected === index ? "border-[#433D8B] bg-[#F0EEF6]" : "border-[#E7E4EF] bg-white", !sheet.included ? "opacity-70" : ""].join(" ")}><div className="flex items-start gap-3"><button type="button" onClick={() => toggleSheet(index)} aria-pressed={sheet.included} aria-label={`${sheet.included ? "Exclude" : "Include"} ${sheet.name}`} className={["mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition", sheet.included ? "border-[#17153B] bg-[#17153B] text-white" : "border-[#CFC9DC] bg-white text-transparent"].join(" ")}>{sheet.included && <Check className="h-3.5 w-3.5" />}</button><button type="button" onClick={() => setSelected(index)} className="min-w-0 flex-1 text-left"><p className="truncate text-sm font-medium text-[#17153B]">{sheet.name}</p><p className="mt-1 text-xs text-[#9A94A8]">{sheet.rowCount.toLocaleString()} rows · {sheet.quality.validPercent}% valid</p><span className={["mt-2 inline-flex rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-wide", sheet.included ? "bg-white text-[#433D8B]" : "bg-[#F3F1F6] text-[#8F899D]"].join(" ")}>{sheet.included ? sheet.kind : "Skipped"}</span></button></div></div>)}</div>
                   <div className="min-w-0"><div className="rounded-2xl border border-[#E7E4EF] bg-[#FBFAFD] p-4"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#68647A]">Sheet context</p><p className="mt-1 text-sm font-medium text-[#17153B]">{current.name}</p></div><div className="flex items-center gap-2"><span className={["rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide", current.included ? "bg-[#EAF5F0] text-[#286B54]" : "bg-[#F1EEF5] text-[#777084]"].join(" ")}>{current.included ? "Included" : "Skipped"}</span><select value={current.kind} onChange={e => changeKind(e.target.value as DatasetKind)} disabled={!current.included} className="rounded-xl border border-[#D9D5E4] bg-white px-3 py-2 text-sm text-[#17153B] outline-none disabled:cursor-not-allowed disabled:opacity-50">{kinds.map(kind => <option key={kind.value} value={kind.value}>{kind.label}</option>)}</select></div></div></div>
+                    {current.quality.missingRows > 0 && (
+                      <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#C58A3A]/20 bg-[#C58A3A]/5 p-3 text-xs text-[#9C6515]">
+                        <AlertCircle className="h-4 w-4 shrink-0" />
+                        <span>Data quality check: {current.quality.missingRows} rows contain missing fields which may affect calculations.</span>
+                      </div>
+                    )}
                     <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E4EF] bg-white"><div className="overflow-x-auto"><table className="min-w-full text-left text-xs"><thead className="bg-[#F7F5FA]"><tr>{current.headers.map(header => <th key={header} className="whitespace-nowrap border-b border-[#E7E4EF] px-3 py-3 font-semibold text-[#68647A]">{header}</th>)}</tr></thead><tbody>{current.rows.slice(0, 8).map((row, rowIndex) => <tr key={rowIndex} className="border-b border-[#F0EDF5] last:border-0">{current.headers.map(header => <td key={header} className="max-w-[220px] truncate px-3 py-3 text-[#3F3A52]">{row[header] === null || row[header] === undefined || row[header] === "" ? "—" : String(row[header])}</td>)}</tr>)}</tbody></table></div><p className="border-t border-[#E7E4EF] px-3 py-3 text-[11px] text-[#9A94A8]">Showing the first {Math.min(8, current.rowCount).toLocaleString()} of {current.rowCount.toLocaleString()} rows.</p></div>
                   </div>
                 </div>

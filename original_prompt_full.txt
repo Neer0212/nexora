@@ -1,0 +1,1347 @@
+<USER_REQUEST>
+NEXORA — MASTER DEVELOPMENT BRIEF
+Complete the product from the current stable checkpoint
+
+You are working on Nexora, a business intelligence SaaS application.
+
+The current GitHub master branch has intentionally been restored to the known-good Sitemap Changes checkpoint:
+
+2361d5e  Sitemap Changes
+
+This checkpoint is currently considered the source of truth.
+
+Do NOT pull/rebase/merge unrelated later commits from the repository history.
+
+Do NOT attempt to resurrect the previously abandoned 62 commits wholesale.
+
+Build the requested functionality cleanly on top of the current codebase.
+
+1. NON-NEGOTIABLE RULES
+Preserve existing functionality
+
+Do not break:
+
+landing page
+login
+signup
+onboarding
+authentication
+middleware
+dashboard
+Data Hub
+Business Brain
+Finance
+Intelligence
+Alerts
+Goals
+Forecasting
+Customers
+Products
+existing navigation
+existing Supabase integration
+Vercel Analytics
+sitemap
+robots
+existing visual identity
+
+Do not replace the application with a generic dashboard template.
+
+Nexora should continue looking like the existing product.
+
+2. CURRENT PRODUCT DESIGN LANGUAGE
+
+Maintain the existing Nexora visual identity.
+
+Use the existing:
+
+dark navy/purple
+lavender
+soft off-white/light-purple backgrounds
+rounded cards
+subtle borders
+restrained shadows
+clean typography
+spacious layouts
+compact labels
+understated data visualizations
+
+The UI should feel like a serious modern B2B SaaS product.
+
+Take inspiration from:
+
+Linear
+Figma
+Monday
+Fivetran
+modern enterprise analytics products
+
+But do not copy their UI.
+
+Avoid:
+
+excessive gradients
+giant decorative illustrations
+generic AI aesthetics
+excessive glassmorphism
+meaningless animations
+fake metrics
+fake AI responses
+placeholder lorem ipsum
+3. MOST IMPORTANT PRODUCT PRINCIPLE
+
+Nexora's core promise is:
+
+Don't just tell the business what happened. Explain what changed, why it matters, and what should happen next.
+
+Therefore the architecture should follow:
+
+CONNECTED DATA
+      ↓
+DATA QUALITY
+      ↓
+BUSINESS METRICS
+      ↓
+INTELLIGENCE
+      ↓
+BUSINESS BRAIN
+      ↓
+WHAT CHANGED
+      ↓
+WHY / INVESTIGATE
+      ↓
+RECOMMENDATION
+      ↓
+ACTION
+
+Every analytical conclusion must be traceable to actual connected data.
+
+Never invent evidence.
+
+If data is insufficient, explicitly say so.
+
+4. L26 — INVESTIGATE
+
+This is the highest-priority feature.
+
+The existing investigation routes should become genuinely different experiences.
+
+Routes:
+
+/autopsy
+/entities
+/inventory
+/suppliers
+/projects
+/changes
+
+All must render inside the existing shared workspace shell.
+
+They must not open as unrelated standalone pages.
+
+The sidebar must remain visible.
+
+5. INVESTIGATE SHARED EXPERIENCE
+
+Create a consistent investigation framework.
+
+Every investigation page should have:
+
+Header
+breadcrumb
+page title
+short explanation
+dataset/data freshness indicator
+relevant filters
+Summary
+
+Show the most important signals for that domain.
+
+Main analysis
+
+Domain-specific cards/charts/tables.
+
+Evidence
+
+Every important insight should have:
+
+metric
+comparison
+supporting records
+source dataset where possible
+Drill-down
+
+User should be able to move from:
+
+signal
+→ explanation
+→ affected entity
+→ underlying records
+Back navigation
+
+Provide a clear path back to:
+
+Dashboard
+Business Brain
+Investigate hub
+6. AUTOPSY
+
+/autopsy
+
+Purpose:
+
+Explain the major business movement.
+
+Show:
+
+Business health summary
+revenue
+orders
+customers
+average order value
+returns
+inventory
+suppliers
+Period comparison
+
+Compare:
+
+current period
+vs
+previous comparable period
+Root-cause tree
+
+Example:
+
+Revenue ↓ 12%
+      │
+      ├── Orders ↓ 9%
+      │
+      ├── Product A ↓ 27%
+      │
+      └── Customer segment B ↓ 18%
+
+Do not claim causality unless the data supports it.
+
+Use language such as:
+
+"largest contributor"
+"associated with"
+"worth investigating"
+"observed alongside"
+
+instead of unsupported:
+
+"caused by"
+Evidence panel
+
+For every major conclusion:
+
+current value
+previous value
+change %
+relevant dataset
+affected entities
+7. ENTITIES
+
+/entities
+
+This should become an actual entity intelligence interface.
+
+Support:
+
+customer search
+product search
+entity filtering
+entity type
+sorting
+pagination or sensible limits
+
+Show entity-level metrics.
+
+For customers:
+
+revenue
+orders
+average order value
+last activity
+returns
+trend
+
+For products:
+
+revenue
+units
+orders
+inventory
+low-stock status
+trend
+
+Clicking an entity should open a detailed view.
+
+Example:
+
+Product A
+
+Revenue
+₹X
+
+Units
+X
+
+Orders
+X
+
+Inventory
+X
+
+Trend
+...
+
+Related customers
+...
+
+Recent activity
+...
+8. INVENTORY INVESTIGATION
+
+/inventory
+
+Show:
+
+total inventory value
+inventory records
+low-stock count
+out-of-stock count
+reorder pressure
+highest exposure products
+stock movement where data supports it
+
+Table:
+
+Product
+SKU
+Current stock
+Reorder level
+Unit cost
+Inventory value
+Status
+
+Statuses:
+
+Healthy
+Low
+Critical
+Out of stock
+
+Do not invent reorder levels if they don't exist.
+
+If the dataset does not contain the required field, explain that.
+
+9. SUPPLIER INVESTIGATION
+
+/suppliers
+
+Show:
+
+supplier count
+average lead time where available
+reliability where available
+high-risk suppliers
+affected products
+delivery risk
+
+Table:
+
+Supplier
+Lead time
+Reliability
+Status
+Risk
+Affected products
+
+Risk must be deterministic based on available fields.
+
+Do not pretend to predict supplier failure.
+
+10. PROJECT INVESTIGATION
+
+/projects
+
+Show project intelligence where project data exists:
+
+project
+owner
+status
+progress
+deadline
+overdue status
+priority
+
+Highlight:
+
+overdue
+at risk
+stalled
+completed
+
+If the connected dataset doesn't contain project information, show a useful empty state rather than fake projects.
+
+11. WHAT CHANGED
+
+/changes
+
+This should be one of Nexora's strongest pages.
+
+Show:
+
+WHAT CHANGED
+
+Compare current vs previous period.
+
+Examples:
+
+Revenue       ↓ 8.4%
+Orders        ↓ 5.1%
+AOV           ↑ 2.7%
+Inventory     ↑ 12.7%
+Returns       ↑ 3.4%
+
+Then show:
+
+Largest changes
+products
+customers
+suppliers
+inventory
+channels where available
+
+Each change should have:
+
+Metric
+Change
+Magnitude
+Evidence
+Investigate →
+12. DATA HUB — L27
+
+Data Hub needs to become a real data management center.
+
+Show a Dataset Library.
+
+Each dataset should display:
+
+dataset name
+original file name
+type
+row count
+upload date
+status
+source/sheet
+owner
+data quality
+
+Example:
+
+Orders
+orders.xlsx
+Sales
+12,483 rows
+Ready
+13. WORKBOOK MANAGEMENT
+
+Users may upload Excel workbooks containing multiple sheets.
+
+The user must be able to:
+
+see every sheet
+select sheets
+deselect sheets
+connect selected sheets
+skip unnecessary sheets such as README
+see connection status
+
+Never assume:
+
+first sheet = useful data
+
+The previous issue where only the first sheet was read must not return.
+
+14. DATASET DELETE
+
+The owner must be able to remove uploaded data.
+
+Provide:
+
+Dataset
+...
+Remove
+
+Before deletion:
+
+Remove dataset?
+
+This will remove:
+• dataset metadata
+• uploaded rows
+• related processing information
+
+This action cannot be undone.
+
+Require confirmation.
+
+Deletion must be enforced server-side.
+
+Do not rely solely on hiding the button.
+
+15. DATASET REPLACEMENT
+
+Allow a dataset to be replaced/re-uploaded where practical.
+
+Preserve business ownership and avoid orphaned records.
+
+Do not leave stale dataset rows behind.
+
+16. DATA QUALITY
+
+Every connected dataset should eventually have a quality summary.
+
+Examples:
+
+Data quality: Good
+
+✓ 12,483 rows
+✓ Revenue field detected
+✓ Date field detected
+✓ 98.7% valid records
+
+⚠ 37 rows missing customer ID
+
+Do not manufacture quality percentages.
+
+If the application cannot calculate a value reliably, don't display it.
+
+17. SHARED PARSING LAYER
+
+Do not duplicate parsing logic across:
+
+dashboard
+finance
+brain
+investigate
+business snapshot
+entity intelligence
+inventory
+suppliers
+
+Create reusable helpers for:
+
+number parsing
+text parsing
+key normalization
+column lookup
+date parsing
+currency parsing
+
+All analytical pages should use the same helpers.
+
+18. COLUMN DETECTION — CRITICAL
+
+Never determine a dataset's schema from rows[0] and then apply it to unrelated datasets.
+
+Schema detection must happen per dataset / per row structure.
+
+For example:
+
+Orders:
+Amount
+
+Sales:
+Revenue
+
+Inventory:
+Quantity
+
+Suppliers:
+Lead_Time
+
+Do not assume one key applies globally.
+
+Support aliases.
+
+Example revenue aliases:
+
+revenue
+sales
+amount
+total
+total_amount
+net_sales
+
+Date aliases:
+
+date
+order_date
+transaction_date
+created_at
+
+etc.
+
+If a required field cannot be identified:
+
+don't silently return zero
+expose an appropriate unavailable state
+continue processing fields that can be safely interpreted
+19. ASK NEXORA — L28
+
+/ask
+
+Build this as a real data-backed business question interface.
+
+Users should be able to ask questions such as:
+
+Why did revenue change?
+Which product drives the most revenue?
+Do I have inventory risk?
+Which suppliers need attention?
+How many customers do I have?
+How many returns are there?
+
+Answers must use connected data.
+
+Example:
+
+Revenue is down 8.2%.
+
+The largest observed contributor is Product A,
+whose revenue declined 27%.
+
+Orders for Product A also declined 19%.
+
+This suggests lower order volume is associated
+with the revenue movement.
+
+Investigate Product A →
+
+Do not claim unsupported causality.
+
+20. ASK NEXORA EVIDENCE
+
+Every answer should be able to show:
+
+Evidence
+
+with:
+
+metrics
+comparison period
+affected records/entities
+source dataset
+
+The user should be able to click:
+
+Investigate →
+
+and land on the relevant investigation page.
+
+21. BUSINESS BRAIN → INVESTIGATE
+
+Business Brain signals must become actionable.
+
+For example:
+
+Revenue has declined 12%
+
+Click:
+
+Investigate
+
+should navigate to the relevant investigation with context.
+
+Inventory:
+
+Inventory pressure detected
+
+→ /inventory
+
+Supplier:
+
+Supplier lead-time risk
+
+→ /suppliers
+
+Product:
+
+Product A is driving the change
+
+→ relevant entity/product investigation.
+
+Do not send every signal to /dashboard.
+
+22. ALERTS
+
+Improve Alerts & Recommendations.
+
+Each alert should contain:
+
+What happened
+Why it matters
+Evidence
+Recommended next step
+Investigate
+
+Examples:
+
+revenue decline
+inventory pressure
+supplier risk
+return spike
+goal miss
+unusual movement
+
+Avoid generating alerts when the necessary data isn't available.
+
+23. RECOMMENDATIONS
+
+Recommendations must be deterministic initially.
+
+Example:
+
+Inventory is below reorder level.
+
+Recommendation:
+Review replenishment for Product A.
+
+Evidence:
+Current stock: 12
+Reorder level: 25
+
+Do not claim that Nexora knows what the business should buy unless sufficient data exists.
+
+24. GOALS
+
+Preserve the existing editable goal functionality.
+
+Important:
+
+If the owner changes:
+
+Monthly revenue target
+
+and refreshes the page, the new value must remain.
+
+Goals should connect to actual performance.
+
+Show:
+
+Target
+Actual
+Achievement %
+Remaining
+Status
+
+Statuses:
+
+On track
+At risk
+Behind
+
+Do not reset to presets after refresh.
+
+25. FORECASTING
+
+Connect forecasting with actual business metrics.
+
+Show:
+
+historical actuals
+forecast
+target
+gap
+trend
+
+Clearly distinguish:
+
+Actual
+Forecast
+Target
+
+Never present forecast values as actuals.
+
+26. PROFILE + WORKSPACE
+
+Profile should provide:
+
+name
+email
+avatar/initial
+workspace
+role
+
+Profile menu should expose:
+
+Profile
+Workspace
+Logout
+
+Logout must actually sign the user out and return them to login/landing.
+
+27. AUTHENTICATION
+
+Improve:
+
+Login
+polished visual design
+proper error states
+loading state
+password visibility
+clear CTA
+forgot password if supported
+Signup
+polished design
+validation
+loading state
+clear password requirements
+clear errors
+Onboarding
+polished first-run experience
+business information
+currency
+clear progression
+useful explanation of why Nexora needs the data
+
+Do not break existing Supabase auth.
+
+28. WORKSPACE SECURITY
+
+Roles should eventually support:
+
+Owner
+Admin
+Member
+Viewer
+
+At minimum:
+
+owner-only destructive dataset actions
+server-side authorization
+Supabase RLS
+
+Never rely solely on client-side checks.
+
+29. ERROR HANDLING
+
+Use structured Nexora errors.
+
+Avoid scattered:
+
+throw new Error("AUTH_REQUIRED")
+
+Use typed/structured error codes where appropriate.
+
+Examples:
+
+AUTH_REQUIRED
+BUSINESS_REQUIRED
+DATASET_NOT_FOUND
+DATA_ACCESS_DENIED
+INVALID_DATASET
+
+Pages should handle these consistently.
+
+30. ERROR / EMPTY / LOADING STATES
+
+Every major page needs:
+
+Loading
+
+Skeletons rather than a blank page.
+
+Empty
+
+Explain:
+
+No inventory data connected yet.
+
+Connect an inventory sheet to start
+tracking stock levels.
+
+with CTA.
+
+Error
+
+Friendly message plus retry/back navigation.
+
+Do not expose raw Supabase errors to users.
+
+31. PERFORMANCE
+
+Do not blindly load every row from every dataset forever.
+
+For now:
+
+limit datasets
+avoid duplicate queries
+only query relevant datasets
+avoid repeated full-table calculations
+reuse shared metric functions
+
+Design the data layer so future caching/aggregation can be added.
+
+Do not introduce complicated caching unless it is actually safe with user-specific Supabase data.
+
+32. TESTS
+
+This is mandatory.
+
+Add a test runner.
+
+At minimum test:
+
+Parsing
+currency values
+commas
+decimals
+nulls
+invalid values
+dates
+aliases
+Aggregation
+revenue
+orders
+units
+AOV
+returns
+period comparison
+Inventory
+low stock
+out of stock
+inventory value
+Supplier
+lead time risk
+reliability
+Dataset classification
+explicit classification takes precedence
+per-dataset schema detection
+Investigation
+different datasets don't contaminate one another
+missing columns don't silently become incorrect zeroes
+
+Tests must run from:
+
+npm test
+33. SECURITY
+
+The previous xlsx dependency needs special attention.
+
+Do not blindly upgrade dependencies just because a scanner says so.
+
+Evaluate the spreadsheet parsing dependency and choose a maintained/supported solution compatible with the current application.
+
+If replacing the spreadsheet parser:
+
+preserve workbook multi-sheet functionality
+preserve sheet selection
+preserve existing data format
+test malformed files
+test empty sheets
+test README/non-data sheets
+
+Do not break uploads.
+
+34. ENVIRONMENT
+
+Provide:
+
+.env.example
+
+with required public configuration such as:
+
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_SITE_URL=
+
+Do not commit secrets.
+
+The production sitemap must never default to:
+
+http://localhost:3000
+
+The current production fallback should remain:
+
+https://nexora-ten-beta.vercel.app
+
+until the production domain changes.
+
+35. SITEMAP / SEO
+
+Keep the sitemap fix from commit 2361d5e.
+
+Public pages can be included.
+
+Do NOT put authenticated application routes into the public sitemap.
+
+Avoid:
+
+/dashboard
+/brain
+/finance
+/data-hub
+/profile
+
+unless they become genuinely public.
+
+Keep:
+
+/
+/about
+/contact
+/privacy
+/terms
+
+and other genuinely public pages.
+
+36. NAVIGATION
+
+Sidebar must remain consistent across authenticated pages.
+
+Make sure it contains all intended sections.
+
+Important:
+
+Intelligence
+Investigate
+Actions
+Alerts
+Ask Nexora
+Data Hub
+Profile access
+
+Do not introduce hydration mismatches through pathname-dependent rendering.
+
+If an active navigation state depends on client-only data, implement it in a hydration-safe manner.
+
+37. NO NEW WINDOW / STANDALONE INVESTIGATE BUG
+
+All new application pages must render within:
+
+AppShell
+  ├── Sidebar
+  └── Main content
+
+Do not create independent full-screen layouts that bypass the sidebar.
+
+38. 303 PAGE
+
+Keep the existing:
+
+/303
+
+page available as a future fallback/error route.
+
+Do not remove it.
+
+39. DATABASE
+
+Use the existing Supabase database structure.
+
+Before creating a new table:
+
+inspect existing tables
+inspect existing relationships
+reuse existing structures where appropriate
+
+If migrations are required:
+
+create proper Supabase migrations
+make them idempotent where appropriate
+preserve existing data
+don't silently delete production data
+40. COMPONENT ARCHITECTURE
+
+Do not create massive files containing everything.
+
+Separate:
+
+components/
+  investigate/
+  intelligence/
+  data-hub/
+  ask/
+  alerts/
+  workspace/
+
+Keep data fetching separate from UI where appropriate.
+
+Prefer:
+
+page
+ ↓
+server data layer
+ ↓
+typed data
+ ↓
+UI component
+
+rather than putting all database queries and UI logic into one huge component.
+
+41. DELETE DUPLICATE CODE
+
+If there are duplicate implementations such as:
+
+DataHub.tsx
+DataHubFixed.tsx
+
+do not keep both indefinitely.
+
+Determine which implementation is actually used.
+
+Remove dead duplicates only after verifying imports.
+
+42. BUSINESS METRICS
+
+Create a central business metrics layer where possible.
+
+Metrics should include:
+
+revenue
+previousRevenue
+revenueChange
+orders
+previousOrders
+units
+AOV
+returns
+customers
+inventoryValue
+lowStock
+outOfStock
+suppliers
+supplierRisk
+
+The same calculation should not be independently reimplemented on five pages.
+
+43. DATA SOURCE TRANSPARENCY
+
+Where possible, tell the user:
+
+Based on:
+Orders
+Inventory
+Suppliers
+
+or:
+
+Based on 3 connected datasets
+
+This reinforces trust.
+
+44. NEVER FAKE DATA
+
+This is extremely important.
+
+Do not write:
+
+const revenue = 1245000
+
+just to make a page look complete.
+
+Do not create fake:
+
+customers
+products
+suppliers
+projects
+recommendations
+alerts
+trends
+
+If there is no data:
+
+show an honest empty state.
+
+45. RESPONSIVE DESIGN
+
+Everything should work on:
+
+desktop
+laptop
+tablet
+mobile
+
+Do not sacrifice desktop information density, but make tables/cards scroll or stack appropriately.
+
+46. BUILD ORDER
+
+Even though this is one large milestone, internally implement in this order:
+
+1. Inspect current architecture
+2. Establish shared parsing/metrics utilities
+3. Build Investigate data layer
+4. Build Autopsy
+5. Build Entities
+6. Build Inventory
+7. Build Suppliers
+8. Build Projects
+9. Build Changes
+10. Improve Data Hub
+11. Add dataset deletion/security
+12. Improve Business Brain navigation
+13. Build Ask Nexora
+14. Connect Alerts/Recommendations
+15. Connect Goals/Forecasting
+16. Profile/workspace
+17. Authentication polish
+18. Data quality
+19. Tests
+20. Security/dependency review
+21. SEO/environment cleanup
+22. Final responsive polish
+23. Full validation
+47. VALIDATION — ABSOLUTE REQUIREMENT
+
+Before considering the work complete:
+
+npm install
+npm run lint
+npm test
+npm run build
+
+All must succeed.
+
+Warnings may exist, but:
+
+0 lint errors
+0 TypeScript errors
+0 test failures
+0 production build errors
+
+are mandatory.
+
+Also manually verify:
+
+/
+ /login
+ /signup
+ /onboarding
+ /dashboard
+ /data-hub
+ /brain
+ /finance
+ /intelligence
+ /goals
+ /forecasting
+ /customers
+ /products
+ /autopsy
+ /entities
+ /inventory
+ /suppliers
+ /projects
+ /changes
+ /alerts
+ /actions
+ /ask
+ /profile
+ /303
+48. GIT RULES
+
+Do not rewrite unrelated history.
+
+Do not merge the abandoned later branch.
+
+Do not force-push unless explicitly instructed.
+
+Create logical commits.
+
+Recommended final structure:
+
+feat: build investigation intelligence
+feat: improve dataset management
+feat: connect intelligence to actions
+feat: improve workspace and authentication
+test: add business intelligence coverage
+chore: production hardening
+
+If something fails, fix it before proceeding.
+
+49. FINAL ACCEPTANCE CRITERIA
+
+Nexora should feel like one coherent product:
+
+User signs up
+      ↓
+Onboarding
+      ↓
+Connects workbook
+      ↓
+Selects useful sheets
+      ↓
+Data Hub confirms datasets
+      ↓
+Dashboard summarizes business
+      ↓
+Business Brain detects signals
+      ↓
+User sees what changed
+      ↓
+User investigates why
+      ↓
+Nexora shows evidence
+      ↓
+User asks a question
+      ↓
+Nexora answers from actual data
+      ↓
+Recommendation appears
+      ↓
+User takes action
+
+That complete loop is the goal.
+
+50. MOST IMPORTANT INSTRUCTION TO THE CODING AGENT
+
+Do not optimize for number of features. Optimize for a coherent, working, trustworthy product.
+
+Do not say a feature is complete merely because a route exists.
+
+A page is complete only when:
+
+it has real data integration,
+it has meaningful domain-specific UI,
+it handles missing data,
+it handles errors,
+it preserves authentication,
+it preserves the sidebar/app shell,
+it does not introduce hydration issues,
+it passes TypeScript,
+it passes lint,
+it passes tests,
+it passes the production build.
+
+Never replace working functionality with placeholders just to satisfy the feature list.
+
+When uncertain, preserve the existing working behavior rather than making a risky architectural change.
+
+Starting point
+
+Current known-good Git checkpoint:
+
+2361d5e
+Sitemap Changes
+
+Current production site:
+
+https://nexora-ten-beta.vercel.app
+
+Current priority:
+
+Build L26–L28 as one coherent product-completion milestone, without breaking the stable baseline.
+
+Do not start by changing everything at once. Inspect the repository first, understand the existing implementation, then implement the above systematically and validate continuously.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-01T19:01:55+05:30.
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Claude Opus 4.6 (Thinking). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
