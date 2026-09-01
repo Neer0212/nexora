@@ -44,10 +44,10 @@ export default async function DataHubPage() {
         .single(),
       supabase
         .from("datasets")
-        .select("id, name, file_name, row_count, column_count, status, created_at")
+        .select("id, name, file_name, row_count, column_count, status, created_at, schema_definition")
         .eq("business_id", membership.business_id)
         .order("created_at", { ascending: false })
-        .limit(8),
+        .limit(100),
     ])
 
   if (businessError || !business) {
