@@ -107,23 +107,88 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
   if (datasetsError) throw new Error(datasetsError.message)
 
   const ready = (datasets ?? []) as Dataset[]
-  const ids = ready.map((item) => item.id)
 
-  const { data: stored, error: rowsError } = ids.length
-    ? await supabase.from("dataset_rows").select("dataset_id,row_number,row_data").eq("business_id", membership.business_id).in("dataset_id", ids).order("row_number", { ascending: true })
-    : { data: [], error: null }
+  const { data: rawRows, error: rowsError } = await supabase
+    .from("dataset_rows")
+    .select("row_id, dataset_id, row_data")
+    .in("dataset_id", ready.map(d => d.id))
 
-  if (rowsError) throw new Error(rowsError.message)
+  if (rowsError) {
+    throw new Error(`Failed to load dataset rows: ${rowsError.message}`)
+  }
 
-  const rows = ((stored ?? []) as StoredRow[]).map((item) => ({
+  const rows = (rawRows || []).map(item => ({
     datasetId: item.dataset_id,
     row: (item.row_data ?? {}) as Row,
   }))
 
+  // Phase 6: Integrate POS operational data natively into the Intelligence layer
+  const { data: posOrders } = await supabase
+    .from("orders")
+    .select(`
+      id, order_number, order_date, total_amount, status,
+      customer:customers(name),
+      items:order_items(quantity, product_name_snapshot)
+    `)
+    .eq("business_id", membership.business_id)
+
+  if (posOrders) {
+    posOrders.forEach(o => {
+      const units = o.items.reduce((sum: number, i: any) => sum + Number(i.quantity), 0)
+      const topProductName = o.items.length > 0 ? o.items[0].product_name_snapshot : "Unknown Product"
+      rows.push({
+        datasetId: "pos-system",
+        row: {
+          order_id: o.order_number,
+          revenue: o.total_amount,
+          date: o.order_date,
+          status: o.status,
+          units: units,
+          customer_name: (o.customer as any)?.name || "Walk-in",
+          product: topProductName
+        }
+      })
+    })
+  }
+
+  const { data: posProducts } = await supabase
+    .from("products")
+    .select("id, name, stock_quantity, low_stock_threshold, unit_cost")
+    .eq("business_id", membership.business_id)
+
+  if (posProducts) {
+    posProducts.forEach(p => {
+      rows.push({
+        datasetId: "pos-system",
+        row: {
+          product: p.name,
+          stock_qty: p.stock_quantity ?? 0,
+          unit_cost: p.unit_cost ?? 0
+        }
+      })
+    })
+  }
+
+  const { data: posCustomers } = await supabase
+    .from("customers")
+    .select("id, name")
+    .eq("business_id", membership.business_id)
+
+  if (posCustomers) {
+    posCustomers.forEach(c => {
+      rows.push({
+        datasetId: "pos-system",
+        row: {
+          customer_name: c.name
+        }
+      })
+    })
+  }
+
   const orderRows = rows.filter(({ row }) => Boolean(keyOf(row, ["order_id", "orderid", "order"]) && keyOf(row, ["revenue", "sales", "amount", "total"])))
-  const inventoryRows = rowsFor(ready, rows, ["inventory", "stock", "warehouse"]).filter(({ row }) => Boolean(keyOf(row, ["product_id", "product", "sku", "item"]) && keyOf(row, ["stock_qty", "stock", "quantity_in_stock", "inventory", "quantity"])))
+  const inventoryRows = rowsFor(ready, rows, ["inventory", "stock", "warehouse"]).concat(rows.filter(r => r.datasetId === "pos-system")).filter(({ row }) => Boolean(keyOf(row, ["product_id", "product", "sku", "item"]) && keyOf(row, ["stock_qty", "stock", "quantity_in_stock", "inventory", "quantity"])))
   const supplierRows = rowsFor(ready, rows, ["supplier", "vendor"]).filter(({ row }) => Boolean(keyOf(row, ["supplier_id", "supplier", "supplier_name", "vendor"])))
-  const customerRows = rowsFor(ready, rows, ["customer", "client"])
+  const customerRows = rowsFor(ready, rows, ["customer", "client"]).concat(rows.filter(r => r.datasetId === "pos-system"))
   const productRows = rowsFor(ready, rows, ["product", "catalog", "items"])
 
   const order = orderRows[0]?.row
