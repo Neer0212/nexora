@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 type Business = { id: string; name: string; currencyCode: string }
 type Dataset = { id: string; name: string; file_name: string | null; row_count: number | null; column_count: number | null; status: string; created_at: string }
 type DatasetKind = "sales" | "products" | "inventory" | "suppliers" | "customers" | "finance" | "other"
-type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unknown>[]; rowCount: number; columnCount: number; kind: DatasetKind }
+type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unknown>[]; rowCount: number; columnCount: number; kind: DatasetKind; included: boolean }
 
 const kinds: { value: DatasetKind; label: string; description: string }[] = [
   { value: "sales", label: "Sales / orders", description: "Orders, revenue and transactions" },
@@ -35,6 +35,10 @@ function suggestKind(sheetName: string, headers: string[]): DatasetKind {
   if (/\b(product|products|catalogue|catalog|sku)\b/.test(text)) return "products"
   if (/\b(finance|financial|expense|expenses|invoice|invoices|payment|payments|profit)\b/.test(text)) return "finance"
   return "other"
+}
+
+function shouldIncludeByDefault(sheetName: string) {
+  return !/^(readme|read me|instructions|notes?)$/i.test(sheetName.trim())
 }
 
 function excelValue(value: unknown, header: string, XLSX: typeof import("xlsx")) {
@@ -75,7 +79,15 @@ function parseSheet(sheetName: string, worksheet: import("xlsx").WorkSheet, XLSX
     })
 
   if (!rows.length) throw new Error(`Sheet “${sheetName}” contains headers but no data rows.`)
-  return { name: sheetName, headers: uniqueHeaders, rows, rowCount: rows.length, columnCount: uniqueHeaders.length, kind: suggestKind(sheetName, uniqueHeaders) }
+  return {
+    name: sheetName,
+    headers: uniqueHeaders,
+    rows,
+    rowCount: rows.length,
+    columnCount: uniqueHeaders.length,
+    kind: suggestKind(sheetName, uniqueHeaders),
+    included: shouldIncludeByDefault(sheetName),
+  }
 }
 
 export default function DataHubFixed({ business, datasets }: { business: Business; datasets: Dataset[] }) {
@@ -91,6 +103,8 @@ export default function DataHubFixed({ business, datasets }: { business: Busines
   const [step, setStep] = useState<1 | 2 | 3>(1)
 
   const current = sheets[selected] ?? null
+  const includedSheets = useMemo(() => sheets.filter((sheet) => sheet.included), [sheets])
+  const includedRows = useMemo(() => includedSheets.reduce((sum, sheet) => sum + sheet.rowCount, 0), [includedSheets])
   const totalRows = useMemo(() => sheets.reduce((sum, sheet) => sum + sheet.rowCount, 0), [sheets])
 
   const parseFile = useCallback(async (file: File) => {
@@ -111,16 +125,34 @@ export default function DataHubFixed({ business, datasets }: { business: Busines
         parsedSheets.push(parseSheet(name, worksheet, XLSX))
       }
 
-      setFileName(file.name); setFileSize(file.size); setSheets(parsedSheets); setSelected(0); setStep(2)
+      setFileName(file.name)
+      setFileSize(file.size)
+      setSheets(parsedSheets)
+      setSelected(0)
+      setStep(2)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The workbook could not be read.")
     } finally { setBusy(false) }
   }, [])
 
-  const changeKind = (kind: DatasetKind) => setSheets(previous => previous.map((sheet, index) => index === selected ? { ...sheet, kind } : sheet))
+  const toggleSheet = (index: number) => {
+    setSheets(previous => previous.map((sheet, sheetIndex) => sheetIndex === index ? { ...sheet, included: !sheet.included } : sheet))
+  }
+
+  const setAllIncluded = (included: boolean) => {
+    setSheets(previous => previous.map(sheet => ({ ...sheet, included })))
+  }
+
+  const changeKind = (kind: DatasetKind) => {
+    setSheets(previous => previous.map((sheet, index) => index === selected ? { ...sheet, kind } : sheet))
+  }
 
   const importData = async () => {
-    if (!sheets.length) return
+    if (!includedSheets.length) {
+      setError("Select at least one sheet before connecting the workbook.")
+      return
+    }
+
     setBusy(true); setError(null); setSuccess(null)
     try {
       const supabase = createClient()
@@ -128,18 +160,11 @@ export default function DataHubFixed({ business, datasets }: { business: Busines
       if (!user) throw new Error("Your session has expired. Please log in again.")
 
       let importedRows = 0
-      for (const sheet of sheets) {
+      const workbookSheetCount = includedSheets.length
+
+      for (const sheet of includedSheets) {
         const baseName = fileName.replace(/\.(csv|xlsx|xls)$/i, "")
-        const datasetName = sheets.length === 1 ? baseName : `${baseName} — ${sheet.name}`
-        const schemaDefinition = {
-          dataset_type: sheet.kind,
-          sheet_name: sheet.name,
-          workbook_file: fileName,
-          workbook_sheet_count: sheets.length,
-          columns: sheet.headers,
-          preview_rows: sheet.rows.slice(0, 5),
-          parser: "xlsx",
-        }
+        const datasetName = workbookSheetCount === 1 ? baseName : `${baseName} — ${sheet.name}`
 
         const { data: dataset, error: datasetError } = await supabase.from("datasets").insert({
           business_id: business.id,
@@ -150,9 +175,18 @@ export default function DataHubFixed({ business, datasets }: { business: Busines
           row_count: sheet.rowCount,
           column_count: sheet.columnCount,
           status: "processing",
-          schema_definition,
+          schema_definition: {
+            dataset_type: sheet.kind,
+            sheet_name: sheet.name,
+            workbook_file: fileName,
+            workbook_sheet_count: workbookSheetCount,
+            columns: sheet.headers,
+            preview_rows: sheet.rows.slice(0, 5),
+            parser: "xlsx",
+          },
           created_by: user.id,
         }).select("id").single()
+
         if (datasetError || !dataset) throw new Error(`Could not create dataset “${sheet.name}”: ${datasetError?.message || "unknown error"}`)
 
         for (let start = 0; start < sheet.rows.length; start += 500) {
@@ -166,7 +200,7 @@ export default function DataHubFixed({ business, datasets }: { business: Busines
         importedRows += sheet.rowCount
       }
 
-      setSuccess(`${sheets.length} ${sheets.length === 1 ? "sheet" : "sheets"} and ${importedRows.toLocaleString()} rows are now part of Nexora.`)
+      setSuccess(`${includedSheets.length} ${includedSheets.length === 1 ? "sheet" : "sheets"} and ${importedRows.toLocaleString()} rows are now part of Nexora.`)
       setStep(3)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The workbook import failed.")
@@ -187,7 +221,7 @@ export default function DataHubFixed({ business, datasets }: { business: Busines
         <div className="mt-8 flex items-center gap-2 text-xs text-[#68647A]">{["Upload", "Understand", "Connect"].map((label, index) => { const n = index + 1; return <div key={label} className="flex items-center gap-2"><div className={["flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-semibold", step >= n ? "border-[#17153B] bg-[#17153B] text-white" : "border-[#E7E4EF] bg-white text-[#9A94A8]"].join(" ")}>{step > n ? <Check className="h-3.5 w-3.5" /> : n}</div><span className={step === n ? "font-medium text-[#17153B]" : "text-[#68647A]"}>{label}</span>{index < 2 && <ChevronRight className="mx-1 h-3.5 w-3.5 text-[#9A94A8]/50" />}</div> })}</div>
 
         {error && <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#B85454]/20 bg-[#B85454]/5 p-4 text-sm text-[#8D3F3F]"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span className="break-words">{error}</span><button type="button" onClick={() => setError(null)} className="ml-auto"><X className="h-4 w-4" /></button></div>}
-        {success && <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#3C8F70]/20 bg-[#3C8F70]/5 p-4 text-sm text-[#286B54]"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>{success}</span></div>}
+        {success && <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#3C8F70]/20 bg-[#3C8F70]/5 p-4 text-sm text-[#286B54]"><CheckCircle2 className="mt-0.5 h-4 w-4" /><span>{success}</span></div>}
 
         {step === 1 && <section className="mt-7 grid gap-5 lg:grid-cols-[1fr_330px]">
           <button type="button" onClick={() => inputRef.current?.click()} onDragEnter={e => { e.preventDefault(); setDragging(true) }} onDragOver={e => e.preventDefault()} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); const file = e.dataTransfer.files?.[0]; if (file) void parseFile(file) }} className={["min-h-[360px] rounded-3xl border-2 border-dashed p-8 text-center transition-all", dragging ? "border-[#433D8B] bg-[#C8ACD6]/15" : "border-[#D9D5E4] bg-white hover:border-[#433D8B]/50"].join(" ")}>
@@ -199,17 +233,17 @@ export default function DataHubFixed({ business, datasets }: { business: Busines
 
         {step === 2 && current && <section className="mt-7 space-y-5">
           <div className="rounded-3xl border border-[#E7E4EF] bg-white p-5 sm:p-7">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div className="flex items-center gap-3"><FileSpreadsheet className="h-5 w-5 text-[#433D8B]" /><div><p className="text-sm font-semibold text-[#17153B]">{fileName}</p><p className="text-xs text-[#9A94A8]">{sheets.length} sheets · {totalRows.toLocaleString()} rows · {(fileSize / 1024 / 1024).toFixed(2)} MB</p></div></div></div><div className="flex gap-2"><button type="button" onClick={reset} className="rounded-xl border border-[#E7E4EF] bg-white px-4 py-2 text-sm font-medium text-[#68647A]">Choose another</button><button type="button" onClick={() => void importData()} disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2 text-sm font-medium text-white disabled:opacity-50">{busy && <Loader2 className="h-4 w-4 animate-spin" />}Connect {sheets.length} {sheets.length === 1 ? "sheet" : "sheets"}</button></div></div>
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"><div><div className="flex items-center gap-3"><FileSpreadsheet className="h-5 w-5 text-[#433D8B]" /><div><p className="text-sm font-semibold text-[#17153B]">{fileName}</p><p className="text-xs text-[#9A94A8]">{sheets.length} sheets · {totalRows.toLocaleString()} rows · {(fileSize / 1024 / 1024).toFixed(2)} MB</p></div></div><p className="mt-2 text-xs text-[#68647A]"><span className="font-medium text-[#17153B]">{includedSheets.length} of {sheets.length}</span> sheets selected · {includedRows.toLocaleString()} rows will be connected</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={() => setAllIncluded(true)} className="rounded-xl border border-[#E7E4EF] bg-white px-3 py-2 text-xs font-medium text-[#68647A] hover:border-[#BEB8D0]">Select all</button><button type="button" onClick={() => setAllIncluded(false)} className="rounded-xl border border-[#E7E4EF] bg-white px-3 py-2 text-xs font-medium text-[#68647A] hover:border-[#BEB8D0]">Deselect all</button><button type="button" onClick={reset} className="rounded-xl border border-[#E7E4EF] bg-white px-4 py-2 text-sm font-medium text-[#68647A]">Choose another</button><button type="button" onClick={() => void importData()} disabled={busy || includedSheets.length === 0} className="inline-flex items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">{busy && <Loader2 className="h-4 w-4 animate-spin" />}Connect {includedSheets.length} {includedSheets.length === 1 ? "sheet" : "sheets"}</button></div></div>
             <div className="mt-7 grid gap-5 lg:grid-cols-[230px_1fr]">
-              <div className="space-y-2">{sheets.map((sheet, index) => <button type="button" key={sheet.name} onClick={() => setSelected(index)} className={["w-full rounded-2xl border p-3 text-left transition", selected === index ? "border-[#433D8B] bg-[#F0EEF6]" : "border-[#E7E4EF] bg-white hover:border-[#BEB8D0]"].join(" ")}><p className="truncate text-sm font-medium text-[#17153B]">{sheet.name}</p><p className="mt-1 text-xs text-[#9A94A8]">{sheet.rowCount.toLocaleString()} rows · {sheet.columnCount} columns</p><span className="mt-2 inline-flex rounded-full bg-white px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-[#433D8B]">{sheet.kind}</span></button>)}</div>
-              <div className="min-w-0"><div className="rounded-2xl border border-[#E7E4EF] bg-[#FBFAFD] p-4"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#68647A]">Sheet context</p><p className="mt-1 text-sm font-medium text-[#17153B]">{current.name}</p></div><select value={current.kind} onChange={e => changeKind(e.target.value as DatasetKind)} className="rounded-xl border border-[#D9D5E4] bg-white px-3 py-2 text-sm text-[#17153B] outline-none"><option value="sales">Sales / orders</option><option value="products">Products</option><option value="inventory">Inventory</option><option value="suppliers">Suppliers</option><option value="customers">Customers</option><option value="finance">Finance</option><option value="other">Other</option></select></div></div>
+              <div className="space-y-2">{sheets.map((sheet, index) => <div key={sheet.name} className={["rounded-2xl border p-3 transition", selected === index ? "border-[#433D8B] bg-[#F0EEF6]" : "border-[#E7E4EF] bg-white", !sheet.included ? "opacity-70" : ""].join(" ")}><div className="flex items-start gap-3"><button type="button" onClick={() => toggleSheet(index)} aria-pressed={sheet.included} aria-label={`${sheet.included ? "Exclude" : "Include"} ${sheet.name}`} className={["mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition", sheet.included ? "border-[#17153B] bg-[#17153B] text-white" : "border-[#CFC9DC] bg-white text-transparent"].join(" ")}>{sheet.included && <Check className="h-3.5 w-3.5" />}</button><button type="button" onClick={() => setSelected(index)} className="min-w-0 flex-1 text-left"><p className="truncate text-sm font-medium text-[#17153B]">{sheet.name}</p><p className="mt-1 text-xs text-[#9A94A8]">{sheet.rowCount.toLocaleString()} rows · {sheet.columnCount} columns</p><span className={["mt-2 inline-flex rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-wide", sheet.included ? "bg-white text-[#433D8B]" : "bg-[#F3F1F6] text-[#8F899D]"].join(" ")}>{sheet.included ? sheet.kind : "Skipped"}</span></button></div></div>)}</div>
+              <div className="min-w-0"><div className="rounded-2xl border border-[#E7E4EF] bg-[#FBFAFD] p-4"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#68647A]">Sheet context</p><p className="mt-1 text-sm font-medium text-[#17153B]">{current.name}</p></div><div className="flex items-center gap-2"><span className={["rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide", current.included ? "bg-[#EAF5F0] text-[#286B54]" : "bg-[#F1EEF5] text-[#777084]"].join(" ")}>{current.included ? "Included" : "Skipped"}</span><select value={current.kind} onChange={e => changeKind(e.target.value as DatasetKind)} disabled={!current.included} className="rounded-xl border border-[#D9D5E4] bg-white px-3 py-2 text-sm text-[#17153B] outline-none disabled:cursor-not-allowed disabled:opacity-50">{kinds.map(kind => <option key={kind.value} value={kind.value}>{kind.label}</option>)}</select></div></div></div>
                 <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E4EF] bg-white"><div className="overflow-x-auto"><table className="min-w-full text-left text-xs"><thead className="bg-[#F7F5FA]"><tr>{current.headers.map(header => <th key={header} className="whitespace-nowrap border-b border-[#E7E4EF] px-3 py-3 font-semibold text-[#68647A]">{header}</th>)}</tr></thead><tbody>{current.rows.slice(0, 8).map((row, rowIndex) => <tr key={rowIndex} className="border-b border-[#F0EDF5] last:border-0">{current.headers.map(header => <td key={header} className="max-w-[220px] truncate px-3 py-3 text-[#3F3A52]">{row[header] === null || row[header] === undefined || row[header] === "" ? "—" : String(row[header])}</td>)}</tr>)}</tbody></table></div><p className="border-t border-[#E7E4EF] px-3 py-3 text-[11px] text-[#9A94A8]">Showing the first {Math.min(8, current.rowCount).toLocaleString()} of {current.rowCount.toLocaleString()} rows.</p></div>
               </div>
             </div>
           </div>
         </section>}
 
-        {step === 3 && <section className="mt-7 rounded-3xl border border-[#E7E4EF] bg-white p-8 text-center"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EAF5F0] text-[#286B54]"><CheckCircle2 className="h-8 w-8" /></div><h2 className="mt-5 text-2xl font-semibold text-[#17153B]">Data connected.</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#68647A]">The workbook has been split into independent datasets. Nexora can now use them across the workspace.</p><div className="mt-6 flex justify-center gap-3"><button type="button" onClick={reset} className="rounded-xl border border-[#E7E4EF] bg-white px-5 py-3 text-sm font-medium text-[#17153B]">Import another workbook</button></div></section>}
+        {step === 3 && <section className="mt-7 rounded-3xl border border-[#E7E4EF] bg-white p-8 text-center"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EAF5F0] text-[#286B54]"><CheckCircle2 className="h-8 w-8" /></div><h2 className="mt-5 text-2xl font-semibold text-[#17153B]">Data connected.</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#68647A]">The selected workbook sheets have been split into independent datasets. Skipped sheets were left out of the import.</p><div className="mt-6 flex justify-center gap-3"><button type="button" onClick={reset} className="rounded-xl border border-[#E7E4EF] bg-white px-5 py-3 text-sm font-medium text-[#17153B]">Import another workbook</button></div></section>}
 
         <div className="mt-8 rounded-2xl border border-[#E7E4EF] bg-white px-5 py-4 text-xs text-[#68647A]"><span className="font-medium text-[#17153B]">Workspace datasets:</span> {datasets.length} existing dataset{datasets.length === 1 ? "" : "s"}. New workbook sheets are stored separately so Nexora can reason across them later.</div>
       </div>
