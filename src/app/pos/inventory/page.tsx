@@ -23,18 +23,26 @@ export default async function POSInventoryPage() {
     .from("inventory_transactions")
     .select(`
       id, transaction_type, quantity, unit_cost, reference, transaction_date, created_at,
-      product:products(id, name, sku)
+      product:products(id, name, sku),
+      supplier:suppliers(id, name)
     `)
     .eq("business_id", context.businessId)
     .order("created_at", { ascending: false })
-    .limit(50)
+    .limit(100)
 
   // Fetch products for dropdown
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, stock_quantity, unit_cost")
+    .select("id, name, stock_quantity, low_stock_threshold, unit_cost")
     .eq("business_id", context.businessId)
     .eq("active", true)
+    .order("name")
+
+  // Fetch suppliers for dropdown
+  const { data: suppliers } = await supabase
+    .from("suppliers")
+    .select("id, name")
+    .eq("business_id", context.businessId)
     .order("name")
 
   return (
@@ -43,6 +51,7 @@ export default async function POSInventoryPage() {
         businessId={context.businessId} 
         transactions={(ledger as any) || []}
         products={products || []}
+        suppliers={suppliers || []}
       />
     </div>
   )

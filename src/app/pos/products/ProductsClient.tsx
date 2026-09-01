@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Search, Plus, Archive, MoreVertical, Edit2, ArchiveRestore, Package, AlertCircle } from "lucide-react"
-import { saveProduct, toggleProductActive, type ProductFormValues } from "./actions"
+import { useState, useMemo, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Search, Plus, Archive, Edit2, ArchiveRestore, Package, AlertCircle } from "lucide-react"
+import { toggleProductActive } from "./actions"
 import ProductModal from "./ProductModal"
 
 type Product = {
@@ -22,29 +23,44 @@ type Product = {
 }
 
 export default function ProductsClient({ businessId, initialProducts }: { businessId: string, initialProducts: Product[] }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [search, setSearch] = useState("")
   const [showInactive, setShowInactive] = useState(false)
-  
   const [modalOpen, setModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [prefillBarcode, setPrefillBarcode] = useState<string | null>(null)
+
+  // Auto-open create modal with barcode pre-filled when coming from POS unknown barcode flow
+  useEffect(() => {
+    const barcode = searchParams.get("barcode")
+    if (barcode) {
+      setPrefillBarcode(barcode)
+      setEditingProduct(null)
+      setModalOpen(true)
+    }
+  }, [searchParams])
 
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
-      const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
-                          (p.barcode && p.barcode.includes(search)) || 
-                          (p.sku && p.sku.toLowerCase().includes(search.toLowerCase()));
+      const matchSearch = !search ||
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        (p.barcode && p.barcode.includes(search)) ||
+        (p.sku && p.sku.toLowerCase().includes(search.toLowerCase()))
       const matchActive = showInactive ? true : p.active
       return matchSearch && matchActive
     })
   }, [products, search, showInactive])
 
   const handleEdit = (p: Product) => {
+    setPrefillBarcode(null)
     setEditingProduct(p)
     setModalOpen(true)
   }
 
   const handleAdd = () => {
+    setPrefillBarcode(null)
     setEditingProduct(null)
     setModalOpen(true)
   }
@@ -62,7 +78,7 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#17153B] sm:text-4xl">Product Catalogue</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#68647A]">Manage your POS products, barcodes, and inventory levels.</p>
         </div>
-        <button 
+        <button
           onClick={handleAdd}
           className="inline-flex items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#2E236C] transition-colors shadow-sm"
         >
@@ -73,7 +89,7 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-2 rounded-2xl border border-[#E7E4EF] shadow-[0_2px_10px_rgba(23,21,59,0.02)]">
         <div className="relative w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9A94A8]" />
-          <input 
+          <input
             type="text"
             placeholder="Search by name, SKU, or barcode..."
             value={search}
@@ -82,10 +98,10 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
           />
         </div>
         <label className="flex items-center gap-2 pr-4 text-sm font-medium text-[#68647A] cursor-pointer shrink-0">
-          <input 
-            type="checkbox" 
-            checked={showInactive} 
-            onChange={(e) => setShowInactive(e.target.checked)} 
+          <input
+            type="checkbox"
+            checked={showInactive}
+            onChange={(e) => setShowInactive(e.target.checked)}
             className="rounded border-[#CFC9DC] text-[#433D8B] focus:ring-[#433D8B]"
           />
           Show archived
@@ -129,7 +145,9 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
                       </div>
                     </td>
                     <td className="px-6 py-4 text-[#68647A]">
-                      {p.category ? <span className="inline-flex rounded-full bg-[#F3F1F6] px-2.5 py-1 text-[11px] font-medium text-[#68647A]">{p.category}</span> : "—"}
+                      {p.category
+                        ? <span className="inline-flex rounded-full bg-[#F3F1F6] px-2.5 py-1 text-[11px] font-medium text-[#68647A]">{p.category}</span>
+                        : "—"}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <p className="font-medium text-[#17153B]">₹{Number(p.selling_price).toLocaleString()}</p>
@@ -169,18 +187,17 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
         </div>
       </div>
 
-      <ProductModal 
-        isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        businessId={businessId} 
-        product={editingProduct} 
+      <ProductModal
+        isOpen={modalOpen}
+        onClose={() => { setModalOpen(false); setPrefillBarcode(null) }}
+        businessId={businessId}
+        product={editingProduct}
+        prefillBarcode={prefillBarcode}
         onSuccess={() => {
           setModalOpen(false)
-          // We rely on Server Action revalidatePath to refresh the data, 
-          // but if we were strictly client-side we'd update state here.
-          // Since the page is a server component, revalidatePath will refresh it.
-          window.location.reload(); 
-        }} 
+          setPrefillBarcode(null)
+          router.refresh()
+        }}
       />
     </div>
   )

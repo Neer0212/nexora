@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo, useTransition } from "react"
-import { Search, Plus, Minus, X, CreditCard, Banknote, UserPlus, Package, Loader2, AlertCircle, Receipt, ShoppingBag } from "lucide-react"
+import { Search, Plus, Minus, X, CreditCard, Banknote, UserPlus, Package, Loader2, AlertCircle, Receipt, ShoppingBag, Tag, ExternalLink } from "lucide-react"
 import { getPOSProducts, processCheckout, type CheckoutPayload } from "./actions"
 
 type Product = {
@@ -27,7 +27,12 @@ type CartItem = {
   cartId: string
   product: Product
   quantity: number
-  customPrice?: number
+  customPrice: number // always set to selling_price on add
+}
+
+// Quick-create prompt shown when barcode scan finds nothing
+type UnknownBarcode = {
+  code: string
 }
 
 export default function POSClient({ businessId, initialProducts, customers }: { businessId: string, initialProducts: Product[], customers: Customer[] }) {
@@ -35,21 +40,22 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
   const [search, setSearch] = useState("")
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)
+  const [discount, setDiscount] = useState<number>(0)
   
   const [isPending, startTransition] = useTransition()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successOrder, setSuccessOrder] = useState<string | null>(null)
+  const [unknownBarcode, setUnknownBarcode] = useState<UnknownBarcode | null>(null)
 
   const barcodeInputRef = useRef<HTMLInputElement>(null)
 
-  // Listen for barcode scanners (which usually act as keyboards emitting rapid keystrokes followed by Enter)
+  // Barcode scanner keyboard listener
   useEffect(() => {
     let buffer = ""
     let lastTime = Date.now()
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept if user is typing in an input unless they hit Enter
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         if (e.key === 'Enter' && e.target === barcodeInputRef.current) {
           const code = barcodeInputRef.current.value
@@ -60,9 +66,7 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
       }
 
       const currentTime = Date.now()
-      if (currentTime - lastTime > 50) {
-        buffer = "" // Reset buffer if typing is too slow (not a scanner)
-      }
+      if (currentTime - lastTime > 50) buffer = ""
       
       if (e.key !== 'Enter' && e.key.length === 1) {
         buffer += e.key
@@ -76,27 +80,25 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [products])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleBarcodeScan = async (code: string) => {
-    // Check locally first
     const match = products.find(p => p.barcode === code)
     if (match) {
       addToCart(match)
       return
     }
 
-    // Try server search
     const remote = await getPOSProducts(businessId, code)
     if (remote.length === 1) {
       addToCart(remote[0])
-      // Update local products cache
       if (!products.some(p => p.id === remote[0].id)) {
         setProducts(prev => [remote[0], ...prev])
       }
     } else {
-      setError(`Barcode not found: ${code}. You can create this product in the Catalogue.`)
-      setTimeout(() => setError(null), 4000)
+      // Unknown barcode — prompt quick-create
+      setUnknownBarcode({ code })
     }
   }
 
@@ -118,7 +120,7 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
       if (existing) {
         return prev.map(item => item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
       }
-      return [...prev, { cartId: Math.random().toString(36).substring(2, 9), product, quantity: 1 }]
+      return [...prev, { cartId: Math.random().toString(36).substring(2, 9), product, quantity: 1, customPrice: product.selling_price ?? 0 }]
     })
     setSuccessOrder(null)
   }
@@ -133,26 +135,39 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
     }))
   }
 
+  const updateCustomPrice = (cartId: string, price: number) => {
+    setCart(prev => prev.map(item => item.cartId === cartId ? { ...item, customPrice: price } : item))
+  }
+
   const removeCartItem = (cartId: string) => {
     setCart(prev => prev.filter(item => item.cartId !== cartId))
   }
+
+  // Oversell check: items where quantity requested > stock
+  const oversellItems = cart.filter(item => 
+    item.product.stock_quantity !== null && item.quantity > item.product.stock_quantity
+  )
 
   const totals = useMemo(() => {
     let subtotal = 0
     let tax = 0
     cart.forEach(item => {
-      const price = item.customPrice ?? item.product.selling_price ?? 0
+      const price = item.customPrice
       const lineTotal = price * item.quantity
       subtotal += lineTotal
-      
       const taxRate = item.product.tax_rate ?? 0
       tax += lineTotal * (taxRate / 100)
     })
-    return { subtotal, tax, discount: 0, total: subtotal + tax }
-  }, [cart])
+    const discountAmt = Math.min(discount, subtotal)
+    return { subtotal, tax, discount: discountAmt, total: subtotal + tax - discountAmt }
+  }, [cart, discount])
 
   const handleCheckout = (paymentMethod: string) => {
     if (cart.length === 0) return
+    if (oversellItems.length > 0) {
+      setError(`Cannot checkout: insufficient stock for ${oversellItems.map(i => i.product.name).join(", ")}`)
+      return
+    }
 
     setBusy(true)
     setError(null)
@@ -166,11 +181,10 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
       total: totals.total,
       payment_method: paymentMethod,
       items: cart.map(item => {
-        const price = item.customPrice ?? item.product.selling_price ?? 0
+        const price = item.customPrice
         const lineTotal = price * item.quantity
         const taxRate = item.product.tax_rate ?? 0
         const lineTax = lineTotal * (taxRate / 100)
-        
         return {
           product_id: item.product.id,
           name: item.product.name,
@@ -191,6 +205,7 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
       if (res.success) {
         setCart([])
         setSelectedCustomer(null)
+        setDiscount(0)
         setSuccessOrder(res.orderNumber!)
       } else {
         setError(res.error || "Checkout failed")
@@ -228,6 +243,27 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
             </div>
           )}
 
+          {/* Unknown barcode prompt */}
+          {unknownBarcode && (
+            <div className="mb-4 rounded-xl border border-[#433D8B]/20 bg-[#F0EEF6] p-4">
+              <p className="text-sm font-medium text-[#17153B]">Barcode not found: <code className="bg-white px-1.5 py-0.5 rounded text-[#433D8B] font-mono">{unknownBarcode.code}</code></p>
+              <p className="text-xs text-[#68647A] mt-1">This barcode doesn&apos;t match any existing product.</p>
+              <div className="flex gap-2 mt-3">
+                <a 
+                  href={`/pos/products?barcode=${encodeURIComponent(unknownBarcode.code)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#433D8B] rounded-lg hover:bg-[#2E236C] transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" /> Create Product
+                </a>
+                <button onClick={() => setUnknownBarcode(null)} className="px-3 py-1.5 text-xs font-medium text-[#68647A] bg-white rounded-lg border border-[#D9D5E4] hover:bg-[#F3F1F6]">
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
           {successOrder && (
             <div className="mb-4 flex items-center justify-between rounded-xl border border-[#3C8F70]/20 bg-[#3C8F70]/5 p-4 text-sm text-[#286B54]">
               <div className="flex items-center gap-3">
@@ -250,19 +286,26 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-              {products.map(p => (
-                <button 
-                  key={p.id} 
-                  onClick={() => addToCart(p)}
-                  className="flex flex-col text-left bg-white border border-[#E7E4EF] rounded-2xl p-4 hover:border-[#433D8B] hover:shadow-[0_4px_20px_rgba(67,61,139,0.08)] transition-all active:scale-[0.98]"
-                >
-                  <span className="font-semibold text-[#17153B] line-clamp-2 leading-tight mb-2">{p.name}</span>
-                  <div className="mt-auto flex items-end justify-between w-full">
-                    <span className="font-medium text-[#433D8B]">₹{Number(p.selling_price).toLocaleString()}</span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#9A94A8]">{p.stock_quantity ?? "—"} left</span>
-                  </div>
-                </button>
-              ))}
+              {products.map(p => {
+                const isOutOfStock = p.stock_quantity !== null && p.stock_quantity <= 0
+                const isLowStock = !isOutOfStock && p.stock_quantity !== null && p.low_stock_threshold !== null && p.stock_quantity <= p.low_stock_threshold
+                return (
+                  <button 
+                    key={p.id} 
+                    onClick={() => addToCart(p)}
+                    disabled={isOutOfStock}
+                    className={`flex flex-col text-left rounded-2xl p-4 transition-all active:scale-[0.98] border ${isOutOfStock ? 'opacity-50 cursor-not-allowed bg-[#F7F5FA] border-[#E7E4EF]' : 'bg-white border-[#E7E4EF] hover:border-[#433D8B] hover:shadow-[0_4px_20px_rgba(67,61,139,0.08)]'}`}
+                  >
+                    <span className="font-semibold text-[#17153B] line-clamp-2 leading-tight mb-2">{p.name}</span>
+                    <div className="mt-auto flex items-end justify-between w-full">
+                      <span className="font-medium text-[#433D8B]">₹{Number(p.selling_price).toLocaleString()}</span>
+                      <span className={`text-[10px] uppercase font-bold tracking-wider ${isOutOfStock ? 'text-[#B85454]' : isLowStock ? 'text-[#C58A3A]' : 'text-[#9A94A8]'}`}>
+                        {isOutOfStock ? "Out of stock" : `${p.stock_quantity} left`}
+                      </span>
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           )}
         </div>
@@ -295,29 +338,56 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
           </div>
         </div>
 
+        {/* Oversell warning */}
+        {oversellItems.length > 0 && (
+          <div className="mx-4 mt-3 flex items-center gap-2 rounded-xl border border-[#C58A3A]/20 bg-[#FDF6EC] p-3 text-xs text-[#8B6020]">
+            <AlertCircle className="h-4 w-4 shrink-0 text-[#C58A3A]" />
+            Insufficient stock: {oversellItems.map(i => i.product.name).join(", ")}
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {cart.length === 0 ? (
             <div className="h-full flex items-center justify-center text-sm text-[#9A94A8]">
               Cart is empty. Scan or select items.
             </div>
           ) : (
-            cart.map(item => (
-              <div key={item.cartId} className="flex items-center gap-3 bg-[#FBFBFC] p-3 rounded-xl border border-[#F0EEF6]">
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[#17153B] text-sm truncate">{item.product.name}</p>
-                  <p className="text-xs text-[#68647A]">₹{Number(item.product.selling_price).toLocaleString()}</p>
+            cart.map(item => {
+              const isOverSell = item.product.stock_quantity !== null && item.quantity > item.product.stock_quantity
+              const lineTotal = item.customPrice * item.quantity
+              return (
+                <div key={item.cartId} className={`bg-[#FBFBFC] p-3 rounded-xl border ${isOverSell ? 'border-[#C58A3A]/30 bg-[#FDF6EC]' : 'border-[#F0EEF6]'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-[#17153B] text-sm truncate">{item.product.name}</p>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white rounded-lg border border-[#E7E4EF] p-1 shadow-sm">
+                      <button onClick={() => updateQuantity(item.cartId, -1)} className="p-1 hover:bg-[#F0EEF6] rounded text-[#68647A]"><Minus className="w-3.5 h-3.5" /></button>
+                      <span className="w-6 text-center text-sm font-medium text-[#17153B]">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.cartId, 1)} className="p-1 hover:bg-[#F0EEF6] rounded text-[#68647A]"><Plus className="w-3.5 h-3.5" /></button>
+                    </div>
+                    <div className="text-right min-w-[70px]">
+                      <p className="font-medium text-[#17153B] text-sm">₹{lineTotal.toLocaleString()}</p>
+                    </div>
+                    <button onClick={() => removeCartItem(item.cartId)} className="p-1.5 text-[#CFC9DC] hover:text-[#B85454] rounded-md transition-colors"><X className="w-4 h-4" /></button>
+                  </div>
+                  {/* Custom price override */}
+                  <div className="mt-2 flex items-center gap-2">
+                    <Tag className="w-3 h-3 text-[#9A94A8] shrink-0" />
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={item.customPrice}
+                      onChange={e => updateCustomPrice(item.cartId, Number(e.target.value))}
+                      className="w-24 text-xs px-2 py-1 border border-[#D9D5E4] rounded-lg outline-none focus:border-[#433D8B] text-[#17153B]"
+                      title="Override unit price"
+                    />
+                    <span className="text-xs text-[#9A94A8]">unit price</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 bg-white rounded-lg border border-[#E7E4EF] p-1 shadow-sm">
-                  <button onClick={() => updateQuantity(item.cartId, -1)} className="p-1 hover:bg-[#F0EEF6] rounded text-[#68647A]"><Minus className="w-3.5 h-3.5" /></button>
-                  <span className="w-6 text-center text-sm font-medium text-[#17153B]">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.cartId, 1)} className="p-1 hover:bg-[#F0EEF6] rounded text-[#68647A]"><Plus className="w-3.5 h-3.5" /></button>
-                </div>
-                <div className="text-right min-w-[70px]">
-                  <p className="font-medium text-[#17153B] text-sm">₹{((item.product.selling_price ?? 0) * item.quantity).toLocaleString()}</p>
-                </div>
-                <button onClick={() => removeCartItem(item.cartId)} className="p-1.5 text-[#CFC9DC] hover:text-[#B85454] rounded-md transition-colors"><X className="w-4 h-4" /></button>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
 
@@ -332,6 +402,23 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
               <span>₹{totals.tax.toLocaleString()}</span>
             </div>
           )}
+          {/* Discount input */}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-[#68647A]">Discount</span>
+            <div className="flex items-center gap-1">
+              <span className="text-[#68647A]">₹</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={discount || ""}
+                onChange={e => setDiscount(Number(e.target.value) || 0)}
+                placeholder="0"
+                className="w-20 text-right text-sm px-2 py-0.5 border border-[#D9D5E4] rounded-lg outline-none focus:border-[#433D8B] text-[#17153B]"
+              />
+            </div>
+          </div>
+
           <div className="flex justify-between text-xl font-bold text-[#17153B] pt-2 border-t border-[#E7E4EF]">
             <span>Total</span>
             <span>₹{totals.total.toLocaleString()}</span>
@@ -340,14 +427,14 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
           <div className="grid grid-cols-2 gap-3 mt-5">
             <button 
               onClick={() => handleCheckout("Cash")}
-              disabled={cart.length === 0 || busy}
+              disabled={cart.length === 0 || busy || oversellItems.length > 0}
               className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold text-white bg-[#286B54] hover:bg-[#1C513E] disabled:opacity-50 transition-colors shadow-sm"
             >
               <Banknote className="w-5 h-5" /> Cash
             </button>
             <button 
               onClick={() => handleCheckout("UPI/Card")}
-              disabled={cart.length === 0 || busy}
+              disabled={cart.length === 0 || busy || oversellItems.length > 0}
               className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold text-white bg-[#433D8B] hover:bg-[#2E2A66] disabled:opacity-50 transition-colors shadow-sm"
             >
               {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />} Digital

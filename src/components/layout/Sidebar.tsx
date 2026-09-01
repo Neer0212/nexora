@@ -6,7 +6,7 @@ import {
   Activity, Bell, Brain, Boxes, Building2, ChevronDown,
   ClipboardCheck, Database, FileSearch, FileText, FolderKanban,
   MessageCircleQuestion, PackageSearch, Sparkles, Target, TrendingUp,
-  User, Users, Package, LineChart,
+  User, Users, Package, LineChart, ShoppingCart, Receipt, Store
 } from "lucide-react"
 
 const navigation = [
@@ -16,6 +16,13 @@ const navigation = [
   { label: "Operations", href: "/operations", icon: Activity },
   { label: "Intelligence", href: "/intelligence", icon: Sparkles },
   { label: "Data Hub", href: "/data-hub", icon: Database },
+]
+
+const pos = [
+  { label: "Checkout", href: "/pos", icon: ShoppingCart },
+  { label: "Orders", href: "/pos/orders", icon: Receipt },
+  { label: "Inventory", href: "/pos/inventory", icon: Boxes },
+  { label: "Catalogue", href: "/pos/products", icon: Store },
 ]
 
 const investigate = [
@@ -42,9 +49,12 @@ const intelligence = [
 ]
 
 function NavItem({ href, label, icon: Icon, pathname }: { href: string; label: string; icon: React.ElementType; pathname: string }) {
-  const active = pathname === href || pathname.startsWith(`${href}/`)
-  return <Link href={href} className={["group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors", active ? "bg-[#F0EEF6] font-medium text-[#17153B]" : "text-[#68647A] hover:bg-[#F1F0F8] hover:text-[#17153B]"].join(" ")}>
-    <Icon className={["h-[17px] w-[17px] shrink-0", active ? "text-[#17153B]" : "text-[#9A94A8] group-hover:text-[#433D8B]"].join(" ")} strokeWidth={1.8} />
+  const active = pathname === href || pathname === `${href}/` || (pathname.startsWith(`${href}/`) && href !== "/pos")
+  // Special exception for /pos because /pos/orders starts with /pos but shouldn't highlight Checkout. 
+  const isActive = href === "/pos" ? pathname === "/pos" : (pathname === href || pathname.startsWith(`${href}/`))
+
+  return <Link href={href} className={["group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors", isActive ? "bg-[#F0EEF6] font-medium text-[#17153B]" : "text-[#68647A] hover:bg-[#F1F0F8] hover:text-[#17153B]"].join(" ")}>
+    <Icon className={["h-[17px] w-[17px] shrink-0", isActive ? "text-[#17153B]" : "text-[#9A94A8] group-hover:text-[#433D8B]"].join(" ")} strokeWidth={1.8} />
     <span>{label}</span>
   </Link>
 }
@@ -59,6 +69,7 @@ export default function Sidebar() {
     <div className="flex h-16 items-center border-b border-[#E7E4EF] px-5"><Link href="/dashboard" className="flex items-center gap-2.5"><div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#17153B]"><Sparkles className="h-4 w-4 text-[#FFFFFF]" /></div><span className="text-[15px] font-semibold tracking-tight text-[#17153B]">nexora</span></Link></div>
     <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
       <Link href="/dashboard" className="mb-2 flex items-center justify-between rounded-lg border border-[#E7E4EF] px-3 py-2.5 transition-colors hover:bg-[#F1F0F8]"><div className="flex min-w-0 items-center gap-2.5"><div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#F0EEF6]"><Building2 className="h-3.5 w-3.5 text-[#68647A]" /></div><div className="min-w-0"><p className="truncate text-xs font-medium text-[#2E236C]">Your Business</p><p className="text-[10px] text-[#9A94A8]">Workspace</p></div></div><ChevronDown className="h-3.5 w-3.5 text-[#9A94A8]" /></Link>
+      <Section label="Operations (POS)" items={pos} pathname={pathname} />
       <Section label="Understand" items={navigation} pathname={pathname} />
       <Section label="Investigate" items={investigate} pathname={pathname} />
       <Section label="Intelligence" items={intelligence} pathname={pathname} />

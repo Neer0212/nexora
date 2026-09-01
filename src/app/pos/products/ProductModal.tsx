@@ -9,10 +9,11 @@ type ProductModalProps = {
   onClose: () => void
   businessId: string
   product: any | null
+  prefillBarcode?: string | null
   onSuccess: () => void
 }
 
-export default function ProductModal({ isOpen, onClose, businessId, product, onSuccess }: ProductModalProps) {
+export default function ProductModal({ isOpen, onClose, businessId, product, prefillBarcode, onSuccess }: ProductModalProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -40,12 +41,12 @@ export default function ProductModal({ isOpen, onClose, businessId, product, onS
         })
       } else {
         setFormData({
-          name: "", sku: "", barcode: "", category: "", brand: "", unit: "piece",
+          name: "", sku: "", barcode: prefillBarcode || "", category: "", brand: "", unit: "piece",
           unit_cost: "", selling_price: "", tax_rate: "0", stock_quantity: "0", low_stock_threshold: "0"
         })
       }
     }
-  }, [isOpen, product])
+  }, [isOpen, product, prefillBarcode])
 
   if (!isOpen) return null
 

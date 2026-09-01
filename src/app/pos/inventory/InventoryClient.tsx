@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { PackageOpen, ArrowUpRight, ArrowDownRight, RefreshCw, AlertCircle, Loader2 } from "lucide-react"
 import { submitInventoryTransaction, type AdjustmentPayload } from "./actions"
 
@@ -13,24 +14,45 @@ type Transaction = {
   transaction_date: string
   created_at: string
   product: { id: string; name: string; sku: string | null } | null
+  supplier: { id: string; name: string } | null
 }
 
 type Product = {
   id: string
   name: string
   stock_quantity: number | null
+  low_stock_threshold: number | null
   unit_cost: number | null
 }
 
-export default function InventoryClient({ businessId, transactions, products }: { businessId: string, transactions: Transaction[], products: Product[] }) {
+type Supplier = {
+  id: string
+  name: string
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  purchase: "Purchase (Restock)",
+  adjustment: "Manual Adjustment",
+  return: "Return",
+  transfer: "Transfer",
+}
+
+export default function InventoryClient({ businessId, transactions, products, suppliers }: {
+  businessId: string
+  transactions: Transaction[]
+  products: Product[]
+  suppliers: Supplier[]
+}) {
+  const router = useRouter()
   const [modalOpen, setModalOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   
   const [formData, setFormData] = useState({
     product_id: "",
-    transaction_type: "purchase", // purchase, adjustment, return
-    direction: "add", // add or remove
+    supplier_id: "",
+    transaction_type: "purchase",
+    direction: "add",
     quantity: "",
     unit_cost: "",
     reference: ""
@@ -47,6 +69,7 @@ export default function InventoryClient({ businessId, transactions, products }: 
 
     const payload: AdjustmentPayload = {
       product_id: formData.product_id,
+      supplier_id: formData.supplier_id || null,
       transaction_type: formData.transaction_type as any,
       quantity: Number(formData.quantity),
       is_negative: formData.direction === "remove",
@@ -58,8 +81,8 @@ export default function InventoryClient({ businessId, transactions, products }: 
       const res = await submitInventoryTransaction(businessId, payload)
       if (res.success) {
         setModalOpen(false)
-        setFormData({ product_id: "", transaction_type: "purchase", direction: "add", quantity: "", unit_cost: "", reference: "" })
-        window.location.reload()
+        setFormData({ product_id: "", supplier_id: "", transaction_type: "purchase", direction: "add", quantity: "", unit_cost: "", reference: "" })
+        router.refresh()
       } else {
         setError(res.error || "Failed to record transaction.")
       }
@@ -67,10 +90,15 @@ export default function InventoryClient({ businessId, transactions, products }: 
   }
 
   const getTypeIcon = (type: string, qty: number) => {
-    if (type === 'sale') return <ArrowDownRight className="w-4 h-4 text-[#C58A3A]" />
     if (qty > 0) return <ArrowUpRight className="w-4 h-4 text-[#3C8F70]" />
     return <ArrowDownRight className="w-4 h-4 text-[#B85454]" />
   }
+
+  // Low-stock products for warning banner
+  const lowStockProducts = products.filter(p => 
+    p.stock_quantity !== null && p.low_stock_threshold !== null &&
+    p.stock_quantity <= p.low_stock_threshold
+  )
 
   return (
     <div className="space-y-6">
@@ -88,6 +116,20 @@ export default function InventoryClient({ businessId, transactions, products }: 
         </button>
       </div>
 
+      {lowStockProducts.length > 0 && (
+        <div className="flex items-start gap-3 rounded-2xl border border-[#C58A3A]/20 bg-[#FDF6EC] p-4">
+          <AlertCircle className="h-5 w-5 text-[#C58A3A] shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium text-[#8B6020] text-sm">
+              {lowStockProducts.length} product{lowStockProducts.length > 1 ? "s" : ""} below low-stock threshold
+            </p>
+            <p className="text-xs text-[#A07A40] mt-1">
+              {lowStockProducts.slice(0, 3).map(p => p.name).join(", ")}{lowStockProducts.length > 3 ? ` and ${lowStockProducts.length - 3} more` : ""}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
@@ -96,6 +138,7 @@ export default function InventoryClient({ businessId, transactions, products }: 
                 <th className="px-6 py-4 font-semibold text-[#68647A]">Date</th>
                 <th className="px-6 py-4 font-semibold text-[#68647A]">Product</th>
                 <th className="px-6 py-4 font-semibold text-[#68647A]">Type</th>
+                <th className="px-6 py-4 font-semibold text-[#68647A]">Supplier</th>
                 <th className="px-6 py-4 font-semibold text-[#68647A]">Reference</th>
                 <th className="px-6 py-4 font-semibold text-[#68647A] text-right">Qty Change</th>
               </tr>
@@ -103,7 +146,7 @@ export default function InventoryClient({ businessId, transactions, products }: 
             <tbody className="divide-y divide-[#F0EDF5]">
               {transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-[#68647A]">
+                  <td colSpan={6} className="px-6 py-12 text-center text-[#68647A]">
                     <PackageOpen className="mx-auto h-8 w-8 text-[#C8ACD6] mb-3" />
                     <p className="font-medium text-[#17153B]">No inventory movements found</p>
                   </td>
@@ -116,7 +159,7 @@ export default function InventoryClient({ businessId, transactions, products }: 
                       <p className="text-xs text-[#9A94A8]">{new Date(tx.created_at).toLocaleTimeString()}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-medium text-[#17153B]">{tx.product?.name ?? "Unknown Product"}</p>
+                      <p className="font-medium text-[#17153B]">{tx.product?.name ?? "Unknown"}</p>
                       <p className="text-xs text-[#68647A]">{tx.product?.sku ?? ""}</p>
                     </td>
                     <td className="px-6 py-4">
@@ -124,6 +167,9 @@ export default function InventoryClient({ businessId, transactions, products }: 
                         {getTypeIcon(tx.transaction_type, tx.quantity)}
                         {tx.transaction_type}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-[#68647A] text-sm">
+                      {tx.supplier?.name || "—"}
                     </td>
                     <td className="px-6 py-4 text-[#68647A]">
                       {tx.reference || "—"}
@@ -166,7 +212,9 @@ export default function InventoryClient({ businessId, transactions, products }: 
                   }} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]">
                     <option value="">Select a product...</option>
                     {products.map(p => (
-                      <option key={p.id} value={p.id}>{p.name} (Stock: {p.stock_quantity ?? 0})</option>
+                      <option key={p.id} value={p.id}>
+                        {p.name} (Stock: {p.stock_quantity ?? 0}{p.low_stock_threshold !== null && p.stock_quantity !== null && p.stock_quantity <= p.low_stock_threshold ? " ⚠️" : ""})
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -175,9 +223,9 @@ export default function InventoryClient({ businessId, transactions, products }: 
                   <div>
                     <label className="block text-xs font-medium text-[#68647A] mb-1.5">Type</label>
                     <select value={formData.transaction_type} onChange={e => setFormData(prev => ({ ...prev, transaction_type: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]">
-                      <option value="purchase">Purchase (Restock)</option>
-                      <option value="adjustment">Manual Adjustment</option>
-                      <option value="return">Return</option>
+                      {Object.entries(TYPE_LABELS).map(([val, label]) => (
+                        <option key={val} value={val}>{label}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -195,14 +243,24 @@ export default function InventoryClient({ businessId, transactions, products }: 
                     <input required type="number" min="0.01" step="0.01" value={formData.quantity} onChange={e => setFormData(prev => ({ ...prev, quantity: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]" placeholder="0" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Unit Cost (Optional)</label>
+                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Unit Cost</label>
                     <input type="number" min="0" step="0.01" value={formData.unit_cost} onChange={e => setFormData(prev => ({ ...prev, unit_cost: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]" placeholder="₹0.00" />
                   </div>
                 </div>
 
+                {suppliers.length > 0 && (
+                  <div>
+                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Supplier (Optional)</label>
+                    <select value={formData.supplier_id} onChange={e => setFormData(prev => ({ ...prev, supplier_id: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]">
+                      <option value="">No supplier</option>
+                      {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-xs font-medium text-[#68647A] mb-1.5">Reference (Invoice / Reason)</label>
-                  <input type="text" value={formData.reference} onChange={e => setFormData(prev => ({ ...prev, reference: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]" placeholder="e.g. PO-2023, Found in backroom" />
+                  <input type="text" value={formData.reference} onChange={e => setFormData(prev => ({ ...prev, reference: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]" placeholder="e.g. PO-2023, Damaged goods" />
                 </div>
               </form>
             </div>

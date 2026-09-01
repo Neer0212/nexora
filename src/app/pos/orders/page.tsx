@@ -43,6 +43,7 @@ export default async function POSOrdersPage() {
     <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
       <OrdersClient 
         orders={(orders as any) || []}
+        businessId={context.businessId}
         businessName={business?.name || "Nexora Business"}
       />
     </div>
