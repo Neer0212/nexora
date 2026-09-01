@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import DataHub from "@/components/data-hub/DataHub"
+import DataHub from "@/components/data-hub/DataHubFixed"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata = {
