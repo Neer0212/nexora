@@ -32,17 +32,6 @@ type OperationsData = {
   latestDate: string | null
 }
 
-function currency(value: number, code: string) {
-  try {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: code,
-      maximumFractionDigits: 0,
-    }).format(value)
-  } catch {
-    return `${code} ${Math.round(value).toLocaleString("en-IN")}`
-  }
-}
 
 function compact(value: number, code: string) {
   const symbol = code === "INR" ? "₹" : `${code} `

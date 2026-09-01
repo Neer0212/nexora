@@ -49,17 +49,6 @@ function date(value: unknown) {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().slice(0, 10)
 }
 
-function currency(value: number, code: string) {
-  try {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: code,
-      maximumFractionDigits: 0,
-    }).format(value)
-  } catch {
-    return `${code} ${Math.round(value).toLocaleString("en-IN")}`
-  }
-}
 
 export default async function OperationsPage() {
   const supabase = await createClient()
@@ -231,7 +220,6 @@ export default async function OperationsPage() {
 
   const inventoryValue = inventoryRows.reduce((sum, item) => {
     const stockKey = keyOf(item.row, aliases.stock)
-    const product = keyOf(item.row, aliases.product)
     const price = keyOf(item.row, ["cost", "unit_cost", "price"])
     return sum + (stockKey && price ? num(item.row[stockKey]) * num(item.row[price]) : 0)
   }, 0)

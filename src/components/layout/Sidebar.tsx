@@ -5,6 +5,10 @@ import { usePathname } from "next/navigation"
 import {
   Activity,
   BarChart3,
+  Bell,
+  ClipboardCheck,
+  FileText,
+  MessageCircleQuestion,
   Brain,
   Database,
   Boxes,
@@ -91,6 +95,26 @@ const investigate = [
 ]
 
 const decide = [
+  {
+    label: "Actions",
+    href: "/actions",
+    icon: ClipboardCheck,
+  },
+  {
+    label: "Alerts",
+    href: "/alerts",
+    icon: Bell,
+  },
+  {
+    label: "Ask Nexora",
+    href: "/ask",
+    icon: MessageCircleQuestion,
+  },
+  {
+    label: "Reports",
+    href: "/reports",
+    icon: FileText,
+  },
   {
     label: "Simulator",
     href: "/simulator",
