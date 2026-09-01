@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
-import AppShell from "@/components/layout/AppShell"
 import GoalsOverview from "@/components/intelligence/GoalsOverview"
 import { getBusinessSnapshot } from "@/lib/business-snapshot"
 import { createClient } from "@/lib/supabase/server"
@@ -31,17 +30,15 @@ export default async function GoalsPage() {
   const savedTargets = Object.fromEntries((goals ?? []).map((goal) => [goal.goal_key, Number(goal.target)]))
 
   return (
-    <AppShell>
-      <GoalsOverview
-        revenue={snapshot.revenue}
-        orders={snapshot.orders}
-        customers={snapshot.customers}
-        lowStock={snapshot.lowStock}
-        currencyCode={snapshot.currencyCode}
-        latestDate={snapshot.latestDate}
-        savedTargets={savedTargets}
-        onSaveGoal={saveGoal}
-      />
-    </AppShell>
+    <GoalsOverview
+      revenue={snapshot.revenue}
+      orders={snapshot.orders}
+      customers={snapshot.customers}
+      lowStock={snapshot.lowStock}
+      currencyCode={snapshot.currencyCode}
+      latestDate={snapshot.latestDate}
+      savedTargets={savedTargets}
+      onSaveGoal={saveGoal}
+    />
   )
 }
