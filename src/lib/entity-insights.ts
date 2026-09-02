@@ -94,32 +94,50 @@ export async function getEntityInsights(): Promise<EntityInsights> {
 
   const rows = (rawRows || []).map((item: any) => ({ datasetId: item.dataset_id, row: (item.row_data ?? {}) as Row }))
 
-  // Phase 6: Integrate POS operational data natively into the Intelligence layer
   const { data: posOrders } = await supabase
     .from("orders")
     .select(`
       id, order_number, order_date, total_amount, status,
       customer:customers(name),
-      items:order_items(quantity, product_name_snapshot)
+      items:order_items(quantity, unit_price, total_amount, product_name_snapshot)
     `)
     .eq("business_id", membership.business_id)
 
   if (posOrders) {
     posOrders.forEach(o => {
-      const units = o.items.reduce((sum: number, i: any) => sum + Number(i.quantity), 0)
-      const topProductName = o.items.length > 0 ? o.items[0].product_name_snapshot : "Unknown Product"
-      rows.push({
-        datasetId: "pos-system",
-        row: {
-          order_id: o.order_number,
-          revenue: o.total_amount,
-          date: o.order_date,
-          status: o.status,
-          units: units,
-          customer_name: (o.customer as any)?.name || "Walk-in",
-          product: topProductName
-        }
-      })
+      const customerName = (o.customer as any)?.name || "Walk-in"
+      if (o.items && o.items.length > 0) {
+        o.items.forEach((item: any) => {
+          const qty = Number(item.quantity) || 0
+          const unitPrice = Number(item.unit_price) || 0
+          const lineTotal = Number(item.total_amount) || (unitPrice * qty)
+          rows.push({
+            datasetId: "pos-system",
+            row: {
+              order_id: o.order_number,
+              revenue: lineTotal,
+              date: o.order_date,
+              status: o.status,
+              units: qty,
+              customer_name: customerName,
+              product: item.product_name_snapshot || "Unknown Product"
+            }
+          })
+        })
+      } else {
+        rows.push({
+          datasetId: "pos-system",
+          row: {
+            order_id: o.order_number,
+            revenue: o.total_amount,
+            date: o.order_date,
+            status: o.status,
+            units: 0,
+            customer_name: customerName,
+            product: "Unknown Product"
+          }
+        })
+      }
     })
   }
 

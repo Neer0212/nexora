@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
+import { revalidatePath } from "next/cache"
 
 const cartItemSchema = z.object({
   product_id: z.string().optional().nullable(),
@@ -38,29 +39,37 @@ export async function processCheckout(businessId: string, payload: CheckoutPaylo
 
   const data = parsed.data
 
-  // Generate an order number (e.g., ORD-20260901-XXXX)
-  const dateStr = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 8)
-  const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase()
-  const orderNumber = `ORD-${dateStr}-${randomStr}`
+  // Retry up to 3 times in case of order number collision
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const dateStr = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 8)
+    const randomStr = Math.random().toString(36).substring(2, 10).toUpperCase()
+    const orderNumber = `ORD-${dateStr}-${randomStr}`
 
-  // Call the atomic checkout RPC
-  const { data: orderId, error } = await supabase.rpc("process_pos_checkout", {
-    p_business_id: businessId,
-    p_customer_id: data.customer_id || null,
-    p_order_number: orderNumber,
-    p_subtotal: data.subtotal,
-    p_discount: data.discount,
-    p_tax: data.tax,
-    p_total: data.total,
-    p_payment_method: data.payment_method,
-    p_items: data.items,
-  })
+    const { data: orderId, error } = await supabase.rpc("process_pos_checkout", {
+      p_business_id: businessId,
+      p_customer_id: data.customer_id || null,
+      p_order_number: orderNumber,
+      p_subtotal: data.subtotal,
+      p_discount: data.discount,
+      p_tax: data.tax,
+      p_total: data.total,
+      p_payment_method: data.payment_method,
+      p_items: data.items,
+    })
 
-  if (error) {
-    return { success: false, error: error.message }
+    if (error) {
+      // If unique violation on order_number, retry
+      if (error.message.includes("unique") || error.message.includes("duplicate")) {
+        continue
+      }
+      return { success: false, error: error.message }
+    }
+
+    revalidatePath("/pos/orders")
+    return { success: true, orderId: orderId as string, orderNumber }
   }
 
-  return { success: true, orderId: orderId as string, orderNumber }
+  return { success: false, error: "Failed to generate unique order number. Please try again." }
 }
 
 export async function getPOSProducts(businessId: string, query: string) {
@@ -81,4 +90,18 @@ export async function getPOSProducts(businessId: string, query: string) {
   
   if (error) return []
   return data
+}
+
+export async function quickCreateCustomer(businessId: string, name: string, phone: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('customers')
+    .insert({ business_id: businessId, name, phone })
+    .select('id, name, phone')
+    .single()
+  if (error) return { success: false, error: error.message }
+  
+  revalidatePath('/pos/customers')
+  
+  return { success: true, customer: data }
 }

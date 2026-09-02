@@ -6,7 +6,8 @@ import {
   Activity, Bell, Brain, Boxes, Building2, ChevronDown,
   ClipboardCheck, Database, FileSearch, FileText, FolderKanban,
   MessageCircleQuestion, PackageSearch, Sparkles, Target, TrendingUp,
-  User, Users, Package, LineChart, ShoppingCart, Receipt, Store
+  User, Users, Package, LineChart, ShoppingCart, Receipt, Store,
+  Truck, Wallet, UserCircle
 } from "lucide-react"
 
 const navigation = [
@@ -23,6 +24,10 @@ const pos = [
   { label: "Orders", href: "/pos/orders", icon: Receipt },
   { label: "Inventory", href: "/pos/inventory", icon: Boxes },
   { label: "Catalogue", href: "/pos/products", icon: Store },
+  { label: "Purchases", href: "/pos/purchases", icon: Truck },
+  { label: "Customers", href: "/pos/customers", icon: UserCircle },
+  { label: "Expenses", href: "/pos/expenses", icon: Wallet },
+  { label: "Suppliers", href: "/pos/suppliers", icon: PackageSearch },
 ]
 
 const investigate = [

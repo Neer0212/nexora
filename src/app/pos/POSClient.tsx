@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo, useTransition } from "react"
-import { Search, Plus, Minus, X, CreditCard, Banknote, UserPlus, Package, Loader2, AlertCircle, Receipt, ShoppingBag, Tag, ExternalLink } from "lucide-react"
-import { getPOSProducts, processCheckout, type CheckoutPayload } from "./actions"
+import { Search, Plus, Minus, X, CreditCard, Banknote, UserPlus, Package, Loader2, AlertCircle, Receipt, ShoppingBag, Tag, ExternalLink, CheckCircle2 } from "lucide-react"
+import { getPOSProducts, processCheckout, quickCreateCustomer, type CheckoutPayload } from "./actions"
+import ReceiptTemplate from "@/components/shared/ReceiptTemplate"
 
 type Product = {
   id: string
@@ -46,7 +47,13 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successOrder, setSuccessOrder] = useState<string | null>(null)
+  const [receiptData, setReceiptData] = useState<any | null>(null)
   const [unknownBarcode, setUnknownBarcode] = useState<UnknownBarcode | null>(null)
+  const [showNewCustomer, setShowNewCustomer] = useState(false)
+  const [newCustomerName, setNewCustomerName] = useState("")
+  const [newCustomerPhone, setNewCustomerPhone] = useState("")
+  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false)
+  const [localCustomers, setLocalCustomers] = useState<Customer[]>(customers)
 
   const barcodeInputRef = useRef<HTMLInputElement>(null)
 
@@ -214,6 +221,22 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
     })
   }
 
+  const handleCreateCustomer = async () => {
+    if (!newCustomerName) return
+    setIsCreatingCustomer(true)
+    const res = await quickCreateCustomer(businessId, newCustomerName, newCustomerPhone)
+    if (res.success && res.customer) {
+      setLocalCustomers(prev => [...prev, { id: res.customer.id, name: res.customer.name, email: null, phone: res.customer.phone }])
+      setSelectedCustomer(res.customer.id)
+      setShowNewCustomer(false)
+      setNewCustomerName("")
+      setNewCustomerPhone("")
+    } else {
+      setError(res.error || "Failed to create customer")
+    }
+    setIsCreatingCustomer(false)
+  }
+
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* Left Pane: Products */}
@@ -323,18 +346,27 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
         </div>
 
         <div className="p-4 border-b border-[#E7E4EF]">
-          <div className="relative">
-            <select
-              value={selectedCustomer || ""}
-              onChange={(e) => setSelectedCustomer(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-[#D9D5E4] bg-white pl-4 pr-10 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]"
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <select
+                value={selectedCustomer || ""}
+                onChange={(e) => setSelectedCustomer(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-[#D9D5E4] bg-white pl-4 pr-10 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]"
+              >
+                <option value="">Walk-in Customer</option>
+                {localCustomers.map(c => (
+                  <option key={c.id} value={c.id}>{c.name} {c.phone ? `(${c.phone})` : ""}</option>
+                ))}
+              </select>
+              <UserPlus className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9A94A8] pointer-events-none" />
+            </div>
+            <button
+              onClick={() => setShowNewCustomer(true)}
+              className="px-3 rounded-xl border border-[#D9D5E4] bg-white text-[#433D8B] hover:bg-[#F7F5FA] hover:border-[#433D8B] transition-colors flex items-center justify-center"
+              title="New Customer"
             >
-              <option value="">Walk-in Customer</option>
-              {customers.map(c => (
-                <option key={c.id} value={c.id}>{c.name} {c.phone ? `(${c.phone})` : ""}</option>
-              ))}
-            </select>
-            <UserPlus className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9A94A8] pointer-events-none" />
+              <Plus className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
@@ -442,6 +474,52 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
           </div>
         </div>
       </div>
+
+      {/* New Customer Modal */}
+      {showNewCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.1)] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-[#E7E4EF] flex items-center justify-between bg-[#F7F5FA]">
+              <h3 className="text-xl font-semibold text-[#17153B]">New Customer</h3>
+              <button onClick={() => setShowNewCustomer(false)} className="text-[#9A94A8] hover:text-[#17153B] transition-colors"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#17153B] mb-1.5">Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newCustomerName}
+                  onChange={e => setNewCustomerName(e.target.value)}
+                  className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                  placeholder="Customer Name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#17153B] mb-1.5">Phone</label>
+                <input
+                  type="tel"
+                  value={newCustomerPhone}
+                  onChange={e => setNewCustomerPhone(e.target.value)}
+                  className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                  placeholder="Phone Number"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t border-[#E7E4EF] bg-[#FBFAFD] flex justify-end gap-3">
+              <button onClick={() => setShowNewCustomer(false)} className="px-5 py-2.5 rounded-xl font-medium text-[#68647A] hover:bg-[#F0EEF6] transition-colors">Cancel</button>
+              <button 
+                onClick={handleCreateCustomer}
+                disabled={!newCustomerName || isCreatingCustomer}
+                className="px-5 py-2.5 rounded-xl font-medium text-white bg-[#17153B] hover:bg-[#2E236C] disabled:opacity-50 transition-colors flex items-center gap-2"
+              >
+                {isCreatingCustomer && <Loader2 className="w-4 h-4 animate-spin" />}
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
