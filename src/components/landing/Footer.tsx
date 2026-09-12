@@ -19,9 +19,9 @@ const accountLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#17153B] text-[#F1F0F8]">
+    <footer className="bg-zinc-950 text-zinc-50">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="border-t border-[#F1F0F8]/10 py-12 sm:py-14">
+        <div className="border-t border-zinc-50/10 py-12 sm:py-14">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
             {/* Brand */}
             <div>
@@ -39,12 +39,12 @@ export default function Footer() {
                 />
               </Link>
 
-              <p className="mt-5 max-w-xs text-sm leading-6 text-[#C8ACD6]/55">
+              <p className="mt-5 max-w-xs text-sm leading-6 text-blue-200/55">
                 Business intelligence that helps you understand what&apos;s
                 happening, why it matters, and what to do next.
               </p>
 
-              <p className="mt-5 text-[10px] font-medium uppercase tracking-[0.2em] text-[#C8ACD6]/35">
+              <p className="mt-5 text-[10px] font-medium uppercase tracking-[0.2em] text-blue-200/35">
                 Understand. Decide. Grow.
               </p>
             </div>
@@ -70,22 +70,22 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="flex flex-col gap-4 border-t border-[#F1F0F8]/10 py-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[10px] text-[#C8ACD6]/35">
+        <div className="flex flex-col gap-4 border-t border-zinc-50/10 py-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[10px] text-blue-200/35">
             © {new Date().getFullYear()} Nexora. All rights reserved.
           </p>
 
           <div className="flex items-center gap-5">
             <Link
               href="/privacy"
-              className="text-[10px] text-[#C8ACD6]/35 transition hover:text-[#C8ACD6]/65"
+              className="text-[10px] text-blue-200/35 transition hover:text-blue-200/65"
             >
               Privacy
             </Link>
 
             <Link
               href="/terms"
-              className="text-[10px] text-[#C8ACD6]/35 transition hover:text-[#C8ACD6]/65"
+              className="text-[10px] text-blue-200/35 transition hover:text-blue-200/65"
             >
               Terms
             </Link>
@@ -105,7 +105,7 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#C8ACD6]/40">
+      <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-blue-200/40">
         {title}
       </p>
 
@@ -114,7 +114,7 @@ function FooterColumn({
           <Link
             key={link.label}
             href={link.href}
-            className="block w-fit text-sm text-[#C8ACD6]/60 transition hover:text-[#F1F0F8]"
+            className="block w-fit text-sm text-blue-200/60 transition hover:text-zinc-50"
           >
             {link.label}
           </Link>

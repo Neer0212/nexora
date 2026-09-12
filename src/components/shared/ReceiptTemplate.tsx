@@ -27,38 +27,38 @@ type ReceiptData = {
 const ReceiptTemplate = forwardRef<HTMLDivElement, { receipt: ReceiptData }>(
   function ReceiptTemplate({ receipt }, ref) {
     return (
-      <div ref={ref} id="receipt-print-area" className="bg-white text-[#17153B] w-full max-w-[320px] mx-auto font-mono text-xs">
+      <div ref={ref} id="receipt-print-area" className="bg-white text-zinc-950 w-full max-w-[320px] mx-auto font-mono text-xs">
         {/* Header */}
         <div className="text-center border-b border-dashed border-[#D9D5E4] pb-3 mb-3">
           <p className="font-bold text-sm uppercase tracking-wider">{receipt.businessName}</p>
-          <p className="text-[#68647A] mt-1">Tax Invoice</p>
+          <p className="text-zinc-500 mt-1">Tax Invoice</p>
         </div>
 
         {/* Order Info */}
         <div className="border-b border-dashed border-[#D9D5E4] pb-3 mb-3 space-y-1">
           <div className="flex justify-between">
-            <span className="text-[#68647A]">Order #</span>
+            <span className="text-zinc-500">Order #</span>
             <span className="font-medium">{receipt.orderNumber}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#68647A]">Date</span>
+            <span className="text-zinc-500">Date</span>
             <span>{receipt.orderDate}</span>
           </div>
           {receipt.customerName && (
             <div className="flex justify-between">
-              <span className="text-[#68647A]">Customer</span>
+              <span className="text-zinc-500">Customer</span>
               <span>{receipt.customerName}</span>
             </div>
           )}
           <div className="flex justify-between">
-            <span className="text-[#68647A]">Payment</span>
+            <span className="text-zinc-500">Payment</span>
             <span>{receipt.paymentMethod}</span>
           </div>
         </div>
 
         {/* Items */}
         <div className="border-b border-dashed border-[#D9D5E4] pb-3 mb-3">
-          <div className="flex justify-between text-[#68647A] mb-2">
+          <div className="flex justify-between text-zinc-500 mb-2">
             <span className="flex-1">Item</span>
             <span className="w-8 text-center">Qty</span>
             <span className="w-16 text-right">Rate</span>
@@ -77,29 +77,29 @@ const ReceiptTemplate = forwardRef<HTMLDivElement, { receipt: ReceiptData }>(
         {/* Totals */}
         <div className="space-y-1 border-b border-dashed border-[#D9D5E4] pb-3 mb-3">
           <div className="flex justify-between">
-            <span className="text-[#68647A]">Subtotal</span>
+            <span className="text-zinc-500">Subtotal</span>
             <span>₹{receipt.subtotal.toLocaleString()}</span>
           </div>
           {receipt.discount > 0 && (
-            <div className="flex justify-between text-[#3C8F70]">
+            <div className="flex justify-between text-emerald-600">
               <span>Discount</span>
               <span>-₹{receipt.discount.toLocaleString()}</span>
             </div>
           )}
           {receipt.tax > 0 && (
             <div className="flex justify-between">
-              <span className="text-[#68647A]">Tax</span>
+              <span className="text-zinc-500">Tax</span>
               <span>₹{receipt.tax.toLocaleString()}</span>
             </div>
           )}
-          <div className="flex justify-between font-bold text-sm pt-1 border-t border-[#E7E4EF]">
+          <div className="flex justify-between font-bold text-sm pt-1 border-t border-zinc-200">
             <span>TOTAL</span>
             <span>₹{receipt.total.toLocaleString()}</span>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-center text-[#9A94A8] space-y-1">
+        <div className="text-center text-zinc-400 space-y-1">
           <p>Thank you for your purchase!</p>
           <p className="text-[10px]">Powered by Nexora</p>
         </div>

@@ -99,21 +99,21 @@ function Metric({
   icon: ElementType
 }) {
   return (
-    <div className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+    <div className="bg-white p-5">
       <div className="flex items-center justify-between">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+        <p className="text-xs font-medium text-zinc-500">
           {label}
         </p>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F0F8] text-[#433D8B]">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-50 text-blue-600">
           <Icon className="h-4 w-4" />
         </div>
       </div>
 
-      <p className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-[#17153B]">
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-zinc-950">
         {value}
       </p>
 
-      <p className="mt-1 text-[10px] text-[#68647A]">{detail}</p>
+      <p className="mt-1 text-xs text-zinc-500">{detail}</p>
     </div>
   )
 }
@@ -137,22 +137,22 @@ export default function FinanceOverview({
     <div className="w-full">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">
+          <p className="text-xs font-medium text-blue-600">
             Finance intelligence
           </p>
 
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#17153B] sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">
             Know where the money goes.
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#68647A]">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
             Revenue, costs, margins, and profitability calculated from the data connected to Nexora.
           </p>
         </div>
 
         <Link
           href="/data-hub"
-          className="group inline-flex w-fit items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#2E236C]"
+          className="group inline-flex w-fit items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-blue-800"
         >
           Connect finance data
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -160,18 +160,18 @@ export default function FinanceOverview({
       </div>
 
       {!data.hasRevenue && (
-        <section className="mt-7 rounded-2xl border border-[#C8ACD6]/40 bg-white p-6">
+        <section className="mt-7 rounded-2xl border border-blue-200/40 bg-white p-6">
           <div className="flex gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C8ACD6]/25 text-[#433D8B]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-200/25 text-blue-600">
               <DollarSign className="h-5 w-5" />
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-[#17153B]">
+              <p className="text-sm font-semibold text-zinc-950">
                 Finance is waiting for connected numbers.
               </p>
 
-              <p className="mt-1 max-w-2xl text-xs leading-5 text-[#68647A]">
+              <p className="mt-1 max-w-2xl text-xs leading-5 text-zinc-500">
                 Connect an orders or finance dataset with revenue, COGS, or expense fields.
                 Nexora will calculate the rest without inventing values.
               </p>
@@ -180,7 +180,7 @@ export default function FinanceOverview({
         </section>
       )}
 
-      <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="mt-7 grid grid-cols-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-zinc-200">
         <Metric
           label="Revenue"
           value={data.hasRevenue ? compactMoney(data.revenue, data.currencyCode) : "—"}
@@ -227,12 +227,12 @@ export default function FinanceOverview({
       </section>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.4fr_0.8fr]">
-        <section className="overflow-hidden rounded-2xl border border-[#E7E4EF] bg-white shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <div className="border-b border-[#E7E4EF] px-5 py-5 sm:px-6">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+          <div className="border-b border-zinc-200 px-5 py-5 sm:px-6">
+            <p className="text-xs font-medium text-zinc-500">
               Financial movement
             </p>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">
               Latest 30 days
             </h2>
           </div>
@@ -251,7 +251,7 @@ export default function FinanceOverview({
                         title={`${point.label}: ${money(point.revenue, data.currencyCode)}`}
                       >
                         <div
-                          className="w-full rounded-t-md bg-[#433D8B]/55 transition group-hover:bg-[#2E236C]"
+                          className="w-full rounded-t-md bg-blue-600/55 transition group-hover:bg-blue-800"
                           style={{ height: `${Math.max(revenueHeight, 3)}%` }}
                         />
                       </div>
@@ -259,7 +259,7 @@ export default function FinanceOverview({
                   })}
                 </div>
 
-                <div className="mt-3 flex justify-between text-[8px] uppercase tracking-[0.12em] text-[#68647A]">
+                <div className="mt-3 flex justify-between text-xs font-medium text-zinc-500">
                   <span>{data.trend[0]?.label}</span>
                   <span>{data.trend.at(-1)?.label}</span>
                 </div>
@@ -270,19 +270,19 @@ export default function FinanceOverview({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#E7E4EF] bg-white shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <div className="border-b border-[#E7E4EF] px-5 py-5">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+        <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
+          <div className="border-b border-zinc-200 px-5 py-5">
+            <p className="text-xs font-medium text-zinc-500">
               Nexora&apos;s read
             </p>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">
               Financial signal
             </h2>
           </div>
 
           <div className="p-5">
-            <div className="rounded-xl bg-[#17153B] p-5 text-white">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#C8ACD6]/20 text-[#C8ACD6]">
+            <div className="rounded-xl bg-zinc-950 p-5 text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-200/20 text-blue-200">
                 <Brain className="h-4 w-4" />
               </div>
 
@@ -294,7 +294,7 @@ export default function FinanceOverview({
                 {data.insight.description}
               </p>
 
-              <div className="mt-4 border-t border-white/10 pt-3 text-[9px] text-[#C8ACD6]">
+              <div className="mt-4 border-t border-white/10 pt-3 text-[9px] text-blue-200">
                 {data.insight.evidence}
               </div>
             </div>
@@ -303,17 +303,17 @@ export default function FinanceOverview({
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+        <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+              <p className="text-xs font-medium text-zinc-500">
                 Expenses
               </p>
-              <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+              <h2 className="mt-1 text-sm font-semibold text-zinc-950">
                 Where operating costs sit
               </h2>
             </div>
-            <ReceiptText className="h-4 w-4 text-[#433D8B]" />
+            <ReceiptText className="h-4 w-4 text-blue-600" />
           </div>
 
           {data.expenseBreakdown.length ? (
@@ -321,17 +321,17 @@ export default function FinanceOverview({
               {data.expenseBreakdown.map((item) => (
                 <div key={item.name}>
                   <div className="flex items-center justify-between gap-3 text-xs">
-                    <span className="min-w-0 truncate font-medium text-[#17153B]">
+                    <span className="min-w-0 truncate font-medium text-zinc-950">
                       {item.name}
                     </span>
-                    <span className="shrink-0 text-[#68647A]">
+                    <span className="shrink-0 text-zinc-500">
                       {compactMoney(item.value, data.currencyCode)}
                     </span>
                   </div>
 
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F1F0F8]">
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-50">
                     <div
-                      className="h-full rounded-full bg-[#433D8B]"
+                      className="h-full rounded-full bg-blue-600"
                       style={{ width: `${(item.value / maxExpense) * 100}%` }}
                     />
                   </div>
@@ -343,63 +343,63 @@ export default function FinanceOverview({
           )}
         </section>
 
-        <section className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+        <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+              <p className="text-xs font-medium text-zinc-500">
                 Period comparison
               </p>
-              <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+              <h2 className="mt-1 text-sm font-semibold text-zinc-950">
                 Latest 30 days vs previous 30
               </h2>
             </div>
 
             {data.revenueChange !== null ? (
               data.revenueChange >= 0 ? (
-                <TrendingUp className="h-4 w-4 text-[#433D8B]" />
+                <TrendingUp className="h-4 w-4 text-blue-600" />
               ) : (
-                <TrendingDown className="h-4 w-4 text-[#68647A]" />
+                <TrendingDown className="h-4 w-4 text-zinc-500" />
               )
             ) : (
-              <BarChart3 className="h-4 w-4 text-[#433D8B]" />
+              <BarChart3 className="h-4 w-4 text-blue-600" />
             )}
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-[#F1F0F8] p-4">
-              <p className="text-[9px] uppercase tracking-[0.12em] text-[#68647A]">
+            <div className="rounded-xl bg-zinc-50 p-4">
+              <p className="text-xs font-medium text-zinc-500">
                 Current revenue
               </p>
-              <p className="mt-2 text-lg font-semibold text-[#17153B]">
+              <p className="mt-2 text-lg font-semibold text-zinc-950">
                 {compactMoney(data.currentRevenue, data.currencyCode)}
               </p>
             </div>
 
-            <div className="rounded-xl bg-[#F1F0F8] p-4">
-              <p className="text-[9px] uppercase tracking-[0.12em] text-[#68647A]">
+            <div className="rounded-xl bg-zinc-50 p-4">
+              <p className="text-xs font-medium text-zinc-500">
                 Previous revenue
               </p>
-              <p className="mt-2 text-lg font-semibold text-[#17153B]">
+              <p className="mt-2 text-lg font-semibold text-zinc-950">
                 {compactMoney(data.previousRevenue, data.currencyCode)}
               </p>
             </div>
           </div>
 
-          <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#E7E4EF] p-4">
+          <div className="mt-3 flex items-center gap-2 rounded-xl border border-zinc-200 p-4">
             {data.revenueChange !== null ? (
               <>
                 {data.revenueChange >= 0 ? (
-                  <TrendingUp className="h-4 w-4 text-[#433D8B]" />
+                  <TrendingUp className="h-4 w-4 text-blue-600" />
                 ) : (
-                  <TrendingDown className="h-4 w-4 text-[#68647A]" />
+                  <TrendingDown className="h-4 w-4 text-zinc-500" />
                 )}
-                <p className="text-xs font-medium text-[#17153B]">
+                <p className="text-xs font-medium text-zinc-950">
                   {data.revenueChange >= 0 ? "+" : ""}
                   {data.revenueChange.toFixed(1)}% revenue change
                 </p>
               </>
             ) : (
-              <p className="text-xs text-[#68647A]">
+              <p className="text-xs text-zinc-500">
                 Not enough dated data for a period comparison.
               </p>
             )}
@@ -407,10 +407,10 @@ export default function FinanceOverview({
         </section>
       </div>
 
-      <section className="mt-5 rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+      <section className="mt-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center gap-2">
-          <CircleAlert className="h-4 w-4 text-[#433D8B]" />
-          <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+          <CircleAlert className="h-4 w-4 text-blue-600" />
+          <p className="text-xs font-medium text-zinc-500">
             Finance coverage
           </p>
         </div>
@@ -447,20 +447,20 @@ function Coverage({
   detail: string
 }) {
   return (
-    <div className="rounded-xl border border-[#E7E4EF] bg-[#F1F0F8]/60 p-4">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#68647A]">
+    <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+      <p className="text-xs font-medium text-zinc-500">
         {label}
       </p>
-      <p className="mt-3 text-lg font-semibold text-[#17153B]">{value}</p>
-      <p className="mt-1 text-[10px] leading-5 text-[#68647A]">{detail}</p>
+      <p className="mt-3 text-lg font-semibold text-zinc-950">{value}</p>
+      <p className="mt-1 text-[10px] leading-5 text-zinc-500">{detail}</p>
     </div>
   )
 }
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="flex min-h-28 items-center justify-center rounded-xl border border-dashed border-[#E7E4EF] bg-[#F1F0F8]/55 px-5 text-center">
-      <p className="text-[10px] leading-5 text-[#68647A]">{text}</p>
+    <div className="flex min-h-28 items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50/55 px-5 text-center">
+      <p className="text-[10px] leading-5 text-zinc-500">{text}</p>
     </div>
   )
 }

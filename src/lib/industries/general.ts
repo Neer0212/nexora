@@ -7,7 +7,7 @@ export const generalConfig: IndustryConfig = {
   shortName: "General",
   description: "A flexible business workspace that works for any kind of operation.",
   icon: "Building2",
-  color: "bg-[#F0EEF6] text-[#433D8B]",
+  color: "bg-zinc-100 text-blue-600",
 
   terminology: {
     customer: { singular: "Customer", plural: "Customers" },

@@ -161,12 +161,12 @@ export default function ExpensesClient({
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-[#17153B] sm:text-4xl">Expenses</h1>
-          <p className="text-[#68647A] mt-1">Manage your business expenses and tracking</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">Expenses</h1>
+          <p className="text-zinc-500 mt-1">Manage your business expenses and tracking</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 bg-[#17153B] text-white px-4 py-2.5 rounded-xl hover:bg-[#2E236C] transition-colors active:scale-[0.98]"
+          className="flex items-center gap-2 bg-zinc-950 text-white px-4 py-2.5 rounded-xl hover:bg-blue-800 transition-colors active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           <span>Add Expense</span>
@@ -174,120 +174,120 @@ export default function ExpensesClient({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-3xl border border-[#E7E4EF] p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+        <div className="bg-white rounded-xl border border-zinc-200 p-6 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#F1F0F8] rounded-xl text-[#433D8B]">
+            <div className="p-3 bg-zinc-50 rounded-xl text-blue-600">
               <IndianRupee className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">This Month</p>
-              <h3 className="text-2xl font-semibold text-[#17153B]">₹{totalThisMonth.toFixed(2)}</h3>
+              <p className="text-xs font-medium text-blue-600">This Month</p>
+              <h3 className="text-2xl font-semibold text-zinc-950">₹{totalThisMonth.toFixed(2)}</h3>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-3xl border border-[#E7E4EF] p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+        <div className="bg-white rounded-xl border border-zinc-200 p-6 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#F1F0F8] rounded-xl text-[#433D8B]">
+            <div className="p-3 bg-zinc-50 rounded-xl text-blue-600">
               <PieChart className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">Top Category</p>
-              <h3 className="text-2xl font-semibold text-[#17153B]">{topCategory}</h3>
+              <p className="text-xs font-medium text-blue-600">Top Category</p>
+              <h3 className="text-2xl font-semibold text-zinc-950">{topCategory}</h3>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl border border-[#E7E4EF] p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+        <div className="bg-white rounded-xl border border-zinc-200 p-6 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#F1F0F8] rounded-xl text-[#433D8B]">
+            <div className="p-3 bg-zinc-50 rounded-xl text-blue-600">
               <Activity className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">Avg. Per Day</p>
-              <h3 className="text-2xl font-semibold text-[#17153B]">₹{averagePerDay.toFixed(2)}</h3>
+              <p className="text-xs font-medium text-blue-600">Avg. Per Day</p>
+              <h3 className="text-2xl font-semibold text-zinc-950">₹{averagePerDay.toFixed(2)}</h3>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden">
-        <div className="p-4 border-b border-[#E7E4EF] flex flex-col sm:flex-row gap-4">
+      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-zinc-200 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9A94A8]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
             <input
               type="text"
               placeholder="Search expenses..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none"
+              className="w-full pl-10 pr-4 py-2 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none"
             />
           </div>
           <div className="relative">
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="appearance-none w-full sm:w-48 pl-10 pr-8 py-2 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none bg-white"
+              className="appearance-none w-full sm:w-48 pl-10 pr-8 py-2 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none bg-white"
             >
               <option value="All">All Categories</option>
               {CATEGORIES.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9A94A8]" />
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#F7F5FA] border-b border-[#E7E4EF]">
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-sm">Date</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-sm">Category</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-sm">Description</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-sm">Amount</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-sm">Payment</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-sm text-right">Actions</th>
+              <tr className="bg-zinc-50 border-b border-zinc-200">
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-sm">Date</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-sm">Category</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-sm">Description</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-sm">Amount</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-sm">Payment</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-sm text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredExpenses.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-[#9A94A8]">
+                  <td colSpan={6} className="px-6 py-8 text-center text-zinc-400">
                     No expenses found.
                   </td>
                 </tr>
               ) : (
                 filteredExpenses.map((expense) => (
-                  <tr key={expense.id} className="border-b border-[#E7E4EF] last:border-0 hover:bg-[#F7F5FA]/50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-[#17153B]">
+                  <tr key={expense.id} className="border-b border-zinc-200 last:border-0 hover:bg-zinc-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-zinc-950">
                       {new Date(expense.expense_date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#F1F0F8] text-[#433D8B]">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-50 text-blue-600">
                         {expense.category}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-[#17153B] max-w-xs truncate">
+                    <td className="px-6 py-4 text-sm text-zinc-950 max-w-xs truncate">
                       {expense.description || "-"}
                       {expense.supplier && (
-                        <div className="text-xs text-[#68647A] mt-0.5">
+                        <div className="text-xs text-zinc-500 mt-0.5">
                           Supplier: {expense.supplier.name}
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm font-medium text-[#17153B]">
+                    <td className="px-6 py-4 text-sm font-medium text-zinc-950">
                       ₹{Number(expense.amount).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-[#17153B]">{expense.payment_method || "-"}</span>
+                        <span className="text-zinc-950">{expense.payment_method || "-"}</span>
                         {expense.payment_status === "Paid" ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#3C8F70]/10 text-[#3C8F70]">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-600/10 text-emerald-600">
                             Paid
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#C58A3A]/10 text-[#C58A3A]">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-500">
                             {expense.payment_status}
                           </span>
                         )}
@@ -297,14 +297,14 @@ export default function ExpensesClient({
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => handleOpenModal(expense)}
-                          className="p-1.5 text-[#68647A] hover:bg-[#F1F0F8] hover:text-[#433D8B] rounded-lg transition-colors"
+                          className="p-1.5 text-zinc-500 hover:bg-zinc-50 hover:text-blue-600 rounded-lg transition-colors"
                         >
                           <span title="Edit"><Pencil className="w-4 h-4" /></span>
                         </button>
                         <button
                           onClick={() => handleDelete(expense.id)}
                           disabled={isDeleting === expense.id}
-                          className="p-1.5 text-[#68647A] hover:bg-[#B85454]/10 hover:text-[#B85454] rounded-lg transition-colors disabled:opacity-50"
+                          className="p-1.5 text-zinc-500 hover:bg-rose-600/10 hover:text-rose-600 rounded-lg transition-colors disabled:opacity-50"
                         >
                           <span title="Delete"><Trash2 className="w-4 h-4" /></span>
                         </button>
@@ -319,15 +319,15 @@ export default function ExpensesClient({
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-[#17153B]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-xl shadow-[0_12px_35px_rgba(23,21,59,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-6 py-4 border-b border-[#E7E4EF] flex justify-between items-center bg-white z-10">
-              <h2 className="text-xl font-semibold text-[#17153B]">
+        <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl w-full max-w-xl shadow-sm overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-zinc-200 flex justify-between items-center bg-white z-10">
+              <h2 className="text-xl font-semibold text-zinc-950">
                 {editingExpense ? 'Edit Expense' : 'Add Expense'}
               </h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-[#9A94A8] hover:bg-[#F1F0F8] hover:text-[#17153B] rounded-xl transition-colors"
+                className="p-2 text-zinc-400 hover:bg-zinc-50 hover:text-zinc-950 rounded-xl transition-colors"
               >
                 <span title="Close"><X className="w-5 h-5" /></span>
               </button>
@@ -336,7 +336,7 @@ export default function ExpensesClient({
             <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Amount (₹)*</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Amount (₹)*</label>
                   <input
                     type="number"
                     step="0.01"
@@ -344,28 +344,28 @@ export default function ExpensesClient({
                     required
                     value={formData.amount || ''}
                     onChange={(e) => setFormData({...formData, amount: parseFloat(e.target.value) || 0})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow"
                   />
                 </div>
                 
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Date*</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Date*</label>
                   <input
                     type="date"
                     required
                     value={formData.expense_date}
                     onChange={(e) => setFormData({...formData, expense_date: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow"
                   />
                 </div>
 
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Category*</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Category*</label>
                   <select
                     required
                     value={formData.category}
                     onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow bg-white"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow bg-white"
                   >
                     {CATEGORIES.map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -374,11 +374,11 @@ export default function ExpensesClient({
                 </div>
                 
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Supplier</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Supplier</label>
                   <select
                     value={formData.supplier_id}
                     onChange={(e) => setFormData({...formData, supplier_id: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow bg-white"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow bg-white"
                   >
                     <option value="">None</option>
                     {suppliers.map(sup => (
@@ -388,22 +388,22 @@ export default function ExpensesClient({
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Description</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Description</label>
                   <input
                     type="text"
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow"
                     placeholder="Brief description of the expense..."
                   />
                 </div>
 
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Payment Method</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Payment Method</label>
                   <select
                     value={formData.payment_method}
                     onChange={(e) => setFormData({...formData, payment_method: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow bg-white"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow bg-white"
                   >
                     <option value="Cash">Cash</option>
                     <option value="Card">Card</option>
@@ -414,11 +414,11 @@ export default function ExpensesClient({
                 </div>
                 
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Payment Status</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Payment Status</label>
                   <select
                     value={formData.payment_status}
                     onChange={(e) => setFormData({...formData, payment_status: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow bg-white"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow bg-white"
                   >
                     <option value="Paid">Paid</option>
                     <option value="Pending">Pending</option>
@@ -427,41 +427,41 @@ export default function ExpensesClient({
                 </div>
                 
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Tax Amount (₹)</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Tax Amount (₹)</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     value={formData.tax_amount || ''}
                     onChange={(e) => setFormData({...formData, tax_amount: parseFloat(e.target.value) || 0})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow"
                   />
                 </div>
                 
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Reference Number</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Reference Number</label>
                   <input
                     type="text"
                     value={formData.reference_number}
                     onChange={(e) => setFormData({...formData, reference_number: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] outline-none transition-shadow"
+                    className="w-full px-4 py-2.5 border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition-shadow"
                     placeholder="Invoice or receipt number"
                   />
                 </div>
               </div>
               
-              <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-[#E7E4EF]">
+              <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-zinc-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 text-sm font-medium text-[#68647A] hover:bg-[#F1F0F8] hover:text-[#17153B] rounded-xl transition-colors"
+                  className="px-5 py-2.5 text-sm font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-950 rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-5 py-2.5 text-sm font-medium bg-[#17153B] text-white rounded-xl hover:bg-[#2E236C] transition-colors active:scale-[0.98] disabled:opacity-50"
+                  className="px-5 py-2.5 text-sm font-medium bg-zinc-950 text-white rounded-xl hover:bg-blue-800 transition-colors active:scale-[0.98] disabled:opacity-50"
                 >
                   {isLoading ? 'Saving...' : 'Save Expense'}
                 </button>

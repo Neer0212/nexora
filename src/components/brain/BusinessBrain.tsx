@@ -148,14 +148,14 @@ function formatDate(value: string) {
 
 function priorityClasses(priority: Insight["priority"]) {
   if (priority === "high") {
-    return "border-[#17153B]/15 bg-[#17153B] text-[#F1F0F8]"
+    return "border-zinc-950/15 bg-zinc-950 text-zinc-50"
   }
 
   if (priority === "medium") {
-    return "border-[#433D8B]/15 bg-[#C8ACD6]/55 text-[#17153B]"
+    return "border-zinc-200 bg-zinc-100 text-zinc-950"
   }
 
-  return "border-[#433D8B]/10 bg-[#FFFFFF] text-[#17153B]"
+  return "border-blue-600/10 bg-white text-zinc-950"
 }
 
 export default function BusinessBrain({ data }: { data: BrainData }) {
@@ -359,17 +359,17 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#433D8B]" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]/55">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+            <p className="text-xs font-medium text-zinc-500">
               Business Brain
             </p>
           </div>
 
-          <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-[-0.045em] text-[#17153B] sm:text-4xl lg:text-5xl">
+          <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl lg:text-5xl">
             Understand what your business is telling you.
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#433D8B]/65">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-500">
             Nexora connects the signals already available in {data.businessName} and
             separates observations from conclusions.
           </p>
@@ -377,7 +377,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
 
         <Link
           href="/dashboard"
-          className="group inline-flex w-fit items-center gap-2 rounded-xl border border-[#433D8B]/15 bg-[#FFFFFF] px-4 py-2.5 text-xs font-medium text-[#2E236C] transition hover:bg-[#C8ACD6]/45"
+          className="group inline-flex w-fit items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-xs font-medium text-blue-800 transition hover:bg-blue-200/45"
         >
           Back to overview
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -385,19 +385,19 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
       </div>
 
       {/* Brain status */}
-      <section className="mt-7 overflow-hidden rounded-[26px] bg-[#17153B] text-[#F1F0F8] shadow-[0_18px_50px_rgba(45,35,46,0.12)]">
+      <section className="mt-7 overflow-hidden bg-zinc-950 text-zinc-50">
         <div className="grid lg:grid-cols-[1fr_auto]">
           <div className="p-6 sm:p-8">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F1F0F8]/10">
-                <Brain className="h-4 w-4 text-[#C8ACD6]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-50/10">
+                <Brain className="h-4 w-4 text-zinc-300" />
               </div>
 
               <div>
-                <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#C8ACD6]/45">
+                <p className="text-xs font-medium text-zinc-300/45">
                   Nexora&apos;s read
                 </p>
-                <p className="mt-0.5 text-xs text-[#F1F0F8]/75">
+                <p className="mt-0.5 text-xs text-zinc-50/75">
                   {hasBusinessContext
                     ? "Your connected signals are being interpreted together."
                     : "Your workspace needs business signals before interpretation can begin."}
@@ -406,33 +406,33 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
             </div>
 
             <div className="mt-8 max-w-3xl">
-              <h2 className="text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                 {insights[0]?.title ?? "Your business context is ready."}
               </h2>
 
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#C8ACD6]/60">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-300/60">
                 {insights[0]?.summary ??
                   "Add business data and Nexora will start turning isolated numbers into connected context."}
               </p>
             </div>
           </div>
 
-          <div className="border-t border-[#F1F0F8]/10 p-6 lg:w-72 lg:border-l lg:border-t-0">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#C8ACD6]/40">
+          <div className="border-t border-zinc-50/10 p-6 lg:w-72 lg:border-l lg:border-t-0">
+            <p className="text-xs font-medium text-zinc-300/40">
               Connected context
             </p>
 
-            <p className="mt-3 text-3xl font-semibold tracking-[-0.04em]">
+            <p className="mt-3 text-3xl font-semibold tracking-tight">
               {data.connectedSignals}/5
             </p>
 
-            <p className="mt-1 text-[10px] leading-5 text-[#C8ACD6]/50">
+            <p className="mt-1 text-[10px] leading-5 text-zinc-300/50">
               core signal groups currently available to Business Brain
             </p>
 
-            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#F1F0F8]/10">
+            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-zinc-50/10">
               <div
-                className="h-full rounded-full bg-[#C8ACD6] transition-all duration-500"
+                className="h-full rounded-full bg-blue-200 transition-all duration-500"
                 style={{ width: `${(data.connectedSignals / 5) * 100}%` }}
               />
             </div>
@@ -485,19 +485,19 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
 
       {/* Insight workspace */}
       <section className="mt-5 grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
-        <div className="overflow-hidden rounded-2xl border border-[#433D8B]/10 bg-[#FFFFFF] shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="border-b border-[#433D8B]/10 px-5 py-4 sm:px-6">
+        <div className="overflow-hidden border-t border-zinc-200 py-6">
+          <div className="mb-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#433D8B]/45">
+                <p className="text-xs font-medium text-zinc-500">
                   Signals worth understanding
                 </p>
-                <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+                <h2 className="mt-1 text-sm font-semibold text-zinc-950">
                   What Nexora noticed
                 </h2>
               </div>
 
-              <div className="flex flex-wrap gap-1 rounded-xl bg-[#F1F0F8] p-1">
+              <div className="flex flex-wrap gap-1 rounded-xl bg-zinc-50 p-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -505,8 +505,8 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
                     onClick={() => setActiveTab(tab.id)}
                     className={`rounded-lg px-3 py-2 text-[10px] font-medium transition ${
                       activeTab === tab.id
-                        ? "bg-[#FFFFFF] text-[#17153B] shadow-sm"
-                        : "text-[#433D8B]/55 hover:text-[#17153B]"
+                        ? "bg-white text-zinc-950 shadow-sm"
+                        : "text-zinc-500 hover:text-zinc-950"
                     }`}
                   >
                     {tab.label}
@@ -516,7 +516,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
             </div>
           </div>
 
-          <div className="divide-y divide-[#433D8B]/10">
+          <div className="divide-y divide-blue-600/10">
             {filteredInsights.length > 0 ? (
               filteredInsights.map((insight) => {
                 const Icon = insight.icon
@@ -528,34 +528,34 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
                     type="button"
                     onClick={() => setSelectedInsightId(insight.id)}
                     className={`group flex w-full items-start gap-4 p-5 text-left transition sm:p-6 ${
-                      selected ? "bg-[#F1F0F8]/55" : "hover:bg-[#F1F0F8]/35"
+                      selected ? "bg-zinc-50/55" : "hover:bg-zinc-50/35"
                     }`}
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C8ACD6]/55">
-                      <Icon className="h-4 w-4 text-[#433D8B]" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100">
+                      <Icon className="h-4 w-4 text-blue-600" />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-[#17153B]">
+                        <p className="text-sm font-semibold text-zinc-950">
                           {insight.title}
                         </p>
 
                         <span
-                          className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.1em] ${priorityClasses(insight.priority)}`}
+                          className={`rounded-full border px-2 py-0.5 text-xs font-medium ${priorityClasses(insight.priority)}`}
                         >
                           {insight.priority}
                         </span>
                       </div>
 
-                      <p className="mt-1 text-xs leading-5 text-[#433D8B]/60">
+                      <p className="mt-1 text-xs leading-5 text-zinc-500">
                         {insight.summary}
                       </p>
                     </div>
 
                     <ChevronRight
-                      className={`mt-1 h-4 w-4 shrink-0 text-[#433D8B]/25 transition-transform ${
-                        selected ? "translate-x-0.5 text-[#433D8B]/60" : "group-hover:translate-x-0.5"
+                      className={`mt-1 h-4 w-4 shrink-0 text-blue-600/25 transition-transform ${
+                        selected ? "translate-x-0.5 text-zinc-500" : "group-hover:translate-x-0.5"
                       }`}
                     />
                   </button>
@@ -573,34 +573,34 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
         </div>
 
         {/* Explanation panel */}
-        <div className="rounded-2xl border border-[#433D8B]/10 bg-[#F1F0F8] p-5 sm:p-6">
+        <div className="border-t border-zinc-200 bg-zinc-50/50 py-6 p-5 sm:p-6">
           <div className="flex items-center gap-2">
-            <CircleAlert className="h-4 w-4 text-[#433D8B]" />
-            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#433D8B]/50">
+            <CircleAlert className="h-4 w-4 text-blue-600" />
+            <p className="text-xs font-medium text-blue-600/50">
               Why this matters
             </p>
           </div>
 
           {selectedInsight ? (
             <>
-              <h2 className="mt-5 text-2xl font-semibold tracking-[-0.035em] text-[#17153B]">
+              <h2 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-950">
                 {selectedInsight.title}
               </h2>
 
-              <p className="mt-3 text-sm leading-6 text-[#433D8B]/65">
+              <p className="mt-3 text-sm leading-6 text-zinc-500">
                 {selectedInsight.detail}
               </p>
 
-              <div className="mt-7 rounded-2xl border border-[#433D8B]/10 bg-[#FFFFFF] p-5">
-                <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#433D8B]/40">
+              <div className="mt-7 rounded-2xl border border-blue-600/10 bg-white p-5">
+                <p className="text-xs font-medium text-blue-600/40">
                   Evidence
                 </p>
 
                 <div className="mt-4 space-y-3">
                   {selectedInsight.evidence.map((item) => (
                     <div key={item} className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#433D8B]" />
-                      <p className="text-xs leading-5 text-[#433D8B]/70">{item}</p>
+                      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />
+                      <p className="text-xs leading-5 text-blue-600/70">{item}</p>
                     </div>
                   ))}
                 </div>
@@ -609,7 +609,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
               {selectedInsight.href && (
                 <Link
                   href={selectedInsight.href}
-                  className="group mt-5 inline-flex items-center gap-2 text-xs font-medium text-[#17153B]"
+                  className="group mt-5 inline-flex items-center gap-2 text-xs font-medium text-zinc-950"
                 >
                   Investigate the underlying data
                   <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -627,15 +627,15 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
 
       {/* Supporting context */}
       <section className="mt-5 grid gap-5 lg:grid-cols-2">
-        <section className="rounded-2xl border border-[#433D8B]/10 bg-[#FFFFFF] shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="border-b border-[#433D8B]/10 px-5 py-5 sm:px-6">
+        <section className="border-t border-zinc-200 py-6">
+          <div className="mb-4">
             <div className="flex items-center gap-2">
-              <Package className="h-4 w-4 text-[#433D8B]" />
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#433D8B]/45">
+              <Package className="h-4 w-4 text-blue-600" />
+              <p className="text-xs font-medium text-zinc-500">
                 Product context
               </p>
             </div>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">
               Where current sales are concentrated
             </h2>
           </div>
@@ -646,27 +646,27 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
                 {data.topProducts.map((product, index) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-3 rounded-xl border border-[#433D8B]/10 p-3"
+                    className="flex items-center gap-3 rounded-xl border border-blue-600/10 p-3"
                   >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#C8ACD6]/55 text-[9px] font-semibold text-[#433D8B]">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-[9px] font-semibold text-blue-600">
                       {String(index + 1).padStart(2, "0")}
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium text-[#17153B]">
+                      <p className="truncate text-xs font-medium text-zinc-950">
                         {product.name}
                       </p>
-                      <p className="mt-0.5 text-[9px] text-[#433D8B]/45">
+                      <p className="mt-0.5 text-[9px] text-zinc-500">
                         {product.category || "Uncategorised"} · {product.quantity.toLocaleString("en-IN")} units
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <p className="text-xs font-semibold text-[#17153B]">
+                      <p className="text-xs font-semibold text-zinc-950">
                         {formatCompactCurrency(product.revenue, data.currencyCode)}
                       </p>
                       {product.lowStock && (
-                        <p className="mt-0.5 text-[8px] font-medium text-[#433D8B]">
+                        <p className="mt-0.5 text-[8px] font-medium text-blue-600">
                           Low stock
                         </p>
                       )}
@@ -683,15 +683,15 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#433D8B]/10 bg-[#FFFFFF] shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="border-b border-[#433D8B]/10 px-5 py-5 sm:px-6">
+        <section className="border-t border-zinc-200 py-6">
+          <div className="mb-4">
             <div className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-[#433D8B]" />
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#433D8B]/45">
+              <Truck className="h-4 w-4 text-blue-600" />
+              <p className="text-xs font-medium text-zinc-500">
                 Supply context
               </p>
             </div>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">
               Supplier signals worth watching
             </h2>
           </div>
@@ -703,17 +703,17 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
                   <Link
                     key={supplier.id}
                     href="/suppliers"
-                    className="group flex items-center gap-3 rounded-xl border border-[#433D8B]/10 p-3 transition hover:bg-[#F1F0F8]/45"
+                    className="group flex items-center gap-3 rounded-xl border border-blue-600/10 p-3 transition hover:bg-zinc-50/45"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#C8ACD6]/55">
-                      <Truck className="h-3.5 w-3.5 text-[#433D8B]" />
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
+                      <Truck className="h-3.5 w-3.5 text-blue-600" />
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium text-[#17153B]">
+                      <p className="truncate text-xs font-medium text-zinc-950">
                         {supplier.name}
                       </p>
-                      <p className="mt-0.5 text-[9px] text-[#433D8B]/45">
+                      <p className="mt-0.5 text-[9px] text-zinc-500">
                         {supplier.leadTime === null
                           ? "Lead time unavailable"
                           : `${supplier.leadTime} days lead time`}
@@ -723,7 +723,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
                       </p>
                     </div>
 
-                    <ArrowRight className="h-3.5 w-3.5 text-[#433D8B]/25 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-3.5 w-3.5 text-blue-600/25 transition-transform group-hover:translate-x-1" />
                   </Link>
                 ))}
               </div>
@@ -743,15 +743,15 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
 
       {/* Events and recommendations */}
       <section className="mt-5 grid gap-5 lg:grid-cols-2">
-        <section className="rounded-2xl border border-[#433D8B]/10 bg-[#FFFFFF] shadow-[0_12px_35px_rgba(45,35,46,0.04)]">
-          <div className="border-b border-[#433D8B]/10 px-5 py-5 sm:px-6">
+        <section className="border-t border-zinc-200 py-6">
+          <div className="mb-4">
             <div className="flex items-center gap-2">
-              <CircleAlert className="h-4 w-4 text-[#433D8B]" />
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#433D8B]/45">
+              <CircleAlert className="h-4 w-4 text-blue-600" />
+              <p className="text-xs font-medium text-zinc-500">
                 Business events
               </p>
             </div>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">
               Recent context
             </h2>
           </div>
@@ -761,26 +761,26 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
               <div className="space-y-4">
                 {data.events.map((event) => (
                   <div key={event.id} className="flex gap-3">
-                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#C8ACD6]/55">
-                      <CircleAlert className="h-3.5 w-3.5 text-[#433D8B]" />
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
+                      <CircleAlert className="h-3.5 w-3.5 text-blue-600" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-xs font-medium text-[#17153B]">
+                        <p className="text-xs font-medium text-zinc-950">
                           {event.title}
                         </p>
                         {event.severity && (
-                          <span className="rounded-full bg-[#F1F0F8] px-2 py-0.5 text-[8px] font-medium capitalize text-[#433D8B]/60">
+                          <span className="rounded-full bg-zinc-50 px-2 py-0.5 text-[8px] font-medium capitalize text-zinc-500">
                             {event.severity}
                           </span>
                         )}
                       </div>
                       {event.description && (
-                        <p className="mt-1 text-[10px] leading-5 text-[#433D8B]/55">
+                        <p className="mt-1 text-[10px] leading-5 text-zinc-500">
                           {event.description}
                         </p>
                       )}
-                      <p className="mt-1 text-[9px] text-[#433D8B]/35">
+                      <p className="mt-1 text-[9px] text-blue-600/35">
                         {formatDate(event.occurredAt)}
                       </p>
                     </div>
@@ -796,15 +796,15 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#433D8B]/10 bg-[#F1F0F8] shadow-[0_12px_35px_rgba(45,35,46,0.03)]">
-          <div className="border-b border-[#433D8B]/10 px-5 py-5 sm:px-6">
+        <section className="border-t border-zinc-200 bg-zinc-50/50 py-6 shadow-sm">
+          <div className="mb-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#433D8B]" />
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#433D8B]/45">
+              <Sparkles className="h-4 w-4 text-blue-600" />
+              <p className="text-xs font-medium text-zinc-500">
                 Recommendations
               </p>
             </div>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">
               Decisions waiting for review
             </h2>
           </div>
@@ -816,26 +816,26 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
                   <Link
                     key={recommendation.id}
                     href="/recommendations"
-                    className="group block rounded-xl border border-[#433D8B]/10 bg-[#FFFFFF] p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
+                    className="group block rounded-xl border border-blue-600/10 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#17153B] text-[#C8ACD6]">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-zinc-300">
                         <Sparkles className="h-3.5 w-3.5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-[#17153B]">
+                        <p className="text-xs font-semibold text-zinc-950">
                           {recommendation.title}
                         </p>
-                        <p className="mt-1 text-[10px] leading-5 text-[#433D8B]/55">
+                        <p className="mt-1 text-[10px] leading-5 text-zinc-500">
                           {recommendation.reason || "Ready for review."}
                         </p>
                         {recommendation.confidence > 0 && (
-                          <p className="mt-2 text-[9px] font-medium text-[#433D8B]/45">
+                          <p className="mt-2 text-[9px] font-medium text-zinc-500">
                             {recommendation.confidence.toFixed(0)}% confidence
                           </p>
                         )}
                       </div>
-                      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-[#433D8B]/25 transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-blue-600/25 transition-transform group-hover:translate-x-1" />
                     </div>
                   </Link>
                 ))}
@@ -851,17 +851,17 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
       </section>
 
       {/* Bottom principle */}
-      <section className="mt-5 rounded-2xl border border-[#433D8B]/10 bg-[#FFFFFF] p-5 shadow-[0_12px_35px_rgba(45,35,46,0.04)] sm:p-6">
+      <section className="mt-5 rounded-2xl border border-blue-600/10 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#C8ACD6]/55">
-              <AlertTriangle className="h-4 w-4 text-[#433D8B]" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100">
+              <AlertTriangle className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-[#17153B]">
+              <p className="text-xs font-semibold text-zinc-950">
                 Nexora separates evidence from interpretation.
               </p>
-              <p className="mt-1 max-w-3xl text-[10px] leading-5 text-[#433D8B]/50">
+              <p className="mt-1 max-w-3xl text-[10px] leading-5 text-blue-600/50">
                 A signal is not automatically a cause, and a recommendation is not automatically a decision. Business Brain shows the evidence first so you can investigate with context.
               </p>
             </div>
@@ -869,7 +869,7 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
 
           <Link
             href="/dashboard"
-            className="group inline-flex shrink-0 items-center gap-2 text-xs font-medium text-[#17153B]"
+            className="group inline-flex shrink-0 items-center gap-2 text-xs font-medium text-zinc-950"
           >
             See the underlying dashboard
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -892,20 +892,20 @@ function Metric({
   icon: typeof TrendingUp
 }) {
   return (
-    <div className="rounded-2xl border border-[#433D8B]/10 bg-[#FFFFFF] p-5 shadow-[0_12px_35px_rgba(45,35,46,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(45,35,46,0.07)]">
+    <div className="rounded-2xl border border-blue-600/10 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-sm">
       <div className="flex items-center justify-between">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#433D8B]/45">
+        <p className="text-xs font-medium text-zinc-500">
           {label}
         </p>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#C8ACD6]/55">
-          <Icon className="h-3.5 w-3.5 text-[#433D8B]" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100">
+          <Icon className="h-3.5 w-3.5 text-blue-600" />
         </div>
       </div>
 
-      <p className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-[#17153B]">
+      <p className="mt-6 text-2xl font-semibold tracking-tight text-zinc-950">
         {value}
       </p>
-      <p className="mt-1 text-[10px] leading-5 text-[#433D8B]/50">{detail}</p>
+      <p className="mt-1 text-[10px] leading-5 text-blue-600/50">{detail}</p>
     </div>
   )
 }
@@ -918,9 +918,9 @@ function EmptyState({
   description: string
 }) {
   return (
-    <div className="flex min-h-28 flex-col justify-center rounded-xl border border-dashed border-[#433D8B]/10 bg-[#F1F0F8]/40 px-5 py-6">
-      <p className="text-xs font-medium text-[#17153B]">{title}</p>
-      <p className="mt-1 max-w-xl text-[10px] leading-5 text-[#433D8B]/50">
+    <div className="flex min-h-28 flex-col justify-center rounded-xl border border-dashed border-blue-600/10 bg-zinc-50/40 px-5 py-6">
+      <p className="text-xs font-medium text-zinc-950">{title}</p>
+      <p className="mt-1 max-w-xl text-[10px] leading-5 text-blue-600/50">
         {description}
       </p>
     </div>

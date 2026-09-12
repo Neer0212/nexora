@@ -90,8 +90,8 @@ export default function InventoryClient({ businessId, transactions, products, su
   }
 
   const getTypeIcon = (type: string, qty: number) => {
-    if (qty > 0) return <ArrowUpRight className="w-4 h-4 text-[#3C8F70]" />
-    return <ArrowDownRight className="w-4 h-4 text-[#B85454]" />
+    if (qty > 0) return <ArrowUpRight className="w-4 h-4 text-emerald-600" />
+    return <ArrowDownRight className="w-4 h-4 text-rose-600" />
   }
 
   // Low-stock products for warning banner
@@ -104,21 +104,21 @@ export default function InventoryClient({ businessId, transactions, products, su
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">Operations</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#17153B] sm:text-4xl">Inventory Ledger</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#68647A]">View product stock movements and record manual adjustments.</p>
+          <p className="text-xs font-medium text-blue-600">Operations</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">Inventory Ledger</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-500">View product stock movements and record manual adjustments.</p>
         </div>
         <button 
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#2E236C] transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-800 transition-colors shadow-sm"
         >
           <RefreshCw className="w-4 h-4" /> Record Movement
         </button>
       </div>
 
       {lowStockProducts.length > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-[#C58A3A]/20 bg-[#FDF6EC] p-4">
-          <AlertCircle className="h-5 w-5 text-[#C58A3A] shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-[#FDF6EC] p-4">
+          <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-[#8B6020] text-sm">
               {lowStockProducts.length} product{lowStockProducts.length > 1 ? "s" : ""} below low-stock threshold
@@ -130,52 +130,52 @@ export default function InventoryClient({ businessId, transactions, products, su
         </div>
       )}
 
-      <div className="bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden">
+      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-[#F7F5FA] border-b border-[#E7E4EF]">
+            <thead className="bg-zinc-50 border-b border-zinc-200">
               <tr>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">Date</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">Product</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">Type</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">Supplier</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">Reference</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-right">Qty Change</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">Date</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">Product</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">Type</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">Supplier</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">Reference</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-right">Qty Change</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F0EDF5]">
+            <tbody className="divide-y divide-zinc-200">
               {transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#68647A]">
-                    <PackageOpen className="mx-auto h-8 w-8 text-[#C8ACD6] mb-3" />
-                    <p className="font-medium text-[#17153B]">No inventory movements found</p>
+                  <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
+                    <PackageOpen className="mx-auto h-8 w-8 text-blue-200 mb-3" />
+                    <p className="font-medium text-zinc-950">No inventory movements found</p>
                   </td>
                 </tr>
               ) : (
                 transactions.map(tx => (
-                  <tr key={tx.id} className="hover:bg-[#FBFAFD] transition-colors">
+                  <tr key={tx.id} className="hover:bg-zinc-50/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="font-medium text-[#17153B]">{new Date(tx.created_at).toLocaleDateString()}</p>
-                      <p className="text-xs text-[#9A94A8]">{new Date(tx.created_at).toLocaleTimeString()}</p>
+                      <p className="font-medium text-zinc-950">{new Date(tx.created_at).toLocaleDateString()}</p>
+                      <p className="text-xs text-zinc-400">{new Date(tx.created_at).toLocaleTimeString()}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-medium text-[#17153B]">{tx.product?.name ?? "Unknown"}</p>
-                      <p className="text-xs text-[#68647A]">{tx.product?.sku ?? ""}</p>
+                      <p className="font-medium text-zinc-950">{tx.product?.name ?? "Unknown"}</p>
+                      <p className="text-xs text-zinc-500">{tx.product?.sku ?? ""}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F3F1F6] px-2.5 py-1 text-[11px] font-medium text-[#17153B] capitalize">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] font-medium text-zinc-950 capitalize">
                         {getTypeIcon(tx.transaction_type, tx.quantity)}
                         {tx.transaction_type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-[#68647A] text-sm">
+                    <td className="px-6 py-4 text-zinc-500 text-sm">
                       {tx.supplier?.name || "—"}
                     </td>
-                    <td className="px-6 py-4 text-[#68647A]">
+                    <td className="px-6 py-4 text-zinc-500">
                       {tx.reference || "—"}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <span className={`font-semibold ${tx.quantity > 0 ? 'text-[#3C8F70]' : 'text-[#B85454]'}`}>
+                      <span className={`font-semibold ${tx.quantity > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {tx.quantity > 0 ? "+" : ""}{tx.quantity}
                       </span>
                     </td>
@@ -188,15 +188,15 @@ export default function InventoryClient({ businessId, transactions, products, su
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#17153B]/20 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-[#E7E4EF]">
-            <div className="px-6 py-5 border-b border-[#E7E4EF] bg-[#FBFAFD]">
-              <h2 className="text-xl font-semibold text-[#17153B]">Record Inventory Movement</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/20 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border border-zinc-200">
+            <div className="px-6 py-5 border-b border-zinc-200 bg-zinc-50/50">
+              <h2 className="text-xl font-semibold text-zinc-950">Record Inventory Movement</h2>
             </div>
             
             <div className="p-6">
               {error && (
-                <div className="mb-6 flex items-start gap-3 rounded-xl border border-[#B85454]/20 bg-[#B85454]/5 p-4 text-sm text-[#8D3F3F]">
+                <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-600/20 bg-rose-600/5 p-4 text-sm text-rose-800">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -204,12 +204,12 @@ export default function InventoryClient({ businessId, transactions, products, su
 
               <form id="tx-form" onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-[#68647A] mb-1.5">Product *</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Product *</label>
                   <select required value={formData.product_id} onChange={e => {
                     const pid = e.target.value
                     const p = products.find(x => x.id === pid)
                     setFormData(prev => ({ ...prev, product_id: pid, unit_cost: p?.unit_cost?.toString() || "" }))
-                  }} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]">
+                  }} className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
                     <option value="">Select a product...</option>
                     {products.map(p => (
                       <option key={p.id} value={p.id}>
@@ -221,16 +221,16 @@ export default function InventoryClient({ businessId, transactions, products, su
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Type</label>
-                    <select value={formData.transaction_type} onChange={e => setFormData(prev => ({ ...prev, transaction_type: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]">
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Type</label>
+                    <select value={formData.transaction_type} onChange={e => setFormData(prev => ({ ...prev, transaction_type: e.target.value }))} className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
                       {Object.entries(TYPE_LABELS).map(([val, label]) => (
                         <option key={val} value={val}>{label}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Direction</label>
-                    <select value={formData.direction} onChange={e => setFormData(prev => ({ ...prev, direction: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]">
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Direction</label>
+                    <select value={formData.direction} onChange={e => setFormData(prev => ({ ...prev, direction: e.target.value }))} className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
                       <option value="add">Add (+)</option>
                       <option value="remove">Remove (-)</option>
                     </select>
@@ -239,19 +239,19 @@ export default function InventoryClient({ businessId, transactions, products, su
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Quantity *</label>
-                    <input required type="number" min="0.01" step="0.01" value={formData.quantity} onChange={e => setFormData(prev => ({ ...prev, quantity: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]" placeholder="0" />
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Quantity *</label>
+                    <input required type="number" min="0.01" step="0.01" value={formData.quantity} onChange={e => setFormData(prev => ({ ...prev, quantity: e.target.value }))} className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="0" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Unit Cost</label>
-                    <input type="number" min="0" step="0.01" value={formData.unit_cost} onChange={e => setFormData(prev => ({ ...prev, unit_cost: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]" placeholder="₹0.00" />
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Unit Cost</label>
+                    <input type="number" min="0" step="0.01" value={formData.unit_cost} onChange={e => setFormData(prev => ({ ...prev, unit_cost: e.target.value }))} className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="₹0.00" />
                   </div>
                 </div>
 
                 {suppliers.length > 0 && (
                   <div>
-                    <label className="block text-xs font-medium text-[#68647A] mb-1.5">Supplier (Optional)</label>
-                    <select value={formData.supplier_id} onChange={e => setFormData(prev => ({ ...prev, supplier_id: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]">
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Supplier (Optional)</label>
+                    <select value={formData.supplier_id} onChange={e => setFormData(prev => ({ ...prev, supplier_id: e.target.value }))} className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
                       <option value="">No supplier</option>
                       {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
@@ -259,17 +259,17 @@ export default function InventoryClient({ businessId, transactions, products, su
                 )}
 
                 <div>
-                  <label className="block text-xs font-medium text-[#68647A] mb-1.5">Reference (Invoice / Reason)</label>
-                  <input type="text" value={formData.reference} onChange={e => setFormData(prev => ({ ...prev, reference: e.target.value }))} className="w-full rounded-xl border border-[#D9D5E4] px-4 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]" placeholder="e.g. PO-2023, Damaged goods" />
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Reference (Invoice / Reason)</label>
+                  <input type="text" value={formData.reference} onChange={e => setFormData(prev => ({ ...prev, reference: e.target.value }))} className="w-full rounded-xl border border-zinc-300 px-4 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="e.g. PO-2023, Damaged goods" />
                 </div>
               </form>
             </div>
 
-            <div className="p-5 border-t border-[#E7E4EF] bg-[#FBFAFD] flex justify-end gap-3">
-              <button type="button" onClick={() => setModalOpen(false)} disabled={isPending} className="px-5 py-2.5 text-sm font-medium text-[#68647A] bg-white border border-[#D9D5E4] rounded-xl hover:bg-[#F3F1F6] transition-colors disabled:opacity-50">
+            <div className="p-5 border-t border-zinc-200 bg-zinc-50/50 flex justify-end gap-3">
+              <button type="button" onClick={() => setModalOpen(false)} disabled={isPending} className="px-5 py-2.5 text-sm font-medium text-zinc-500 bg-white border border-zinc-300 rounded-xl hover:bg-zinc-100 transition-colors disabled:opacity-50">
                 Cancel
               </button>
-              <button type="submit" form="tx-form" disabled={isPending} className="inline-flex items-center justify-center min-w-[100px] px-5 py-2.5 text-sm font-medium text-white bg-[#17153B] rounded-xl hover:bg-[#2E236C] transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" form="tx-form" disabled={isPending} className="inline-flex items-center justify-center min-w-[100px] px-5 py-2.5 text-sm font-medium text-white bg-zinc-950 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-50 shadow-sm">
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
               </button>
             </div>

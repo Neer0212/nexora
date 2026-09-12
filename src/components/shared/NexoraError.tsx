@@ -33,7 +33,7 @@ export function NexoraError({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-[var(--nexora-surface)] rounded-2xl shadow-[0_12px_35px_rgba(23,21,59,0.04)] border border-[var(--nexora-border)] text-center max-w-md mx-auto my-8">
+    <div className="flex flex-col items-center justify-center p-8 bg-[var(--nexora-surface)] rounded-2xl shadow-sm border border-[var(--nexora-border)] text-center max-w-md mx-auto my-8">
       {getIcon()}
       <h3 className="text-xl font-semibold text-[var(--nexora-ink)] mb-2">{title}</h3>
       <p className="text-[var(--nexora-muted)] text-sm mb-6">{message}</p>

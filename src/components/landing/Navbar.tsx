@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react"
 export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-[#433D8B]/15 bg-[#F1F0F8]/90 px-4 shadow-[0_8px_30px_rgba(45,35,46,0.06)] backdrop-blur-xl sm:px-5">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-blue-600/15 bg-zinc-50/90 px-4 shadow-sm backdrop-blur-xl sm:px-5">
         
         {/* Brand */}
         <Link
@@ -27,21 +27,21 @@ export default function Navbar() {
         <div className="hidden items-center gap-8 md:flex">
           <a
             href="#product"
-            className="text-sm text-[#433D8B] transition-colors hover:text-[#17153B]"
+            className="text-sm text-blue-600 transition-colors hover:text-zinc-950"
           >
             Product
           </a>
 
           <a
             href="#intelligence"
-            className="text-sm text-[#433D8B] transition-colors hover:text-[#17153B]"
+            className="text-sm text-blue-600 transition-colors hover:text-zinc-950"
           >
             Intelligence
           </a>
 
           <a
             href="#how-it-works"
-            className="text-sm text-[#433D8B] transition-colors hover:text-[#17153B]"
+            className="text-sm text-blue-600 transition-colors hover:text-zinc-950"
           >
             How it works
           </a>
@@ -51,14 +51,14 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className="hidden rounded-xl px-4 py-2.5 text-sm font-medium text-[#2E236C] transition hover:bg-[#C8ACD6]/60 sm:block"
+            className="hidden rounded-xl px-4 py-2.5 text-sm font-medium text-blue-800 transition hover:bg-blue-200/60 sm:block"
           >
             Log in
           </Link>
 
           <Link
             href="/signup"
-            className="group flex items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2.5 text-sm font-medium text-[#F1F0F8] transition hover:bg-[#2E236C]"
+            className="group flex items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-medium text-zinc-50 transition hover:bg-blue-800"
           >
             Get started
 

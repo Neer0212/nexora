@@ -80,16 +80,16 @@ function NavItem({
       className={[
         "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         isActive
-          ? "bg-[#F0EEF6] font-medium text-[#17153B]"
-          : "text-[#68647A] hover:bg-[#F1F0F8] hover:text-[#17153B]",
+          ? "bg-zinc-100 font-medium text-zinc-950"
+          : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-950",
       ].join(" ")}
     >
       <Icon
         className={[
           "h-[17px] w-[17px] shrink-0",
           isActive
-            ? "text-[#17153B]"
-            : "text-[#9A94A8] group-hover:text-[#433D8B]",
+            ? "text-zinc-950"
+            : "text-zinc-400 group-hover:text-blue-600",
         ].join(" ")}
         strokeWidth={1.8}
       />
@@ -108,10 +108,12 @@ function Section({
   pathname: string
 }) {
   return (
-    <div className="mt-7">
-      <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9A94A8]">
-        {label}
-      </p>
+    <div className="mt-6">
+      {label && (
+        <p className="mb-2 px-3 text-xs font-semibold text-zinc-900">
+          {label}
+        </p>
+      )}
       <div className="space-y-0.5">
         {items.map((item) => (
           <NavItem key={item.href} {...item} pathname={pathname} />
@@ -131,14 +133,14 @@ export default function Sidebar({ industryConfig }: { industryConfig: IndustryCo
   }))
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 self-start border-r border-[#E7E4EF] bg-white lg:flex lg:flex-col">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 self-start border-r border-zinc-200 bg-white lg:flex lg:flex-col">
       {/* Logo */}
-      <div className="flex h-16 items-center border-b border-[#E7E4EF] px-5">
+      <div className="flex h-16 items-center border-b border-zinc-200 px-5">
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#17153B]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950">
             <Sparkles className="h-4 w-4 text-white" />
           </div>
-          <span className="text-[15px] font-semibold tracking-tight text-[#17153B]">
+          <span className="text-[15px] font-semibold tracking-tight text-zinc-950">
             nexora
           </span>
         </Link>
@@ -149,22 +151,22 @@ export default function Sidebar({ industryConfig }: { industryConfig: IndustryCo
         {/* Business switcher */}
         <Link
           href="/dashboard"
-          className="mb-2 flex items-center justify-between rounded-lg border border-[#E7E4EF] px-3 py-2.5 transition-colors hover:bg-[#F1F0F8]"
+          className="mb-4 flex items-center justify-between rounded-lg px-3 py-2 transition-colors hover:bg-zinc-50"
         >
-          <div className="flex min-w-0 items-center gap-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#F0EEF6]">
-              <Building2 className="h-3.5 w-3.5 text-[#68647A]" />
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white shadow-sm">
+              <Building2 className="h-4 w-4 text-zinc-700" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-[#2E236C]">
+              <p className="truncate text-sm font-medium text-zinc-950">
                 Your Business
               </p>
-              <p className="text-[10px] text-[#9A94A8]">
+              <p className="text-xs text-zinc-500">
                 {industryConfig.shortName}
               </p>
             </div>
           </div>
-          <ChevronDown className="h-3.5 w-3.5 text-[#9A94A8]" />
+          <ChevronDown className="h-4 w-4 text-zinc-400" />
         </Link>
 
         {/* Industry-aware operations */}
@@ -175,14 +177,14 @@ export default function Sidebar({ industryConfig }: { industryConfig: IndustryCo
         />
 
         {/* Static core sections */}
-        <Section label="Understand" items={understandNav} pathname={pathname} />
-        <Section label="Investigate" items={investigateNav} pathname={pathname} />
-        <Section label="Intelligence" items={intelligenceNav} pathname={pathname} />
-        <Section label="Decide" items={decideNav} pathname={pathname} />
+        <Section label="" items={understandNav} pathname={pathname} />
+        <Section label="" items={investigateNav} pathname={pathname} />
+        <Section label="" items={intelligenceNav} pathname={pathname} />
+        <Section label="" items={decideNav} pathname={pathname} />
       </div>
 
       {/* Footer */}
-      <div className="border-t border-[#E7E4EF] p-3">
+      <div className="border-t border-zinc-200 p-3">
         <NavItem href="/profile" label="Profile" icon={User} pathname={pathname} />
       </div>
     </aside>

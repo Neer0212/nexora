@@ -33,8 +33,8 @@ export default async function SuppliersPage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#17153B] tracking-tight">Suppliers & Vendors</h1>
-        <p className="text-[#68647A] mt-2">Monitor supplier lead times, reliability, and risk across your supply chain.</p>
+        <h1 className="text-3xl font-bold text-zinc-950 tracking-tight">Suppliers & Vendors</h1>
+        <p className="text-zinc-500 mt-2">Monitor supplier lead times, reliability, and risk across your supply chain.</p>
       </div>
 
       <SuppliersView data={viewData} />

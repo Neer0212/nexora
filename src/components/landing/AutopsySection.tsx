@@ -1,13 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import {
   ArrowRight,
-  ChevronDown,
-  CircleAlert,
   Search,
-  Sparkles,
-  TrendingDown,
 } from "lucide-react"
 
 const factors = [
@@ -35,258 +30,74 @@ const factors = [
 ]
 
 export default function AutopsySection() {
-  const [expanded, setExpanded] = useState<number | null>(0)
-
   return (
     <section
       id="how-it-works"
-      className="relative overflow-hidden bg-[#F1F0F8] py-16 sm:py-20"
+      className="relative overflow-hidden bg-zinc-50 py-24 sm:py-32 border-t border-zinc-200"
     >
-      <div className="pointer-events-none absolute right-[-180px] top-20 h-[500px] w-[500px] rounded-full bg-[#C8ACD6]/45 blur-3xl" />
-
-      <div className="relative mx-auto max-w-7xl px-6">
-        {/* Heading */}
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#433D8B]/15 bg-[#FFFFFF]/50 px-3.5 py-2">
-              <Search className="h-3.5 w-3.5 text-[#433D8B]" />
-
-              <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#433D8B]">
-                Business autopsy
-              </span>
-            </div>
-
-            <h2 className="mt-5 text-4xl font-semibold leading-[1.04] tracking-[-0.045em] text-[#17153B] sm:text-5xl lg:text-6xl">
-              Don&apos;t just see
-              <span className="block text-[#433D8B]">
-                what changed.
-              </span>
-              <span className="block">Know why.</span>
-            </h2>
+      <div className="relative mx-auto max-w-5xl px-6">
+        <div className="flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 mb-6">
+            <Search className="h-3.5 w-3.5 text-blue-600" />
+            <span className="text-xs font-medium uppercase tracking-widest text-zinc-950">
+              Business Autopsy
+            </span>
           </div>
 
-          <div className="max-w-xl">
-            <p className="text-base leading-7 text-[#433D8B] sm:text-lg">
-              When an important number moves, Nexora works backwards through
-              your business data to identify the signals that matter.
-            </p>
+          <h2 className="text-4xl font-semibold leading-tight tracking-tight text-zinc-950 sm:text-5xl max-w-2xl">
+            Don't just see what changed. Know why.
+          </h2>
 
-            <p className="mt-3 text-sm leading-6 text-[#433D8B]/65">
-              No endless spreadsheet comparisons. No guessing. Just a clear
-              explanation of what is driving the change.
+          <p className="mt-6 text-lg leading-8 text-zinc-600 max-w-2xl">
+            When an important number moves, Nexora works backwards through
+            your business data to identify the signals that matter. No endless spreadsheet comparisons. No guessing. Just a clear explanation of what is driving the change.
+          </p>
+        </div>
+
+        <div className="mt-16 bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="p-6 sm:p-8 border-b border-zinc-200">
+            <h3 className="text-xl font-semibold text-zinc-950">
+              The decline is mainly connected to product availability.
+            </h3>
+            <p className="mt-2 text-sm text-zinc-600">
+              Nexora traced the change across inventory, orders, supplier performance, and regional demand.
             </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-zinc-50">
+                <tr>
+                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200">Factor</th>
+                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200">Impact</th>
+                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200">Contribution</th>
+                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200 w-full">Description</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200">
+                {factors.map((factor) => (
+                  <tr key={factor.title} className="hover:bg-zinc-50/50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-zinc-950">{factor.title}</td>
+                    <td className="px-6 py-4 text-zinc-950 font-medium">{factor.impact}</td>
+                    <td className="px-6 py-4 text-zinc-600">{factor.contribution}</td>
+                    <td className="px-6 py-4 text-zinc-600 truncate max-w-xs md:max-w-md">{factor.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Autopsy interface */}
-        <div className="mt-10 overflow-hidden rounded-[30px] border border-[#433D8B]/15 bg-[#FFFFFF] shadow-[0_25px_70px_rgba(45,35,46,0.10)] sm:mt-12">
-          {/* Header */}
-          <div className="flex flex-col gap-4 border-b border-[#433D8B]/10 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#C8ACD6]/60">
-                <TrendingDown className="h-4 w-4 text-[#2E236C]" />
-              </div>
-
-              <div>
-                <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#433D8B]/50">
-                  Revenue analysis
-                </p>
-
-                <p className="mt-0.5 text-sm font-semibold text-[#17153B]">
-                  Something changed.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="rounded-lg border border-[#433D8B]/10 px-3 py-2 text-[9px] text-[#433D8B]/60">
-                Previous 30 days
-              </span>
-
-              <span className="rounded-lg bg-[#C8ACD6]/50 px-3 py-2 text-[9px] font-medium text-[#2E236C]">
-                Investigating
-              </span>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-[0.75fr_1.25fr]">
-            {/* Left */}
-            <div className="border-b border-[#433D8B]/10 bg-[#F1F0F8]/45 p-6 sm:p-8 lg:border-b-0 lg:border-r">
-              <p className="text-[9px] uppercase tracking-[0.16em] text-[#433D8B]/50">
-                Revenue
-              </p>
-
-              <div className="mt-5 flex items-end gap-3">
-                <span className="text-5xl font-semibold tracking-[-0.06em] text-[#17153B]">
-                  ₹21.7L
-                </span>
-
-                <span className="mb-1.5 inline-flex items-center gap-1 rounded-full bg-[#C8ACD6]/70 px-2 py-1 text-[9px] font-medium text-[#2E236C]">
-                  <TrendingDown className="h-3 w-3" />
-                  12.5%
-                </span>
-              </div>
-
-              <p className="mt-3 max-w-xs text-xs leading-5 text-[#433D8B]/60">
-                Revenue is down compared with the previous 30-day period.
-              </p>
-
-              <div className="mt-8">
-                <div className="flex h-28 items-end gap-1">
-                  {[80, 84, 76, 89, 82, 78, 73, 69, 63, 60, 53, 46].map(
-                    (height, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 rounded-t-sm bg-[#433D8B]/20"
-                        style={{ height: `${height}%` }}
-                      />
-                    )
-                  )}
-                </div>
-
-                <div className="mt-3 flex justify-between text-[8px] uppercase tracking-[0.1em] text-[#433D8B]/35">
-                  <span>30 days ago</span>
-                  <span>Today</span>
-                </div>
-              </div>
-
-              <div className="mt-7 rounded-xl border border-[#433D8B]/10 bg-[#FFFFFF] p-4">
-                <div className="flex items-center gap-2">
-                  <CircleAlert className="h-3.5 w-3.5 text-[#433D8B]" />
-
-                  <span className="text-[10px] font-medium text-[#2E236C]">
-                    Nexora detected a meaningful change
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right */}
-            <div className="p-6 sm:p-8">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-3.5 w-3.5 text-[#433D8B]" />
-
-                  <span className="text-[9px] font-medium uppercase tracking-[0.16em] text-[#433D8B]/50">
-                    Nexora&apos;s analysis
-                  </span>
-                </div>
-
-                <h3 className="mt-3 max-w-lg text-xl font-semibold tracking-[-0.03em] text-[#17153B] sm:text-2xl">
-                  The decline is mainly connected to product availability.
-                </h3>
-
-                <p className="mt-3 max-w-lg text-xs leading-5 text-[#433D8B]/60">
-                  Nexora traced the change across inventory, orders, supplier
-                  performance, and regional demand.
-                </p>
-              </div>
-
-              {/* Factors */}
-              <div className="mt-6 space-y-2">
-                {factors.map((factor, index) => {
-                  const isExpanded = expanded === index
-
-                  return (
-                    <div
-                      key={factor.title}
-                      className="overflow-hidden rounded-xl border border-[#433D8B]/10 bg-[#F1F0F8]/35"
-                    >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setExpanded(isExpanded ? null : index)
-                        }
-                        className="flex w-full items-center gap-3 p-4 text-left"
-                      >
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#FFFFFF] text-[9px] font-medium text-[#433D8B]">
-                          0{index + 1}
-                        </span>
-
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-[#17153B]">
-                            {factor.title}
-                          </p>
-
-                          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#C8ACD6]/60">
-                            <div
-                              className="h-full rounded-full bg-[#433D8B]/45"
-                              style={{ width: factor.contribution }}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex shrink-0 items-center gap-3">
-                          <span className="hidden text-[9px] text-[#433D8B]/50 sm:block">
-                            {factor.contribution}
-                          </span>
-
-                          <span className="text-[10px] font-semibold text-[#2E236C]">
-                            {factor.impact}
-                          </span>
-
-                          <ChevronDown
-                            className={[
-                              "h-3.5 w-3.5 text-[#433D8B]/45 transition-transform",
-                              isExpanded ? "rotate-180" : "",
-                            ].join(" ")}
-                          />
-                        </div>
-                      </button>
-
-                      {isExpanded && (
-                        <div className="border-t border-[#433D8B]/10 px-4 pb-4 pt-3 pl-14">
-                          <p className="text-[10px] leading-5 text-[#433D8B]/65">
-                            {factor.description}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Finding */}
-              <div className="mt-5 rounded-2xl bg-[#17153B] p-5 text-[#F1F0F8]">
-                <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-[#C8ACD6]/50">
-                  The finding
-                </p>
-
-                <p className="mt-2 text-sm font-medium leading-5">
-                  Longer supplier lead times reduced Product A availability,
-                  which contributed to lower orders in the West region.
-                </p>
-
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#C8ACD6]" />
-
-                  <span className="text-[9px] text-[#C8ACD6]/55">
-                    Connected across 4 business signals
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Closing statement */}
-        <div className="mt-10 flex flex-col gap-4 border-t border-[#433D8B]/10 pt-7 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-base font-medium tracking-tight text-[#17153B]">
-              Numbers tell you what happened.
-            </p>
-
-            <p className="mt-1 text-base font-medium tracking-tight text-[#433D8B]">
-              Context tells you why.
-            </p>
-          </div>
+        <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-lg font-medium text-zinc-950">
+            Numbers tell you what happened. <span className="text-zinc-500">Context tells you why.</span>
+          </p>
 
           <a
             href="#business-types"
-            className="group inline-flex items-center gap-2 text-sm font-medium text-[#2E236C]"
+            className="group inline-flex items-center gap-2 text-sm font-medium text-zinc-950 hover:text-blue-600 transition-colors"
           >
             See what Nexora can connect
-
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
         </div>

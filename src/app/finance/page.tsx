@@ -374,7 +374,7 @@ export default async function FinancePage() {
             }
 
   return (
-    <main className="min-h-full bg-[#F1F0F8]">
+    <main className="min-h-full bg-zinc-50">
       <div className="mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
         <Breadcrumbs items={[{ label: "Finance" }]} />
         <FinanceOverview

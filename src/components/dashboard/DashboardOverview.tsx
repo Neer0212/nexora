@@ -112,19 +112,19 @@ function Metric({
   icon: ElementType
 }) {
   return (
-    <div className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] transition hover:-translate-y-0.5">
+    <div className="bg-white p-5">
       <div className="flex items-center justify-between">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+        <p className="text-xs font-medium text-zinc-500">
           {label}
         </p>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F0F8] text-[#433D8B]">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-50 text-blue-600">
           <Icon className="h-4 w-4" />
         </div>
       </div>
-      <p className="mt-6 text-2xl font-semibold tracking-[-0.04em] text-[#17153B]">
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-zinc-950">
         {value}
       </p>
-      <p className="mt-1 text-[10px] text-[#68647A]">{detail}</p>
+      <p className="mt-1 text-xs text-zinc-500">{detail}</p>
     </div>
   )
 }
@@ -138,26 +138,26 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
     <div className="w-full">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">
+          <p className="text-xs font-medium text-blue-600">
             Live business intelligence
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#17153B] sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">
             {t.dashboardTagline}
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#68647A]">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
             These numbers are calculated from the business data connected to Nexora.
           </p>
         </div>
         <Link
           href="/data-hub"
-          className="group inline-flex w-fit items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#2E236C]"
+          className="group inline-flex w-fit items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-blue-800"
         >
           Connect more data
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
 
-      <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="mt-7 grid grid-cols-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-zinc-200">
         <Metric
           label={t.revenueLabel}
           value={data.revenue ? compactCurrency(data.revenue, data.currencyCode) : "—"}
@@ -190,15 +190,15 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
 
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.45fr_0.75fr]">
-        <section className="overflow-hidden rounded-2xl border border-[#E7E4EF] bg-white shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <div className="flex items-start justify-between border-b border-[#E7E4EF] px-5 py-5 sm:px-6">
+        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+          <div className="flex items-start justify-between border-b border-zinc-200 px-5 py-5 sm:px-6">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+              <p className="text-xs font-medium text-zinc-500">
                 Revenue movement
               </p>
-              <h2 className="mt-1 text-sm font-semibold text-[#17153B]">Last 30 days</h2>
+              <h2 className="mt-1 text-sm font-semibold text-zinc-950">Last 30 days</h2>
             </div>
-            <span className="rounded-lg bg-[#F1F0F8] px-2.5 py-1.5 text-[9px] text-[#433D8B]">
+            <span className="rounded-lg bg-zinc-50 px-2.5 py-1.5 text-[9px] text-blue-600">
               Live
             </span>
           </div>
@@ -213,7 +213,7 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
                       title={`${point.label}: ${currency(point.value, data.currencyCode)}`}
                     >
                       <div
-                        className="w-full rounded-t-md bg-[#433D8B]/55 transition group-hover:bg-[#2E236C]"
+                        className="w-full rounded-t-md bg-blue-600/55 transition group-hover:bg-blue-800"
                         style={{
                           height: `${Math.max((point.value / maxTrend) * 100, 3)}%`,
                         }}
@@ -221,7 +221,7 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 flex justify-between text-[8px] uppercase tracking-[0.12em] text-[#68647A]">
+                <div className="mt-3 flex justify-between text-xs font-medium text-zinc-500">
                   <span>{data.trend[0]?.label}</span>
                   <span>{data.trend.at(-1)?.label}</span>
                 </div>
@@ -232,23 +232,23 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#E7E4EF] bg-white shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <div className="border-b border-[#E7E4EF] px-5 py-5">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+        <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
+          <div className="border-b border-zinc-200 px-5 py-5">
+            <p className="text-xs font-medium text-zinc-500">
               Nexora&apos;s read
             </p>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">What stands out</h2>
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">What stands out</h2>
           </div>
           <div className="p-5">
-            <div className="rounded-xl bg-[#17153B] p-5 text-white">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#C8ACD6]/20 text-[#C8ACD6]">
+            <div className="rounded-xl bg-zinc-950 p-5 text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-200/20 text-blue-200">
                 <Brain className="h-4 w-4" />
               </div>
               <h3 className="mt-4 text-sm font-semibold leading-5">{data.insight.title}</h3>
               <p className="mt-2 text-[10px] leading-5 text-white/65">
                 {data.insight.description}
               </p>
-              <div className="mt-4 border-t border-white/10 pt-3 text-[9px] text-[#C8ACD6]">
+              <div className="mt-4 border-t border-white/10 pt-3 text-[9px] text-blue-200">
                 {data.insight.evidence}
               </div>
             </div>
@@ -256,17 +256,17 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
         </section>
       </div>
 
-      <section className="mt-5 rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+      <section className="mt-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+            <p className="text-xs font-medium text-zinc-500">
               Business coverage
             </p>
-            <h2 className="mt-1 text-sm font-semibold text-[#17153B]">
+            <h2 className="mt-1 text-sm font-semibold text-zinc-950">
               What Nexora can see
             </h2>
           </div>
-          <Database className="h-4 w-4 text-[#433D8B]" />
+          <Database className="h-4 w-4 text-blue-600" />
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <Coverage label="Products" connected={data.connected.products} />
@@ -277,7 +277,7 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
         </div>
       </section>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-3">
+      <div className="mt-5 grid grid-cols-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm xl:grid-cols-3 divide-y xl:divide-y-0 xl:divide-x divide-zinc-200">
         <SignalCard
           icon={Package}
           title="Inventory"
@@ -318,31 +318,31 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+              <p className="text-xs font-medium text-zinc-500">
                 Products
               </p>
-              <h2 className="mt-1 text-sm font-semibold text-[#17153B]">Top revenue drivers</h2>
+              <h2 className="mt-1 text-sm font-semibold text-zinc-950">Top revenue drivers</h2>
             </div>
-            <Package className="h-4 w-4 text-[#433D8B]" />
+            <Package className="h-4 w-4 text-blue-600" />
           </div>
           {data.topProducts.length ? (
             <div className="mt-5 space-y-4">
               {data.topProducts.map((product, index) => (
                 <div key={product.name}>
                   <div className="flex items-center justify-between gap-3 text-xs">
-                    <span className="min-w-0 truncate font-medium text-[#17153B]">
+                    <span className="min-w-0 truncate font-medium text-zinc-950">
                       {index + 1}. {product.name}
                     </span>
-                    <span className="shrink-0 text-[#68647A]">
+                    <span className="shrink-0 text-zinc-500">
                       {compactCurrency(product.value, data.currencyCode)}
                     </span>
                   </div>
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F1F0F8]">
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-50">
                     <div
-                      className="h-full rounded-full bg-[#433D8B]"
+                      className="h-full rounded-full bg-blue-600"
                       style={{ width: `${(product.value / maxProduct) * 100}%` }}
                     />
                   </div>
@@ -354,21 +354,21 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
           )}
         </section>
 
-        <section className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+        <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+              <p className="text-xs font-medium text-zinc-500">
                 Order activity
               </p>
-              <h2 className="mt-1 text-sm font-semibold text-[#17153B]">Recent connected orders</h2>
+              <h2 className="mt-1 text-sm font-semibold text-zinc-950">Recent connected orders</h2>
             </div>
-            <ShoppingCart className="h-4 w-4 text-[#433D8B]" />
+            <ShoppingCart className="h-4 w-4 text-blue-600" />
           </div>
           {data.recentOrders.length ? (
             <div className="mt-4 overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
-                  <tr className="border-b border-[#E7E4EF] text-[9px] uppercase tracking-[0.12em] text-[#68647A]">
+                  <tr className="border-b border-zinc-200 text-xs font-medium text-zinc-500">
                     <th className="py-3">Order</th>
                     <th className="py-3">Customer</th>
                     <th className="py-3">Date</th>
@@ -379,12 +379,12 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
                   {data.recentOrders.map((order) => (
                     <tr
                       key={order.orderNumber}
-                      className="border-b border-[#E7E4EF]/60 last:border-0"
+                      className="border-b border-zinc-200/60 last:border-0"
                     >
-                      <td className="py-3 text-xs font-medium text-[#17153B]">{order.orderNumber}</td>
-                      <td className="py-3 text-xs text-[#68647A]">{order.customer}</td>
-                      <td className="py-3 text-xs text-[#68647A]">{dateLabel(order.date)}</td>
-                      <td className="py-3 text-right text-xs font-medium text-[#17153B]">
+                      <td className="py-3 text-xs font-medium text-zinc-950">{order.orderNumber}</td>
+                      <td className="py-3 text-xs text-zinc-500">{order.customer}</td>
+                      <td className="py-3 text-xs text-zinc-500">{dateLabel(order.date)}</td>
+                      <td className="py-3 text-right text-xs font-medium text-zinc-950">
                         {currency(order.amount, data.currencyCode)}
                       </td>
                     </tr>
@@ -398,10 +398,10 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
         </section>
       </div>
 
-      <section className="mt-5 rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-6">
+      <section className="mt-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center gap-2">
-          <CircleAlert className="h-4 w-4 text-[#433D8B]" />
-          <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">
+          <CircleAlert className="h-4 w-4 text-blue-600" />
+          <p className="text-xs font-medium text-zinc-500">
             Data signals
           </p>
         </div>
@@ -417,10 +417,10 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
 
 function Coverage({ label, connected }: { label: string; connected: boolean }) {
   return (
-    <div className="rounded-xl border border-[#E7E4EF] bg-[#F1F0F8]/60 p-4">
-      <div className={`h-2 w-2 rounded-full ${connected ? "bg-[#433D8B]" : "bg-[#C8C4D2]"}`} />
-      <p className="mt-3 text-xs font-medium text-[#17153B]">{label}</p>
-      <p className="mt-1 text-[9px] text-[#68647A]">{connected ? "Connected" : "Not connected"}</p>
+    <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+      <div className={`h-2 w-2 rounded-full ${connected ? "bg-blue-600" : "bg-[#C8C4D2]"}`} />
+      <p className="mt-3 text-xs font-medium text-zinc-950">{label}</p>
+      <p className="mt-1 text-[9px] text-zinc-500">{connected ? "Connected" : "Not connected"}</p>
     </div>
   )
 }
@@ -439,38 +439,38 @@ function SignalCard({
   warning: boolean
 }) {
   return (
-    <div className="rounded-2xl border border-[#E7E4EF] bg-white p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+    <div className="bg-white p-5">
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F1F0F8] text-[#433D8B]">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-50 text-blue-600">
           <Icon className="h-4 w-4" />
         </div>
-        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#68647A]">{title}</p>
+        <p className="text-xs font-medium text-zinc-500">{title}</p>
       </div>
-      <p className={`mt-5 text-2xl font-semibold tracking-[-0.04em] ${warning ? "text-[#433D8B]" : "text-[#17153B]"}`}>
+      <p className={`mt-5 text-2xl font-semibold tracking-tight ${warning ? "text-blue-600" : "text-zinc-950"}`}>
         {value}
       </p>
-      <p className="mt-1 text-[10px] leading-5 text-[#68647A]">{detail}</p>
+      <p className="mt-1 text-xs text-zinc-500">{detail}</p>
     </div>
   )
 }
 
 function Signal({ icon: Icon, title, value, detail }: { icon: ElementType; title: string; value: string; detail: string }) {
   return (
-    <div className="rounded-xl border border-[#E7E4EF] bg-[#F1F0F8]/60 p-4">
-      <div className="flex items-center gap-2 text-[#433D8B]">
+    <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+      <div className="flex items-center gap-2 text-blue-600">
         <Icon className="h-3.5 w-3.5" />
-        <span className="text-[9px] font-semibold uppercase tracking-[0.12em]">{title}</span>
+        <span className="text-xs font-medium">{title}</span>
       </div>
-      <p className="mt-3 text-lg font-semibold text-[#17153B]">{value}</p>
-      <p className="mt-1 text-[10px] leading-5 text-[#68647A]">{detail}</p>
+      <p className="mt-3 text-lg font-semibold text-zinc-950">{value}</p>
+      <p className="mt-1 text-[10px] leading-5 text-zinc-500">{detail}</p>
     </div>
   )
 }
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="mt-5 flex min-h-28 items-center justify-center rounded-xl border border-dashed border-[#E7E4EF] bg-[#F1F0F8]/55 px-5 text-center">
-      <p className="text-[10px] leading-5 text-[#68647A]">{text}</p>
+    <div className="mt-5 flex min-h-28 items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50/55 px-5 text-center">
+      <p className="text-[10px] leading-5 text-zinc-500">{text}</p>
     </div>
   )
 }

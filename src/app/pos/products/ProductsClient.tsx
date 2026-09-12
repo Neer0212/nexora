@@ -74,106 +74,106 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">Operations</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#17153B] sm:text-4xl">Product Catalogue</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#68647A]">Manage your POS products, barcodes, and inventory levels.</p>
+          <p className="text-xs font-medium text-blue-600">Operations</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">Product Catalogue</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-500">Manage your POS products, barcodes, and inventory levels.</p>
         </div>
         <button
           onClick={handleAdd}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#17153B] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#2E236C] transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-800 transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" /> Add Product
         </button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-2 rounded-2xl border border-[#E7E4EF] shadow-[0_2px_10px_rgba(23,21,59,0.02)]">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-2 rounded-2xl border border-zinc-200 shadow-sm">
         <div className="relative w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9A94A8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
           <input
             type="text"
             placeholder="Search by name, SKU, or barcode..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm text-[#17153B] placeholder-[#9A94A8] outline-none"
+            className="w-full pl-9 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm text-zinc-950 placeholder-zinc-400 outline-none"
           />
         </div>
-        <label className="flex items-center gap-2 pr-4 text-sm font-medium text-[#68647A] cursor-pointer shrink-0">
+        <label className="flex items-center gap-2 pr-4 text-sm font-medium text-zinc-500 cursor-pointer shrink-0">
           <input
             type="checkbox"
             checked={showInactive}
             onChange={(e) => setShowInactive(e.target.checked)}
-            className="rounded border-[#CFC9DC] text-[#433D8B] focus:ring-[#433D8B]"
+            className="rounded border-zinc-300 text-blue-600 focus:ring-blue-600"
           />
           Show archived
         </label>
       </div>
 
-      <div className="bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden">
+      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-[#F7F5FA] border-b border-[#E7E4EF]">
+            <thead className="bg-zinc-50 border-b border-zinc-200">
               <tr>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">Product Name</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">SKU / Barcode</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A]">Category</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-right">Price</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A] text-right">Stock</th>
-                <th className="px-6 py-4 font-semibold text-[#68647A]"></th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">Product Name</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">SKU / Barcode</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500">Category</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-right">Price</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500 text-right">Stock</th>
+                <th className="px-6 py-4 font-semibold text-zinc-500"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F0EDF5]">
+            <tbody className="divide-y divide-zinc-200">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#68647A]">
-                    <Package className="mx-auto h-8 w-8 text-[#C8ACD6] mb-3" />
-                    <p className="font-medium text-[#17153B]">No products found</p>
+                  <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
+                    <Package className="mx-auto h-8 w-8 text-zinc-300 mb-3" />
+                    <p className="font-medium text-zinc-950">No products found</p>
                     <p className="text-xs mt-1">Try adjusting your search or add a new product.</p>
                   </td>
                 </tr>
               ) : (
                 filteredProducts.map(p => (
-                  <tr key={p.id} className={`hover:bg-[#FBFAFD] transition-colors ${!p.active ? 'opacity-60' : ''}`}>
+                  <tr key={p.id} className={`hover:bg-zinc-50/50 transition-colors ${!p.active ? 'opacity-60' : ''}`}>
                     <td className="px-6 py-4">
-                      <p className="font-medium text-[#17153B]">{p.name}</p>
-                      {p.brand && <p className="text-xs text-[#9A94A8]">{p.brand}</p>}
+                      <p className="font-medium text-zinc-950">{p.name}</p>
+                      {p.brand && <p className="text-xs text-zinc-400">{p.brand}</p>}
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-xs">
-                        {p.sku && <p className="text-[#68647A]">SKU: {p.sku}</p>}
-                        {p.barcode && <p className="text-[#9A94A8] font-mono">{p.barcode}</p>}
-                        {!p.sku && !p.barcode && <span className="text-[#CFC9DC]">—</span>}
+                        {p.sku && <p className="text-zinc-500">SKU: {p.sku}</p>}
+                        {p.barcode && <p className="text-zinc-400 font-mono">{p.barcode}</p>}
+                        {!p.sku && !p.barcode && <span className="text-zinc-400">—</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-[#68647A]">
+                    <td className="px-6 py-4 text-zinc-500">
                       {p.category
-                        ? <span className="inline-flex rounded-full bg-[#F3F1F6] px-2.5 py-1 text-[11px] font-medium text-[#68647A]">{p.category}</span>
+                        ? <span className="inline-flex rounded-md bg-zinc-100 border border-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-600">{p.category}</span>
                         : "—"}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <p className="font-medium text-[#17153B]">₹{Number(p.selling_price).toLocaleString()}</p>
-                      {p.unit_cost && <p className="text-xs text-[#9A94A8]">Cost: ₹{Number(p.unit_cost).toLocaleString()}</p>}
+                      <p className="font-medium text-zinc-950">₹{Number(p.selling_price).toLocaleString()}</p>
+                      {p.unit_cost && <p className="text-xs text-zinc-400">Cost: ₹{Number(p.unit_cost).toLocaleString()}</p>}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         {p.stock_quantity !== null && p.low_stock_threshold !== null && p.stock_quantity <= p.low_stock_threshold && (
-                          <span title="Low stock"><AlertCircle className="w-3.5 h-3.5 text-[#C58A3A]" /></span>
+                          <span title="Low stock"><AlertCircle className="w-3.5 h-3.5 text-amber-500" /></span>
                         )}
-                        <span className={`font-medium ${p.stock_quantity !== null && p.stock_quantity <= 0 ? 'text-[#B85454]' : 'text-[#17153B]'}`}>
+                        <span className={`font-medium ${p.stock_quantity !== null && p.stock_quantity <= 0 ? 'text-rose-600' : 'text-zinc-950'}`}>
                           {p.stock_quantity ?? "—"}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button onClick={() => handleEdit(p)} className="p-1.5 text-[#9A94A8] hover:text-[#433D8B] hover:bg-[#F0EEF6] rounded-md transition-colors" title="Edit">
+                        <button onClick={() => handleEdit(p)} className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 rounded-md transition-colors" title="Edit">
                           <Edit2 className="w-4 h-4" />
                         </button>
                         {p.active ? (
-                          <button onClick={() => handleToggleActive(p.id, false)} className="p-1.5 text-[#9A94A8] hover:text-[#B85454] hover:bg-[#FFF5F5] rounded-md transition-colors" title="Archive">
+                          <button onClick={() => handleToggleActive(p.id, false)} className="p-1.5 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors" title="Archive">
                             <Archive className="w-4 h-4" />
                           </button>
                         ) : (
-                          <button onClick={() => handleToggleActive(p.id, true)} className="p-1.5 text-[#9A94A8] hover:text-[#286B54] hover:bg-[#EAF5F0] rounded-md transition-colors" title="Restore">
+                          <button onClick={() => handleToggleActive(p.id, true)} className="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors" title="Restore">
                             <ArchiveRestore className="w-4 h-4" />
                           </button>
                         )}

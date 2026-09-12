@@ -16,15 +16,15 @@ export default function ExpensesError({
 
   return (
     <div className="p-6 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[50vh]">
-      <div className="bg-white p-8 rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] text-center max-w-md w-full">
-        <div className="w-16 h-16 bg-[#B85454]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#B85454]">
+      <div className="bg-white p-8 rounded-xl border border-zinc-200 shadow-sm text-center max-w-md w-full">
+        <div className="w-16 h-16 bg-rose-600/10 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-600">
           <span title="Error"><AlertCircle className="w-8 h-8" /></span>
         </div>
-        <h2 className="text-2xl font-semibold text-[#17153B] mb-2">Something went wrong!</h2>
-        <p className="text-[#68647A] mb-8">We couldn't load your expenses. Please try again.</p>
+        <h2 className="text-2xl font-semibold text-zinc-950 mb-2">Something went wrong!</h2>
+        <p className="text-zinc-500 mb-8">We couldn't load your expenses. Please try again.</p>
         <button
           onClick={() => reset()}
-          className="w-full py-3 bg-[#17153B] text-white rounded-xl font-medium hover:bg-[#2E236C] transition-colors"
+          className="w-full py-3 bg-zinc-950 text-white rounded-xl font-medium hover:bg-blue-800 transition-colors"
         >
           Try again
         </button>

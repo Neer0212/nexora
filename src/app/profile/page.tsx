@@ -43,22 +43,22 @@ export default async function ProfilePage() {
         : "Member"
 
   return (
-    <main className="min-h-screen bg-[#F1F0F8]">
+    <main className="min-h-screen bg-zinc-50">
       <div className="mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
         <Breadcrumbs items={[{ label: "Profile" }]} />
 
         <div className="mt-4 space-y-6">
           {/* Profile Header */}
-          <div className="rounded-2xl border border-[#E7E4EF] bg-white p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
             <div className="flex items-start gap-5">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#433D8B] text-xl font-bold text-white">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-xl font-bold text-white">
                 {initial}
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg font-semibold text-[#17153B]">
+                <h1 className="text-lg font-semibold text-zinc-950">
                   {user.user_metadata?.full_name ?? user.email ?? "Nexora User"}
                 </h1>
-                <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-[#68647A]">
+                <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
                   <span className="flex items-center gap-1.5">
                     <Mail className="h-3.5 w-3.5" />
                     {user.email}
@@ -73,36 +73,36 @@ export default async function ProfilePage() {
           </div>
 
           {/* Account Details */}
-          <div className="rounded-2xl border border-[#E7E4EF] bg-white p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-medium text-blue-600">
               Account
             </p>
             <div className="mt-4 space-y-4">
               <div className="flex items-center gap-3">
-                <User className="h-4 w-4 text-[#68647A]" />
+                <User className="h-4 w-4 text-zinc-500" />
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
                     Email
                   </p>
-                  <p className="text-sm text-[#17153B]">{user.email}</p>
+                  <p className="text-sm text-zinc-950">{user.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Calendar className="h-4 w-4 text-[#68647A]" />
+                <Calendar className="h-4 w-4 text-zinc-500" />
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
                     Joined
                   </p>
-                  <p className="text-sm text-[#17153B]">{joinDate}</p>
+                  <p className="text-sm text-zinc-950">{joinDate}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Shield className="h-4 w-4 text-[#68647A]" />
+                <Shield className="h-4 w-4 text-zinc-500" />
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
                     Role
                   </p>
-                  <p className="text-sm text-[#17153B]">{roleLabel}</p>
+                  <p className="text-sm text-zinc-950">{roleLabel}</p>
                 </div>
               </div>
             </div>
@@ -110,18 +110,18 @@ export default async function ProfilePage() {
 
           {/* Workspace Details */}
           {business && (
-            <div className="rounded-2xl border border-[#E7E4EF] bg-white p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">
+            <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <p className="text-xs font-medium text-blue-600">
                 Workspace
               </p>
               <div className="mt-4 space-y-4">
                 <div className="flex items-center gap-3">
-                  <Building2 className="h-4 w-4 text-[#68647A]" />
+                  <Building2 className="h-4 w-4 text-zinc-500" />
                   <div>
-                    <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
                       Business
                     </p>
-                    <p className="text-sm text-[#17153B]">{business.name}</p>
+                    <p className="text-sm text-zinc-950">{business.name}</p>
                   </div>
                 </div>
                 <ProfileIndustrySection 
@@ -130,10 +130,10 @@ export default async function ProfilePage() {
                   currentType={business.business_type}
                 />
                 <div className="pl-7">
-                  <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
                     Currency
                   </p>
-                  <p className="text-sm text-[#17153B]">{business.currency_code}</p>
+                  <p className="text-sm text-zinc-950">{business.currency_code}</p>
                 </div>
               </div>
             </div>

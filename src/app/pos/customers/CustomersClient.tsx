@@ -129,48 +129,48 @@ export default function CustomersClient({ businessId, customers, orderData }: { 
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#433D8B] mb-1">Directory</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-[#17153B]">Customers</h1>
+          <p className="text-xs font-medium text-blue-600 mb-1">Directory</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-950">Customers</h1>
         </div>
-        <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2.5 bg-[#17153B] text-white rounded-xl hover:bg-[#2E236C] transition-all active:scale-[0.98] font-medium text-sm shadow-sm">
+        <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2.5 bg-zinc-950 text-white rounded-xl hover:bg-blue-800 transition-all active:scale-[0.98] font-medium text-sm shadow-sm">
           <Plus className="w-4 h-4" /> Add Customer
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-3xl border border-[#E7E4EF] p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+        <div className="bg-white rounded-xl border border-zinc-200 p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-[#F7F5FA] rounded-xl text-[#433D8B]"><Users className="w-5 h-5" /></div>
-            <p className="text-sm font-medium text-[#68647A]">Total Customers</p>
+            <div className="p-2 bg-zinc-50 rounded-xl text-blue-600"><Users className="w-5 h-5" /></div>
+            <p className="text-sm font-medium text-zinc-500">Total Customers</p>
           </div>
-          <p className="text-3xl font-bold text-[#17153B]">{totalCustomers}</p>
+          <p className="text-3xl font-bold text-zinc-950">{totalCustomers}</p>
         </div>
-        <div className="bg-white rounded-3xl border border-[#E7E4EF] p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+        <div className="bg-white rounded-xl border border-zinc-200 p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-[#F0FDF4] rounded-xl text-[#16A34A]"><UserCheck className="w-5 h-5" /></div>
-            <p className="text-sm font-medium text-[#68647A]">Active (30d)</p>
+            <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600"><UserCheck className="w-5 h-5" /></div>
+            <p className="text-sm font-medium text-zinc-500">Active (30d)</p>
           </div>
-          <p className="text-3xl font-bold text-[#17153B]">{activeCustomers}</p>
+          <p className="text-3xl font-bold text-zinc-950">{activeCustomers}</p>
         </div>
-        <div className="bg-white rounded-3xl border border-[#E7E4EF] p-5 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+        <div className="bg-white rounded-xl border border-zinc-200 p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-[#FDF4FF] rounded-xl text-[#C026D3]"><UserPlus className="w-5 h-5" /></div>
-            <p className="text-sm font-medium text-[#68647A]">New This Month</p>
+            <div className="p-2 bg-fuchsia-50 rounded-xl text-fuchsia-600"><UserPlus className="w-5 h-5" /></div>
+            <p className="text-sm font-medium text-zinc-500">New This Month</p>
           </div>
-          <p className="text-3xl font-bold text-[#17153B]">{newThisMonth}</p>
+          <p className="text-3xl font-bold text-zinc-950">{newThisMonth}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden">
-        <div className="p-4 border-b border-[#E7E4EF] bg-[#FBFAFD]">
+      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-zinc-200 bg-zinc-50/50">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#9A94A8]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
             <input 
               type="text"
               placeholder="Search customers..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B] placeholder-[#9A94A8] outline-none text-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950 placeholder-zinc-400 outline-none text-sm"
             />
           </div>
         </div>
@@ -178,7 +178,7 @@ export default function CustomersClient({ businessId, customers, orderData }: { 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#F7F5FA] border-b border-[#E7E4EF] text-xs uppercase tracking-wider text-[#68647A] font-semibold">
+              <tr className="bg-zinc-50 border-b border-zinc-200 text-xs uppercase tracking-wider text-zinc-500 font-semibold">
                 <th className="px-6 py-4">Customer</th>
                 <th className="px-6 py-4">Contact</th>
                 <th className="px-6 py-4">Type</th>
@@ -187,63 +187,63 @@ export default function CustomersClient({ businessId, customers, orderData }: { 
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E7E4EF] text-sm text-[#17153B]">
+            <tbody className="divide-y divide-zinc-200 text-sm text-zinc-950">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#68647A]">No customers found</td>
+                  <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">No customers found</td>
                 </tr>
               ) : (
                 filtered.map(c => (
                   <React.Fragment key={c.id}>
-                    <tr onClick={() => toggleRow(c.id)} className={`hover:bg-[#FDFCFE] cursor-pointer transition-colors ${expandedRow === c.id ? 'bg-[#FBFAFD]' : ''}`}>
+                    <tr onClick={() => toggleRow(c.id)} className={`hover:bg-white cursor-pointer transition-colors ${expandedRow === c.id ? 'bg-zinc-50/50' : ''}`}>
                       <td className="px-6 py-4">
-                        <p className="font-semibold text-[#17153B] flex items-center gap-2">
+                        <p className="font-semibold text-zinc-950 flex items-center gap-2">
                           {c.name}
-                          {expandedRow === c.id ? <ChevronUp className="w-4 h-4 text-[#9A94A8]" /> : <ChevronDown className="w-4 h-4 text-[#9A94A8]" />}
+                          {expandedRow === c.id ? <ChevronUp className="w-4 h-4 text-zinc-400" /> : <ChevronDown className="w-4 h-4 text-zinc-400" />}
                         </p>
-                        {c.location && <p className="text-xs text-[#68647A] flex items-center gap-1 mt-1"><MapPin className="w-3 h-3" /> {c.location}</p>}
+                        {c.location && <p className="text-xs text-zinc-500 flex items-center gap-1 mt-1"><MapPin className="w-3 h-3" /> {c.location}</p>}
                       </td>
                       <td className="px-6 py-4 space-y-1">
-                        {c.email && <p className="text-xs text-[#68647A] flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> {c.email}</p>}
-                        {c.phone && <p className="text-xs text-[#68647A] flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> {c.phone}</p>}
-                        {!c.email && !c.phone && <span className="text-[#9A94A8]">-</span>}
+                        {c.email && <p className="text-xs text-zinc-500 flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> {c.email}</p>}
+                        {c.phone && <p className="text-xs text-zinc-500 flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> {c.phone}</p>}
+                        {!c.email && !c.phone && <span className="text-zinc-400">-</span>}
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-[#F0EEF6] text-[#433D8B]">{c.type}</span>
+                        <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-100 text-blue-600">{c.type}</span>
                       </td>
                       <td className="px-6 py-4 font-medium">{c.totalOrders}</td>
                       <td className="px-6 py-4 font-medium">₹{c.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={(e) => handleEdit(c, e)} className="p-2 text-[#9A94A8] hover:text-[#433D8B] hover:bg-[#F0EEF6] rounded-lg transition-colors">
+                        <button onClick={(e) => handleEdit(c, e)} className="p-2 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 rounded-lg transition-colors">
                           <Edit2 className="w-4 h-4" />
                         </button>
                       </td>
                     </tr>
                     {expandedRow === c.id && (
-                      <tr className="bg-[#FBFAFD] border-b border-[#E7E4EF]">
+                      <tr className="bg-zinc-50/50 border-b border-zinc-200">
                         <td colSpan={6} className="px-6 py-4">
-                          <div className="pl-6 border-l-2 border-[#433D8B]/20 py-2">
-                            <h4 className="text-sm font-semibold text-[#17153B] flex items-center gap-2 mb-3">
-                              <ShoppingBag className="w-4 h-4 text-[#433D8B]" /> Recent Orders
+                          <div className="pl-6 border-l-2 border-blue-600/20 py-2">
+                            <h4 className="text-sm font-semibold text-zinc-950 flex items-center gap-2 mb-3">
+                              <ShoppingBag className="w-4 h-4 text-blue-600" /> Recent Orders
                             </h4>
                             {loadingHistory[c.id] ? (
-                              <div className="flex items-center gap-2 text-sm text-[#68647A]"><Loader2 className="w-4 h-4 animate-spin" /> Loading history...</div>
+                              <div className="flex items-center gap-2 text-sm text-zinc-500"><Loader2 className="w-4 h-4 animate-spin" /> Loading history...</div>
                             ) : !historyData[c.id] || historyData[c.id].length === 0 ? (
-                              <p className="text-sm text-[#68647A]">No orders found for this customer.</p>
+                              <p className="text-sm text-zinc-500">No orders found for this customer.</p>
                             ) : (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {historyData[c.id].map(order => (
-                                  <div key={order.id} className="bg-white p-3 rounded-xl border border-[#E7E4EF] shadow-sm text-sm">
+                                  <div key={order.id} className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm text-sm">
                                     <div className="flex justify-between items-center mb-2">
-                                      <span className="font-medium text-[#433D8B]">{order.order_number}</span>
-                                      <span className="text-xs text-[#68647A]">{new Date(order.order_date).toLocaleDateString()}</span>
+                                      <span className="font-medium text-blue-600">{order.order_number}</span>
+                                      <span className="text-xs text-zinc-500">{new Date(order.order_date).toLocaleDateString()}</span>
                                     </div>
                                     <div className="flex justify-between items-end">
                                       <div>
-                                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'Completed' ? 'bg-[#3C8F70]/10 text-[#286B54]' : 'bg-[#E7E4EF] text-[#68647A]'}`}>{order.status}</span>
-                                        <p className="text-xs text-[#9A94A8] mt-1">{order.payment_method}</p>
+                                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'Completed' ? 'bg-emerald-600/10 text-emerald-700' : 'bg-zinc-200 text-zinc-500'}`}>{order.status}</span>
+                                        <p className="text-xs text-zinc-400 mt-1">{order.payment_method}</p>
                                       </div>
-                                      <span className="font-semibold text-[#17153B]">₹{Number(order.total_amount).toLocaleString()}</span>
+                                      <span className="font-semibold text-zinc-950">₹{Number(order.total_amount).toLocaleString()}</span>
                                     </div>
                                   </div>
                                 ))}
@@ -263,60 +263,60 @@ export default function CustomersClient({ businessId, customers, orderData }: { 
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.1)] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-[#E7E4EF] flex items-center justify-between bg-[#F7F5FA]">
-              <h3 className="text-xl font-semibold text-[#17153B]">{form.id ? "Edit Customer" : "New Customer"}</h3>
-              <button onClick={() => setShowModal(false)} className="text-[#9A94A8] hover:text-[#17153B] transition-colors"><X className="w-5 h-5" /></button>
+          <div className="w-full max-w-md bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+              <h3 className="text-xl font-semibold text-zinc-950">{form.id ? "Edit Customer" : "New Customer"}</h3>
+              <button onClick={() => setShowModal(false)} className="text-zinc-400 hover:text-zinc-950 transition-colors"><X className="w-5 h-5" /></button>
             </div>
             
             <div className="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
               {error && (
-                <div className="p-3 bg-[#B85454]/10 border border-[#B85454]/20 rounded-xl text-sm text-[#8D3F3F]">
+                <div className="p-3 bg-rose-600/10 border border-rose-600/20 rounded-xl text-sm text-rose-800">
                   {error}
                 </div>
               )}
               
               <div>
-                <label className="block text-sm font-medium text-[#17153B] mb-1.5">Name *</label>
+                <label className="block text-sm font-medium text-zinc-950 mb-1.5">Name *</label>
                 <input
                   type="text"
                   required
                   value={form.name}
                   onChange={e => setForm({...form, name: e.target.value})}
-                  className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                  className="w-full border border-zinc-300 rounded-xl px-4 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950"
                   placeholder="Customer Name"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Email</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Email</label>
                   <input
                     type="email"
                     value={form.email || ""}
                     onChange={e => setForm({...form, email: e.target.value})}
-                    className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                    className="w-full border border-zinc-300 rounded-xl px-4 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950"
                     placeholder="email@example.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#17153B] mb-1.5">Phone</label>
+                  <label className="block text-sm font-medium text-zinc-950 mb-1.5">Phone</label>
                   <input
                     type="tel"
                     value={form.phone || ""}
                     onChange={e => setForm({...form, phone: e.target.value})}
-                    className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                    className="w-full border border-zinc-300 rounded-xl px-4 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950"
                     placeholder="Phone Number"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#17153B] mb-1.5">Type</label>
+                <label className="block text-sm font-medium text-zinc-950 mb-1.5">Type</label>
                 <select
                   value={form.type}
                   onChange={e => setForm({...form, type: e.target.value as "Individual" | "Business" | "Wholesale"})}
-                  className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B] bg-white"
+                  className="w-full border border-zinc-300 rounded-xl px-4 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950 bg-white"
                 >
                   <option value="Individual">Individual</option>
                   <option value="Business">Business</option>
@@ -325,23 +325,23 @@ export default function CustomersClient({ businessId, customers, orderData }: { 
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#17153B] mb-1.5">Location</label>
+                <label className="block text-sm font-medium text-zinc-950 mb-1.5">Location</label>
                 <input
                   type="text"
                   value={form.location || ""}
                   onChange={e => setForm({...form, location: e.target.value})}
-                  className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                  className="w-full border border-zinc-300 rounded-xl px-4 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950"
                   placeholder="City, Area, etc."
                 />
               </div>
             </div>
             
-            <div className="p-6 border-t border-[#E7E4EF] bg-[#FBFAFD] flex justify-end gap-3">
-              <button onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl font-medium text-[#68647A] hover:bg-[#F0EEF6] transition-colors">Cancel</button>
+            <div className="p-6 border-t border-zinc-200 bg-zinc-50/50 flex justify-end gap-3">
+              <button onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl font-medium text-zinc-500 hover:bg-zinc-100 transition-colors">Cancel</button>
               <button 
                 onClick={handleSave}
                 disabled={!form.name || isPending}
-                className="px-5 py-2.5 rounded-xl font-medium text-white bg-[#17153B] hover:bg-[#2E236C] disabled:opacity-50 transition-colors flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl font-medium text-white bg-zinc-950 hover:bg-blue-800 disabled:opacity-50 transition-colors flex items-center gap-2"
               >
                 {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                 Save

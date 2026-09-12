@@ -50,13 +50,13 @@ export default function ProfileIndustrySection({
   return (
     <div className="pl-7">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
+        <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
           Industry Context
         </p>
         {!isEditing && (
           <button 
             onClick={() => setIsEditing(true)}
-            className="text-[10px] font-medium text-[#433D8B] hover:underline"
+            className="text-[10px] font-medium text-blue-600 hover:underline"
           >
             Change
           </button>
@@ -65,8 +65,8 @@ export default function ProfileIndustrySection({
 
       {!isEditing ? (
         <div className="mt-1">
-          <p className="text-sm font-medium text-[#17153B]">{currentConfig.shortName}</p>
-          <p className="text-xs text-[#68647A] mt-0.5">{currentConfig.description}</p>
+          <p className="text-sm font-medium text-zinc-950">{currentConfig.shortName}</p>
+          <p className="text-xs text-zinc-500 mt-0.5">{currentConfig.description}</p>
         </div>
       ) : (
         <div className="mt-2 space-y-3">
@@ -74,7 +74,7 @@ export default function ProfileIndustrySection({
             value={selectedId}
             onChange={(e) => setSelectedId(e.target.value)}
             disabled={isLoading}
-            className="w-full rounded-xl border border-[#E7E4EF] bg-white px-3 py-2 text-sm outline-none transition focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] disabled:opacity-50"
+            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-600 focus:ring-1 focus:ring-blue-600 disabled:opacity-50"
           >
             <optgroup label="Primary Industries">
               {getTier1Industries().map(ind => (
@@ -94,7 +94,7 @@ export default function ProfileIndustrySection({
             <button
               onClick={handleSave}
               disabled={isLoading}
-              className="inline-flex h-8 items-center justify-center rounded-lg bg-[#17153B] px-4 text-[11px] font-medium text-white transition hover:bg-[#2E236C] disabled:opacity-50"
+              className="inline-flex h-8 items-center justify-center rounded-lg bg-zinc-950 px-4 text-[11px] font-medium text-white transition hover:bg-blue-800 disabled:opacity-50"
             >
               {isLoading && <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />}
               Save Industry
@@ -105,7 +105,7 @@ export default function ProfileIndustrySection({
                 setIsEditing(false)
               }}
               disabled={isLoading}
-              className="inline-flex h-8 items-center justify-center rounded-lg border border-[#E7E4EF] px-4 text-[11px] font-medium text-[#17153B] transition hover:bg-[#F8F8FB]"
+              className="inline-flex h-8 items-center justify-center rounded-lg border border-zinc-200 px-4 text-[11px] font-medium text-zinc-950 transition hover:bg-[#F8F8FB]"
             >
               Cancel
             </button>

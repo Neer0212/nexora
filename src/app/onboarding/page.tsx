@@ -178,8 +178,8 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#F1F0F8]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#433D8B]" />
+      <main className="flex min-h-screen items-center justify-center bg-zinc-50">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </main>
     )
   }
@@ -189,27 +189,27 @@ export default function OnboardingPage() {
   const general = INDUSTRIES.filter((i) => i.tier === "general")
 
   return (
-    <main className="min-h-screen bg-[#F1F0F8] px-4 py-12 sm:px-6">
+    <main className="min-h-screen bg-zinc-50 px-4 py-12 sm:px-6">
       <div className="mx-auto w-full max-w-3xl">
         {/* Header */}
         <div className="mb-10 text-center">
-          <p className="text-[10px] font-bold tracking-[0.2em] text-[#433D8B] uppercase">
+          <p className="text-[10px] font-bold tracking-[0.2em] text-blue-600 uppercase">
             NEXORA
           </p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#17153B]">
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950">
             Set up your workspace
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#68647A]">
+          <p className="mt-2 text-sm leading-6 text-zinc-500">
             Nexora adapts its intelligence, terminology, and workflows to your business.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Business Name */}
-          <div className="rounded-2xl border border-[#E7E4EF] bg-white p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
             <label
               htmlFor="business-name"
-              className="mb-2 block text-sm font-medium text-[#17153B]"
+              className="mb-2 block text-sm font-medium text-zinc-950"
             >
               Business name
             </label>
@@ -220,14 +220,14 @@ export default function OnboardingPage() {
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               placeholder="e.g. Sunrise Store, FitZone Gym"
-              className="w-full rounded-xl border border-[#E7E4EF] px-4 py-3 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30 placeholder:text-[#68647A]/60"
+              className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200/30 placeholder:text-zinc-500/60"
             />
 
             <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
               <div>
                 <label
                   htmlFor="currency"
-                  className="mb-1.5 block text-xs font-medium text-[#68647A]"
+                  className="mb-1.5 block text-xs font-medium text-zinc-500"
                 >
                   Primary currency
                 </label>
@@ -236,7 +236,7 @@ export default function OnboardingPage() {
                     id="currency"
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-[#E7E4EF] bg-white px-4 py-2.5 pr-8 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30"
+                    className="w-full appearance-none rounded-xl border border-zinc-200 bg-white px-4 py-2.5 pr-8 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200/30"
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -247,25 +247,25 @@ export default function OnboardingPage() {
                     <option value="AUD">AUD ($)</option>
                     <option value="CAD">CAD ($)</option>
                   </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#68647A]" />
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Industry Selection */}
-          <div className="rounded-2xl border border-[#E7E4EF] bg-white p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
             <div className="mb-5">
-              <p className="text-sm font-medium text-[#17153B]">
+              <p className="text-sm font-medium text-zinc-950">
                 What kind of business do you run?
               </p>
-              <p className="mt-1 text-xs text-[#68647A]">
+              <p className="mt-1 text-xs text-zinc-500">
                 Nexora will adapt its navigation, terminology, and intelligence to match.
               </p>
             </div>
 
             {/* Tier 1 */}
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9A94A8]">
+            <p className="mb-3 text-xs font-medium text-zinc-400">
               Most common
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -280,7 +280,7 @@ export default function OnboardingPage() {
             </div>
 
             {/* Tier 2 */}
-            <p className="mb-3 mt-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9A94A8]">
+            <p className="mb-3 mt-6 text-xs font-medium text-zinc-400">
               Specialty businesses
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -310,7 +310,7 @@ export default function OnboardingPage() {
 
           {/* Error */}
           {error && (
-            <div className="flex items-center gap-3 rounded-xl border border-[#B85454]/20 bg-[#B85454]/5 px-4 py-3 text-sm text-[#B85454]">
+            <div className="flex items-center gap-3 rounded-xl border border-rose-600/20 bg-rose-600/5 px-4 py-3 text-sm text-rose-600">
               <AlertCircle className="h-4 w-4 flex-shrink-0" />
               <p>{error}</p>
             </div>
@@ -320,7 +320,7 @@ export default function OnboardingPage() {
           <button
             type="submit"
             disabled={submitting || !selectedIndustry}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#17153B] px-4 py-3.5 text-sm font-medium text-white transition hover:bg-[#2E236C] disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-3.5 text-sm font-medium text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? (
               <>
@@ -332,7 +332,7 @@ export default function OnboardingPage() {
             )}
           </button>
 
-          <p className="text-center text-xs text-[#68647A]">
+          <p className="text-center text-xs text-zinc-500">
             You can change your business type later in Settings.
           </p>
         </form>
@@ -362,22 +362,22 @@ function IndustryCard({
         className={[
           "flex w-full items-center gap-4 rounded-xl border px-4 py-3.5 text-left transition",
           selected
-            ? "border-[#433D8B] bg-[#F0EEF6] ring-1 ring-[#433D8B]"
-            : "border-[#E7E4EF] hover:border-[#C8ACD6] hover:bg-[#FAFAFA]",
+            ? "border-blue-600 bg-zinc-100 ring-1 ring-blue-600"
+            : "border-zinc-200 hover:border-blue-200 hover:bg-[#FAFAFA]",
         ].join(" ")}
       >
         <div className={[
           "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-          selected ? "bg-[#433D8B] text-white" : "bg-[#F1F0F8] text-[#68647A]",
+          selected ? "bg-blue-600 text-white" : "bg-zinc-50 text-zinc-500",
         ].join(" ")}>
           <Icon className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-[#17153B]">{industry.name}</p>
-          <p className="mt-0.5 text-xs text-[#68647A]">{industry.description}</p>
+          <p className="text-sm font-medium text-zinc-950">{industry.name}</p>
+          <p className="mt-0.5 text-xs text-zinc-500">{industry.description}</p>
         </div>
         {selected && (
-          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#433D8B]">
+          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600">
             <Check className="h-3 w-3 text-white" />
           </div>
         )}
@@ -392,31 +392,31 @@ function IndustryCard({
       className={[
         "group flex flex-col gap-3 rounded-xl border p-4 text-left transition",
         selected
-          ? "border-[#433D8B] bg-[#F0EEF6] ring-1 ring-[#433D8B]"
-          : "border-[#E7E4EF] hover:border-[#C8ACD6] hover:bg-[#FAFAFA]",
+          ? "border-blue-600 bg-zinc-100 ring-1 ring-blue-600"
+          : "border-zinc-200 hover:border-blue-200 hover:bg-[#FAFAFA]",
       ].join(" ")}
     >
       <div className="flex items-start justify-between">
         <div className={[
           "flex h-9 w-9 items-center justify-center rounded-lg",
-          selected ? "bg-[#433D8B] text-white" : "bg-[#F1F0F8] text-[#68647A] group-hover:bg-[#E7E4EF]",
+          selected ? "bg-blue-600 text-white" : "bg-zinc-50 text-zinc-500 group-hover:bg-zinc-200",
         ].join(" ")}>
           <Icon className="h-4 w-4" />
         </div>
         {selected && (
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#433D8B]">
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600">
             <Check className="h-3 w-3 text-white" />
           </div>
         )}
       </div>
       <div>
-        <p className="text-sm font-medium text-[#17153B]">{industry.shortName}</p>
-        <p className="mt-0.5 text-xs leading-5 text-[#68647A]">{industry.description}</p>
+        <p className="text-sm font-medium text-zinc-950">{industry.shortName}</p>
+        <p className="mt-0.5 text-xs leading-5 text-zinc-500">{industry.description}</p>
       </div>
       <ul className="space-y-1">
         {industry.highlights.map((h) => (
-          <li key={h} className="flex items-center gap-1.5 text-[10px] text-[#9A94A8]">
-            <span className="h-1 w-1 rounded-full bg-[#C8ACD6]" />
+          <li key={h} className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+            <span className="h-1 w-1 rounded-full bg-blue-200" />
             {h}
           </li>
         ))}

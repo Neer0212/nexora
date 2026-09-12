@@ -39,8 +39,8 @@ export default async function POSPage() {
     <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8 h-[calc(100vh-64px)] flex flex-col">
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">Operations</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#17153B]">Checkout</h1>
+          <p className="text-xs font-medium text-blue-600">Operations</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-950">Checkout</h1>
         </div>
       </div>
       <div className="flex-1 min-h-0">

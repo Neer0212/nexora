@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --nexora-ink: #17153B;
-  --nexora-indigo: #2E236C;
-  --nexora-accent: #433D8B;
-  --nexora-lavender: #C8ACD6;
-  --nexora-background: #F1F0F8;
-  --nexora-surface: #FFFFFF;
-  --nexora-border: #E7E4EF;
-  --nexora-muted: #68647A;
-  --nexora-success: #3C8F70;
-  --nexora-warning: #C58A3A;
-  --nexora-danger: #B85454;
+  --nexora-ink: #09090B; /* zinc-950 */
+  --nexora-indigo: #1E40AF; /* blue-800 */
+  --nexora-accent: #2563EB; /* blue-600 */
+  --nexora-lavender: #DBEAFE; /* blue-100 */
+  --nexora-background: #FAFAFA; /* zinc-50 */
+  --nexora-surface: #FFFFFF; /* white */
+  --nexora-border: #E4E4E7; /* zinc-200 */
+  --nexora-muted: #71717A; /* zinc-500 */
+  --nexora-success: #16A34A; /* emerald-600 */
+  --nexora-warning: #F59E0B; /* amber-500 */
+  --nexora-danger: #E11D48; /* rose-600 */
 
   --background: var(--nexora-background);
   --foreground: var(--nexora-ink);

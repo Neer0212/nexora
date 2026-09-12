@@ -356,16 +356,16 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F1F0F8]">
-      <header className="border-b border-[#E7E4EF] bg-white">
+    <main className="min-h-screen bg-zinc-50">
+      <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#433D8B]">Nexora</p>
-            <p className="mt-1 text-base font-semibold text-[#17153B]">{business.name}</p>
+            <p className="text-xs font-medium text-blue-600">Nexora</p>
+            <p className="mt-1 text-base font-semibold text-zinc-950">{business.name}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-[#433D8B]">{user.email}</p>
-            <p className="mt-1 text-[10px] capitalize text-[#68647A]">{membership.role}</p>
+            <p className="text-xs text-blue-600">{user.email}</p>
+            <p className="mt-1 text-[10px] capitalize text-zinc-500">{membership.role}</p>
           </div>
         </div>
       </header>

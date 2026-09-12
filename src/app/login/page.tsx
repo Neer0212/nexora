@@ -67,28 +67,28 @@ export default function LoginPage() {
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-[#F1F0F8] px-6">
+        <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-6">
             <div className="w-full max-w-md">
                 <div className="mb-8">
-                    <p className="text-[10px] font-bold tracking-[0.2em] text-[#433D8B] uppercase">
+                    <p className="text-[10px] font-bold tracking-[0.2em] text-blue-600 uppercase">
                         NEXORA
                     </p>
 
-                    <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#17153B]">
+                    <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950">
                         Welcome back
                     </h1>
 
-                    <p className="mt-2 text-sm text-[#68647A]">
+                    <p className="mt-2 text-sm text-zinc-500">
                         Sign in to continue to your business workspace.
                     </p>
                 </div>
 
-                <div className="rounded-3xl border border-[#E7E4EF] bg-[#FFFFFF] p-6 sm:p-8 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+                <div className="rounded-3xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-sm">
                     <form onSubmit={handleLogin} className="space-y-5">
                         <div>
                             <label
                                 htmlFor="email"
-                                className="mb-2 block text-sm font-medium text-[#17153B]"
+                                className="mb-2 block text-sm font-medium text-zinc-950"
                             >
                                 Email
                             </label>
@@ -100,7 +100,7 @@ export default function LoginPage() {
                                 autoComplete="email"
                                 value={email}
                                 onChange={(event) => setEmail(event.target.value)}
-                                className="w-full rounded-xl border border-[#E7E4EF] px-4 py-3 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30 placeholder:text-[#68647A]/60"
+                                className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200/30 placeholder:text-zinc-500/60"
                                 placeholder="you@company.com"
                             />
                         </div>
@@ -108,7 +108,7 @@ export default function LoginPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="mb-2 block text-sm font-medium text-[#17153B]"
+                                className="mb-2 block text-sm font-medium text-zinc-950"
                             >
                                 Password
                             </label>
@@ -121,13 +121,13 @@ export default function LoginPage() {
                                     autoComplete="current-password"
                                     value={password}
                                     onChange={(event) => setPassword(event.target.value)}
-                                    className="w-full rounded-xl border border-[#E7E4EF] pl-4 pr-11 py-3 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30 placeholder:text-[#68647A]/60"
+                                    className="w-full rounded-xl border border-zinc-200 pl-4 pr-11 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200/30 placeholder:text-zinc-500/60"
                                     placeholder="••••••••"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#68647A] hover:text-[#17153B] transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-950 transition-colors"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="h-4 w-4" />
@@ -139,7 +139,7 @@ export default function LoginPage() {
                         </div>
 
                         {error && (
-                            <div className="flex items-center gap-3 rounded-xl border border-[#B85454]/20 bg-[#B85454]/5 px-4 py-3 text-sm text-[#B85454]">
+                            <div className="flex items-center gap-3 rounded-xl border border-rose-600/20 bg-rose-600/5 px-4 py-3 text-sm text-rose-600">
                                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                                 <p>{error}</p>
                             </div>
@@ -148,7 +148,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#17153B] px-4 py-3 text-sm font-medium text-[#FFFFFF] transition hover:bg-[#2E236C] disabled:cursor-not-allowed disabled:opacity-70"
+                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {loading ? (
                                 <>
@@ -161,11 +161,11 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <p className="mt-8 text-center text-sm text-[#68647A]">
+                    <p className="mt-8 text-center text-sm text-zinc-500">
                         Don&apos;t have an account?{" "}
                         <Link
                             href="/signup"
-                            className="font-medium text-[#433D8B] hover:text-[#2E236C] hover:underline underline-offset-4"
+                            className="font-medium text-blue-600 hover:text-blue-800 hover:underline underline-offset-4"
                         >
                             Create one
                         </Link>

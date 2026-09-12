@@ -2,7 +2,7 @@ import React from 'react';
 
 export function CardSkeleton() {
   return (
-    <div className="p-6 bg-[var(--nexora-surface)] rounded-2xl border border-[var(--nexora-border)] shadow-[0_12px_35px_rgba(23,21,59,0.04)] animate-pulse flex flex-col space-y-4">
+    <div className="p-6 bg-[var(--nexora-surface)] rounded-2xl border border-[var(--nexora-border)] shadow-sm animate-pulse flex flex-col space-y-4">
       <div className="h-4 bg-[var(--nexora-border)] rounded w-1/3"></div>
       <div className="h-8 bg-[var(--nexora-background)] rounded w-1/2"></div>
       <div className="h-4 bg-[var(--nexora-border)] rounded w-full"></div>
@@ -13,7 +13,7 @@ export function CardSkeleton() {
 
 export function TableSkeleton() {
   return (
-    <div className="w-full bg-[var(--nexora-surface)] rounded-2xl border border-[var(--nexora-border)] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden">
+    <div className="w-full bg-[var(--nexora-surface)] rounded-2xl border border-[var(--nexora-border)] shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-[var(--nexora-border)] bg-[var(--nexora-background)]">
         <div className="h-5 bg-[var(--nexora-border)] rounded w-1/4 animate-pulse"></div>
       </div>

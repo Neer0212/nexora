@@ -33,8 +33,8 @@ export default async function ProjectsPage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#17153B] tracking-tight">Project Intelligence</h1>
-        <p className="text-[#68647A] mt-2">Track progress, health, and deadlines across all initiatives.</p>
+        <h1 className="text-3xl font-bold text-zinc-950 tracking-tight">Project Intelligence</h1>
+        <p className="text-zinc-500 mt-2">Track progress, health, and deadlines across all initiatives.</p>
       </div>
 
       <ProjectsView data={viewData} />

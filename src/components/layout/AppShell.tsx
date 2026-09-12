@@ -39,7 +39,7 @@ export default async function AppShell({
   const industryConfig = getIndustryConfig(rawIndustry)
 
   return (
-    <div className="flex min-h-screen bg-[#F1F0F8]">
+    <div className="flex min-h-screen bg-zinc-50">
       <Sidebar industryConfig={industryConfig} />
 
       <div className="flex min-w-0 flex-1 flex-col">

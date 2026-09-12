@@ -7,25 +7,25 @@ export default function Breadcrumbs({ items }: { items: Breadcrumb[] }) {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-[#68647A]"
+      className="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500"
     >
       <Link
         href="/dashboard"
         aria-label="Dashboard"
-        className="inline-flex items-center rounded-md p-1 transition hover:bg-[#E7E4EF] hover:text-[#17153B]"
+        className="inline-flex items-center rounded-md p-1 transition hover:bg-zinc-200 hover:text-zinc-950"
       >
         <Home className="h-3.5 w-3.5" />
       </Link>
 
       {items.map((item, index) => (
         <span key={`${item.label}-${index}`} className="flex items-center gap-1.5">
-          <ChevronRight className="h-3 w-3 text-[#68647A]/40" />
+          <ChevronRight className="h-3 w-3 text-zinc-500/40" />
           {item.href ? (
-            <Link href={item.href} className="transition hover:text-[#17153B]">
+            <Link href={item.href} className="transition hover:text-zinc-950">
               {item.label}
             </Link>
           ) : (
-            <span aria-current="page" className="font-medium text-[#433D8B]">
+            <span aria-current="page" className="font-medium text-zinc-900">
               {item.label}
             </span>
           )}

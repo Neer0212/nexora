@@ -225,7 +225,7 @@ export default async function OperationsPage() {
   }, 0)
 
   return (
-    <main className="min-h-screen bg-[#F1F0F8]">
+    <main className="min-h-screen bg-zinc-50">
       <div className="mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
         <OperationsOverview
           businessName={business.name}

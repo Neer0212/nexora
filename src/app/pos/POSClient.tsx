@@ -231,24 +231,24 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* Left Pane: Products */}
-      <div className="flex-1 flex flex-col bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden">
-        <div className="p-4 border-b border-[#E7E4EF] bg-[#FBFAFD]">
+      <div className="flex-1 flex flex-col bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-zinc-200 bg-zinc-50/50">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#9A94A8]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
             <input 
               ref={barcodeInputRef}
               type="text"
               placeholder="Scan barcode or search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-[#D9D5E4] rounded-xl focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B] placeholder-[#9A94A8] outline-none transition-shadow"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-zinc-300 rounded-xl focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950 placeholder-zinc-400 outline-none transition-shadow"
             />
           </div>
         </div>
         
         <div className="flex-1 overflow-y-auto p-4">
           {error && (
-            <div className="mb-4 flex items-center justify-between rounded-xl border border-[#B85454]/20 bg-[#B85454]/5 p-3 text-sm text-[#8D3F3F]">
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-rose-600/20 bg-rose-600/5 p-3 text-sm text-rose-800">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{error}</span>
@@ -259,19 +259,19 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
 
           {/* Unknown barcode prompt */}
           {unknownBarcode && (
-            <div className="mb-4 rounded-xl border border-[#433D8B]/20 bg-[#F0EEF6] p-4">
-              <p className="text-sm font-medium text-[#17153B]">Barcode not found: <code className="bg-white px-1.5 py-0.5 rounded text-[#433D8B] font-mono">{unknownBarcode.code}</code></p>
-              <p className="text-xs text-[#68647A] mt-1">This barcode doesn&apos;t match any existing product.</p>
+            <div className="mb-4 rounded-xl border border-blue-600/20 bg-zinc-100 p-4">
+              <p className="text-sm font-medium text-zinc-950">Barcode not found: <code className="bg-white px-1.5 py-0.5 rounded text-blue-600 font-mono">{unknownBarcode.code}</code></p>
+              <p className="text-xs text-zinc-500 mt-1">This barcode doesn&apos;t match any existing product.</p>
               <div className="flex gap-2 mt-3">
                 <a 
                   href={`/pos/products?barcode=${encodeURIComponent(unknownBarcode.code)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#433D8B] rounded-lg hover:bg-[#2E236C] transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-800 transition-colors"
                 >
                   <ExternalLink className="w-3 h-3" /> Create Product
                 </a>
-                <button onClick={() => setUnknownBarcode(null)} className="px-3 py-1.5 text-xs font-medium text-[#68647A] bg-white rounded-lg border border-[#D9D5E4] hover:bg-[#F3F1F6]">
+                <button onClick={() => setUnknownBarcode(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-500 bg-white rounded-lg border border-zinc-300 hover:bg-zinc-100">
                   Dismiss
                 </button>
               </div>
@@ -279,13 +279,13 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
           )}
 
           {successOrder && (
-            <div className="mb-4 flex items-center justify-between rounded-xl border border-[#3C8F70]/20 bg-[#3C8F70]/5 p-4 text-sm text-[#286B54]">
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-emerald-600/20 bg-emerald-600/5 p-4 text-sm text-emerald-700">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                  <Receipt className="h-5 w-5 text-[#3C8F70]" />
+                  <Receipt className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#17153B]">Checkout Successful</p>
+                  <p className="font-semibold text-zinc-950">Checkout Successful</p>
                   <p>Order {successOrder} recorded and inventory updated.</p>
                 </div>
               </div>
@@ -294,8 +294,8 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
           )}
 
           {products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-[#68647A] space-y-4">
-              <Package className="h-12 w-12 text-[#C8ACD6]" />
+            <div className="flex flex-col items-center justify-center h-full text-zinc-500 space-y-4">
+              <Package className="h-12 w-12 text-blue-200" />
               <p>No products found.</p>
             </div>
           ) : (
@@ -308,12 +308,12 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
                     key={p.id} 
                     onClick={() => addToCart(p)}
                     disabled={isOutOfStock}
-                    className={`flex flex-col text-left rounded-2xl p-4 transition-all active:scale-[0.98] border ${isOutOfStock ? 'opacity-50 cursor-not-allowed bg-[#F7F5FA] border-[#E7E4EF]' : 'bg-white border-[#E7E4EF] hover:border-[#433D8B] hover:shadow-[0_4px_20px_rgba(67,61,139,0.08)]'}`}
+                    className={`flex flex-col text-left rounded-2xl p-4 transition-all active:scale-[0.98] border ${isOutOfStock ? 'opacity-50 cursor-not-allowed bg-zinc-50 border-zinc-200' : 'bg-white border-zinc-200 hover:border-blue-600 hover:shadow-sm'}`}
                   >
-                    <span className="font-semibold text-[#17153B] line-clamp-2 leading-tight mb-2">{p.name}</span>
+                    <span className="font-semibold text-zinc-950 line-clamp-2 leading-tight mb-2">{p.name}</span>
                     <div className="mt-auto flex items-end justify-between w-full">
-                      <span className="font-medium text-[#433D8B]">₹{Number(p.selling_price).toLocaleString()}</span>
-                      <span className={`text-[10px] uppercase font-bold tracking-wider ${isOutOfStock ? 'text-[#B85454]' : isLowStock ? 'text-[#C58A3A]' : 'text-[#9A94A8]'}`}>
+                      <span className="font-medium text-blue-600">₹{Number(p.selling_price).toLocaleString()}</span>
+                      <span className={`text-[10px] uppercase font-bold tracking-wider ${isOutOfStock ? 'text-rose-600' : isLowStock ? 'text-amber-500' : 'text-zinc-400'}`}>
                         {isOutOfStock ? "Out of stock" : `${p.stock_quantity} left`}
                       </span>
                     </div>
@@ -326,34 +326,34 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
       </div>
 
       {/* Right Pane: Cart */}
-      <div className="w-full lg:w-[400px] xl:w-[480px] flex flex-col bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)] overflow-hidden shrink-0">
-        <div className="p-4 border-b border-[#E7E4EF] bg-[#FBFAFD] flex items-center justify-between">
-          <h2 className="font-semibold text-[#17153B] flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-[#433D8B]" /> Current Cart
+      <div className="w-full lg:w-[400px] xl:w-[480px] flex flex-col bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden shrink-0">
+        <div className="p-4 border-b border-zinc-200 bg-zinc-50/50 flex items-center justify-between">
+          <h2 className="font-semibold text-zinc-950 flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 text-blue-600" /> Current Cart
           </h2>
-          <button onClick={() => setCart([])} disabled={cart.length === 0} className="text-xs font-medium text-[#68647A] hover:text-[#B85454] disabled:opacity-50 transition-colors">
+          <button onClick={() => setCart([])} disabled={cart.length === 0} className="text-xs font-medium text-zinc-500 hover:text-rose-600 disabled:opacity-50 transition-colors">
             Clear
           </button>
         </div>
 
-        <div className="p-4 border-b border-[#E7E4EF]">
+        <div className="p-4 border-b border-zinc-200">
           <div className="flex gap-2">
             <div className="relative flex-1">
               <select
                 value={selectedCustomer || ""}
                 onChange={(e) => setSelectedCustomer(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-[#D9D5E4] bg-white pl-4 pr-10 py-2.5 text-sm text-[#17153B] outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B]"
+                className="w-full appearance-none rounded-xl border border-zinc-300 bg-white pl-4 pr-10 py-2.5 text-sm text-zinc-950 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
               >
                 <option value="">Walk-in Customer</option>
                 {localCustomers.map(c => (
                   <option key={c.id} value={c.id}>{c.name} {c.phone ? `(${c.phone})` : ""}</option>
                 ))}
               </select>
-              <UserPlus className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9A94A8] pointer-events-none" />
+              <UserPlus className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
             </div>
             <button
               onClick={() => setShowNewCustomer(true)}
-              className="px-3 rounded-xl border border-[#D9D5E4] bg-white text-[#433D8B] hover:bg-[#F7F5FA] hover:border-[#433D8B] transition-colors flex items-center justify-center"
+              className="px-3 rounded-xl border border-zinc-300 bg-white text-blue-600 hover:bg-zinc-50 hover:border-blue-600 transition-colors flex items-center justify-center"
               title="New Customer"
             >
               <Plus className="w-5 h-5" />
@@ -363,15 +363,15 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
 
         {/* Oversell warning */}
         {oversellItems.length > 0 && (
-          <div className="mx-4 mt-3 flex items-center gap-2 rounded-xl border border-[#C58A3A]/20 bg-[#FDF6EC] p-3 text-xs text-[#8B6020]">
-            <AlertCircle className="h-4 w-4 shrink-0 text-[#C58A3A]" />
+          <div className="mx-4 mt-3 flex items-center gap-2 rounded-xl border border-amber-500/20 bg-[#FDF6EC] p-3 text-xs text-[#8B6020]">
+            <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
             Insufficient stock: {oversellItems.map(i => i.product.name).join(", ")}
           </div>
         )}
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {cart.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-sm text-[#9A94A8]">
+            <div className="h-full flex items-center justify-center text-sm text-zinc-400">
               Cart is empty. Scan or select items.
             </div>
           ) : (
@@ -379,34 +379,34 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
               const isOverSell = item.product.stock_quantity !== null && item.quantity > item.product.stock_quantity
               const lineTotal = item.customPrice * item.quantity
               return (
-                <div key={item.cartId} className={`bg-[#FBFBFC] p-3 rounded-xl border ${isOverSell ? 'border-[#C58A3A]/30 bg-[#FDF6EC]' : 'border-[#F0EEF6]'}`}>
+                <div key={item.cartId} className={`bg-[#FBFBFC] p-3 rounded-xl border ${isOverSell ? 'border-amber-500/30 bg-[#FDF6EC]' : 'border-zinc-100'}`}>
                   <div className="flex items-center gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-[#17153B] text-sm truncate">{item.product.name}</p>
+                      <p className="font-medium text-zinc-950 text-sm truncate">{item.product.name}</p>
                     </div>
-                    <div className="flex items-center gap-2 bg-white rounded-lg border border-[#E7E4EF] p-1 shadow-sm">
-                      <button onClick={() => updateQuantity(item.cartId, -1)} className="p-1 hover:bg-[#F0EEF6] rounded text-[#68647A]"><Minus className="w-3.5 h-3.5" /></button>
-                      <span className="w-6 text-center text-sm font-medium text-[#17153B]">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.cartId, 1)} className="p-1 hover:bg-[#F0EEF6] rounded text-[#68647A]"><Plus className="w-3.5 h-3.5" /></button>
+                    <div className="flex items-center gap-2 bg-white rounded-lg border border-zinc-200 p-1 shadow-sm">
+                      <button onClick={() => updateQuantity(item.cartId, -1)} className="p-1 hover:bg-zinc-100 rounded text-zinc-500"><Minus className="w-3.5 h-3.5" /></button>
+                      <span className="w-6 text-center text-sm font-medium text-zinc-950">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.cartId, 1)} className="p-1 hover:bg-zinc-100 rounded text-zinc-500"><Plus className="w-3.5 h-3.5" /></button>
                     </div>
                     <div className="text-right min-w-[70px]">
-                      <p className="font-medium text-[#17153B] text-sm">₹{lineTotal.toLocaleString()}</p>
+                      <p className="font-medium text-zinc-950 text-sm">₹{lineTotal.toLocaleString()}</p>
                     </div>
-                    <button onClick={() => removeCartItem(item.cartId)} className="p-1.5 text-[#CFC9DC] hover:text-[#B85454] rounded-md transition-colors"><X className="w-4 h-4" /></button>
+                    <button onClick={() => removeCartItem(item.cartId)} className="p-1.5 text-zinc-300 hover:text-rose-600 rounded-md transition-colors"><X className="w-4 h-4" /></button>
                   </div>
                   {/* Custom price override */}
                   <div className="mt-2 flex items-center gap-2">
-                    <Tag className="w-3 h-3 text-[#9A94A8] shrink-0" />
+                    <Tag className="w-3 h-3 text-zinc-400 shrink-0" />
                     <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={item.customPrice}
                       onChange={e => updateCustomPrice(item.cartId, Number(e.target.value))}
-                      className="w-24 text-xs px-2 py-1 border border-[#D9D5E4] rounded-lg outline-none focus:border-[#433D8B] text-[#17153B]"
+                      className="w-24 text-xs px-2 py-1 border border-zinc-300 rounded-lg outline-none focus:border-blue-600 text-zinc-950"
                       title="Override unit price"
                     />
-                    <span className="text-xs text-[#9A94A8]">unit price</span>
+                    <span className="text-xs text-zinc-400">unit price</span>
                   </div>
                 </div>
               )
@@ -414,22 +414,22 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
           )}
         </div>
 
-        <div className="p-5 border-t border-[#E7E4EF] bg-[#FBFAFD] space-y-3">
-          <div className="flex justify-between text-sm text-[#68647A]">
+        <div className="p-5 border-t border-zinc-200 bg-zinc-50/50 space-y-3">
+          <div className="flex justify-between text-sm text-zinc-500">
             <span>Subtotal</span>
             <span>₹{totals.subtotal.toLocaleString()}</span>
           </div>
           {totals.tax > 0 && (
-            <div className="flex justify-between text-sm text-[#68647A]">
+            <div className="flex justify-between text-sm text-zinc-500">
               <span>Tax</span>
               <span>₹{totals.tax.toLocaleString()}</span>
             </div>
           )}
           {/* Discount input */}
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#68647A]">Discount</span>
+            <span className="text-zinc-500">Discount</span>
             <div className="flex items-center gap-1">
-              <span className="text-[#68647A]">₹</span>
+              <span className="text-zinc-500">₹</span>
               <input
                 type="number"
                 min="0"
@@ -437,12 +437,12 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
                 value={discount || ""}
                 onChange={e => setDiscount(Number(e.target.value) || 0)}
                 placeholder="0"
-                className="w-20 text-right text-sm px-2 py-0.5 border border-[#D9D5E4] rounded-lg outline-none focus:border-[#433D8B] text-[#17153B]"
+                className="w-20 text-right text-sm px-2 py-0.5 border border-zinc-300 rounded-lg outline-none focus:border-blue-600 text-zinc-950"
               />
             </div>
           </div>
 
-          <div className="flex justify-between text-xl font-bold text-[#17153B] pt-2 border-t border-[#E7E4EF]">
+          <div className="flex justify-between text-xl font-bold text-zinc-950 pt-2 border-t border-zinc-200">
             <span>Total</span>
             <span>₹{totals.total.toLocaleString()}</span>
           </div>
@@ -451,14 +451,14 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
             <button 
               onClick={() => handleCheckout("Cash")}
               disabled={cart.length === 0 || busy || oversellItems.length > 0}
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold text-white bg-[#286B54] hover:bg-[#1C513E] disabled:opacity-50 transition-colors shadow-sm"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold text-white bg-emerald-700 hover:bg-[#1C513E] disabled:opacity-50 transition-colors shadow-sm"
             >
               <Banknote className="w-5 h-5" /> Cash
             </button>
             <button 
               onClick={() => handleCheckout("UPI/Card")}
               disabled={cart.length === 0 || busy || oversellItems.length > 0}
-              className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold text-white bg-[#433D8B] hover:bg-[#2E2A66] disabled:opacity-50 transition-colors shadow-sm"
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-800 disabled:opacity-50 transition-colors shadow-sm"
             >
               {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />} Digital
             </button>
@@ -469,40 +469,40 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
       {/* New Customer Modal */}
       {showNewCustomer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.1)] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-[#E7E4EF] flex items-center justify-between bg-[#F7F5FA]">
-              <h3 className="text-xl font-semibold text-[#17153B]">New Customer</h3>
-              <button onClick={() => setShowNewCustomer(false)} className="text-[#9A94A8] hover:text-[#17153B] transition-colors"><X className="w-5 h-5" /></button>
+          <div className="w-full max-w-md bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+              <h3 className="text-xl font-semibold text-zinc-950">New Customer</h3>
+              <button onClick={() => setShowNewCustomer(false)} className="text-zinc-400 hover:text-zinc-950 transition-colors"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#17153B] mb-1.5">Name *</label>
+                <label className="block text-sm font-medium text-zinc-950 mb-1.5">Name *</label>
                 <input
                   type="text"
                   required
                   value={newCustomerName}
                   onChange={e => setNewCustomerName(e.target.value)}
-                  className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                  className="w-full border border-zinc-300 rounded-xl px-4 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950"
                   placeholder="Customer Name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#17153B] mb-1.5">Phone</label>
+                <label className="block text-sm font-medium text-zinc-950 mb-1.5">Phone</label>
                 <input
                   type="tel"
                   value={newCustomerPhone}
                   onChange={e => setNewCustomerPhone(e.target.value)}
-                  className="w-full border border-[#D9D5E4] rounded-xl px-4 py-2.5 outline-none focus:border-[#433D8B] focus:ring-1 focus:ring-[#433D8B] text-[#17153B]"
+                  className="w-full border border-zinc-300 rounded-xl px-4 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-zinc-950"
                   placeholder="Phone Number"
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-[#E7E4EF] bg-[#FBFAFD] flex justify-end gap-3">
-              <button onClick={() => setShowNewCustomer(false)} className="px-5 py-2.5 rounded-xl font-medium text-[#68647A] hover:bg-[#F0EEF6] transition-colors">Cancel</button>
+            <div className="p-6 border-t border-zinc-200 bg-zinc-50/50 flex justify-end gap-3">
+              <button onClick={() => setShowNewCustomer(false)} className="px-5 py-2.5 rounded-xl font-medium text-zinc-500 hover:bg-zinc-100 transition-colors">Cancel</button>
               <button 
                 onClick={handleCreateCustomer}
                 disabled={!newCustomerName || isCreatingCustomer}
-                className="px-5 py-2.5 rounded-xl font-medium text-white bg-[#17153B] hover:bg-[#2E236C] disabled:opacity-50 transition-colors flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl font-medium text-white bg-zinc-950 hover:bg-blue-800 disabled:opacity-50 transition-colors flex items-center gap-2"
               >
                 {isCreatingCustomer && <Loader2 className="w-4 h-4 animate-spin" />}
                 Save
