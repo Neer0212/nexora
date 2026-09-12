@@ -32,7 +32,10 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  // Using getSession() instead of getUser() to prevent a network request on 
+  // every single navigation which causes Vercel 504 Gateway Timeouts.
+  // getSession() will only make a network request if the token needs refreshing.
+  await supabase.auth.getSession()
 
   return response
 }
