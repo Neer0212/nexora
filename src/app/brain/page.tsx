@@ -141,11 +141,14 @@ export default async function BusinessBrainPage() {
 
   if (rowsError) throw new Error(rowsError.message)
 
-  const rows: StoredRow[] = (storedRows ?? []).map((item) => ({
+  const parsedRows: StoredRow[] = (storedRows ?? []).map((item) => ({
     datasetId: item.dataset_id as string,
     rowNumber: item.row_number as number,
     row: (item.row_data ?? {}) as JsonRow,
   }))
+
+  const { appendOperationalData } = await import("@/lib/pos-integration")
+  const rows = (await appendOperationalData(membership.business_id, parsedRows)) as StoredRow[]
 
   const orderRows = rowsFor(rows, readyDatasets, ["order", "sales", "revenue"])
   const inventoryRows = rowsFor(rows, readyDatasets, ["inventory", "stock", "warehouse"])

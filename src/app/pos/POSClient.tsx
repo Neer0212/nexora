@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useMemo, useTransition } from "react"
 import { Search, Plus, Minus, X, CreditCard, Banknote, UserPlus, Package, Loader2, AlertCircle, Receipt, ShoppingBag, Tag, ExternalLink, CheckCircle2 } from "lucide-react"
 import { getPOSProducts, processCheckout, quickCreateCustomer, type CheckoutPayload } from "./actions"
 import ReceiptTemplate from "@/components/shared/ReceiptTemplate"
+import { calculateCartTotals } from "@/lib/cart"
 
 type Product = {
   id: string
@@ -156,17 +157,7 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
   )
 
   const totals = useMemo(() => {
-    let subtotal = 0
-    let tax = 0
-    cart.forEach(item => {
-      const price = item.customPrice
-      const lineTotal = price * item.quantity
-      subtotal += lineTotal
-      const taxRate = item.product.tax_rate ?? 0
-      tax += lineTotal * (taxRate / 100)
-    })
-    const discountAmt = Math.min(discount, subtotal)
-    return { subtotal, tax, discount: discountAmt, total: subtotal + tax - discountAmt }
+    return calculateCartTotals(cart, discount)
   }, [cart, discount])
 
   const handleCheckout = (paymentMethod: string) => {

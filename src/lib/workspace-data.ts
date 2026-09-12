@@ -150,9 +150,35 @@ export async function getWorkspaceData(): Promise<WorkspaceData> {
 
   if (error) throw new Error(error.message)
 
-  const rows = classifyRows(datasets, (stored ?? []) as RawStoredRow[])
+  const rawStoredRows = (stored ?? []) as RawStoredRow[]
+  
+  // Transform format to match what appendOperationalData expects
+  let unifiedRows: { datasetId: string; rowNumber: number; row: Record<string, unknown> }[] = rawStoredRows.map((r, i) => ({
+    datasetId: r.dataset_id,
+    rowNumber: i,
+    row: (r.row_data ?? {}) as Record<string, unknown>
+  }))
 
-  return { context, datasets, rows }
+  const { appendOperationalData } = await import("@/lib/pos-integration")
+  unifiedRows = await appendOperationalData(context.businessId, unifiedRows)
+
+  // Map back to RawStoredRow shape for classification
+  const rowsToClassify = unifiedRows.map((r, i) => ({
+    dataset_id: r.datasetId,
+    row_number: i,
+    row_data: r.row
+  }))
+
+  const allDatasets = [
+    ...datasets,
+    { id: "pos-sales", name: "POS Sales Data", fileName: "pos-system", rowCount: 1, status: "ready", createdAt: new Date().toISOString() },
+    { id: "pos-expenses", name: "POS Expenses Data", fileName: "pos-system", rowCount: 1, status: "ready", createdAt: new Date().toISOString() },
+    { id: "pos-inventory", name: "POS Inventory Data", fileName: "pos-system", rowCount: 1, status: "ready", createdAt: new Date().toISOString() }
+  ]
+
+  const rows = classifyRows(allDatasets, rowsToClassify)
+
+  return { context, datasets: allDatasets, rows }
 }
 
 /**

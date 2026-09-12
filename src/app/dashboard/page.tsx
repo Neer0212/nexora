@@ -105,11 +105,14 @@ export default async function DashboardPage() {
 
   if (rowsError) throw new Error(rowsError.message)
 
-  const rows = (storedRows ?? []).map((item) => ({
+  const parsedRows = (storedRows ?? []).map((item) => ({
     datasetId: item.dataset_id as string,
     rowNumber: item.row_number as number,
     row: (item.row_data ?? {}) as JsonRow,
   }))
+
+  const { appendOperationalData } = await import("@/lib/pos-integration")
+  const rows = await appendOperationalData(membership.business_id, parsedRows)
 
   const orderRows = rows.filter(({ row }) =>
     Boolean(

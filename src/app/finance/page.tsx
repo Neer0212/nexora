@@ -130,11 +130,14 @@ export default async function FinancePage() {
 
   if (rowsError) throw new Error(rowsError.message)
 
-  const rows = ((storedRows ?? []) as StoredRow[]).map((item) => ({
+  const parsedRows = ((storedRows ?? []) as StoredRow[]).map((item) => ({
     datasetId: item.dataset_id,
     rowNumber: item.row_number,
     row: (item.row_data ?? {}) as JsonRow,
   }))
+
+  const { appendOperationalData } = await import("@/lib/pos-integration")
+  const rows = await appendOperationalData(membership.business_id, parsedRows)
 
   const orderRows = rows.filter(({ row }) =>
     Boolean(
