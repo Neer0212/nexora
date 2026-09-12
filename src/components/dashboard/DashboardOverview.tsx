@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react"
 import type { ElementType } from "react"
+import type { IndustryConfig } from "@/lib/industries"
 
 type TrendPoint = { label: string; value: number }
 type RecentOrder = {
@@ -29,6 +30,7 @@ type Insight = { title: string; description: string; evidence: string }
 
 type DashboardData = {
   currencyCode: string
+  industryConfig: IndustryConfig
   hasData: boolean
   revenue: number
   ordersCount: number
@@ -130,6 +132,7 @@ function Metric({
 export default function DashboardOverview({ data }: { data: DashboardData }) {
   const maxTrend = Math.max(...data.trend.map((point) => point.value), 1)
   const maxProduct = Math.max(...data.topProducts.map((product) => product.value), 1)
+  const t = data.industryConfig.terminology
 
   return (
     <div className="w-full">
@@ -139,7 +142,7 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
             Live business intelligence
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#17153B] sm:text-4xl">
-            See what&apos;s happening.
+            {t.dashboardTagline}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#68647A]">
             These numbers are calculated from the business data connected to Nexora.
@@ -156,34 +159,35 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
 
       <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
-          label="Revenue"
+          label={t.revenueLabel}
           value={data.revenue ? compactCurrency(data.revenue, data.currencyCode) : "—"}
           detail={
             data.ordersCount
-              ? `${data.ordersCount.toLocaleString("en-IN")} completed orders`
-              : "Waiting for order data"
+              ? `${data.ordersCount.toLocaleString("en-IN")} ${t.ordersLabel.toLowerCase()}`
+              : `Waiting for ${t.order.plural.toLowerCase()}`
           }
           icon={ShoppingCart}
         />
         <Metric
-          label="Units sold"
+          label={t.unitsLabel}
           value={data.unitsSold ? data.unitsSold.toLocaleString("en-IN") : "—"}
-          detail={data.unitsSold ? "From connected order rows" : "Waiting for quantity data"}
+          detail={data.unitsSold ? `From connected ${t.order.plural.toLowerCase()}` : `Waiting for ${t.order.plural.toLowerCase()}`}
           icon={BarChart3}
         />
         <Metric
-          label="Average order value"
+          label={t.averageOrderValueLabel}
           value={data.averageOrderValue ? currency(data.averageOrderValue, data.currencyCode) : "—"}
-          detail={data.ordersCount ? "Revenue ÷ completed orders" : "Waiting for orders"}
+          detail={data.ordersCount ? `${t.revenueLabel} ÷ ${t.ordersLabel.toLowerCase()}` : `Waiting for ${t.order.plural.toLowerCase()}`}
           icon={Sparkles}
         />
         <Metric
-          label="Customers"
+          label={t.customersLabel}
           value={data.customersCount ? data.customersCount.toLocaleString("en-IN") : "—"}
-          detail={data.customersCount ? "Unique customers" : "Waiting for customer data"}
+          detail={data.customersCount ? `Unique ${t.customer.plural.toLowerCase()}` : `Waiting for ${t.customer.plural.toLowerCase()}`}
           icon={Users}
         />
       </section>
+
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.45fr_0.75fr]">
         <section className="overflow-hidden rounded-2xl border border-[#E7E4EF] bg-white shadow-[0_12px_35px_rgba(23,21,59,0.04)]">

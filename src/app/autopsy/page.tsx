@@ -33,6 +33,7 @@ export default async function AutopsyPage() {
   const productMetrics = computeProductMetrics(salesRows)
 
   const data = {
+    industryConfig: result.context.industryConfig,
     businessName: result.context.businessName,
     currencyCode: result.context.currencyCode,
     latestDate: comparison.latestDate,

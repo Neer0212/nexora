@@ -6,6 +6,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server"
+import { type IndustryId, type IndustryConfig, getIndustryConfig } from "@/lib/industries"
 import {
   type DatasetInfo,
   type ClassifiedRow,
@@ -23,6 +24,9 @@ export type WorkspaceContext = {
   businessName: string
   currencyCode: string
   role: string
+  industry: IndustryId
+  businessType: string | null
+  industryConfig: IndustryConfig
 }
 
 export type WorkspaceData = {
@@ -72,13 +76,15 @@ export async function getWorkspaceContext(): Promise<WorkspaceContext> {
 
   const { data: business, error: businessError } = await supabase
     .from("businesses")
-    .select("id, name, currency_code")
+    .select("id, name, currency_code, industry, business_type")
     .eq("id", membership.business_id)
     .single()
 
   if (businessError || !business) {
     throw new Error(businessError?.message || "Business could not be loaded.")
   }
+
+  const industryConfig = getIndustryConfig(business.industry)
 
   return {
     userId: user.id,
@@ -87,6 +93,9 @@ export async function getWorkspaceContext(): Promise<WorkspaceContext> {
     businessName: business.name,
     currencyCode: business.currency_code || "INR",
     role: membership.role,
+    industry: industryConfig.id,
+    businessType: business.business_type ?? null,
+    industryConfig,
   }
 }
 

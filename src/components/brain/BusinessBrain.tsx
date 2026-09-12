@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import Breadcrumbs from "@/components/layout/Breadcrumbs"
+import type { IndustryConfig } from "@/lib/industries"
 import {
   AlertTriangle,
   ArrowRight,
@@ -65,6 +66,7 @@ type Recommendation = {
 type BrainData = {
   businessName: string
   currencyCode: string
+  industryConfig: IndustryConfig
   currentRevenue: number
   previousRevenue: number
   revenueChange: number | null
@@ -162,18 +164,19 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
 
   const insights = useMemo<Insight[]>(() => {
     const result: Insight[] = []
+    const t = data.industryConfig.terminology
 
     if (data.currentOrdersCount === 0) {
       result.push({
         id: "revenue-no-signal",
         category: "context",
-        title: "There is no revenue signal yet.",
-        summary: "Connect or import orders to start building a performance picture.",
+        title: `There is no ${t.revenueLabel.toLowerCase()} signal yet.`,
+        summary: `Connect or import ${t.order.plural.toLowerCase()} to start building a performance picture.`,
         detail:
           "Business Brain needs historical business activity before it can compare performance, identify movement, or explain changes.",
         icon: BarChart3,
         priority: "medium",
-        evidence: ["No non-cancelled orders in the last 30 days"],
+        evidence: [`No non-cancelled ${t.order.plural.toLowerCase()} in the last 30 days`],
         href: "/autopsy",
       })
     } else if (data.revenueChange !== null) {
@@ -183,19 +186,19 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
       result.push({
         id: "revenue-movement",
         category: "performance",
-        title: `Revenue is ${direction} ${magnitude.toFixed(1)}%.`,
+        title: `${t.revenueLabel} is ${direction} ${magnitude.toFixed(1)}%.`,
         summary:
           direction === "up"
             ? "The latest 30 days are ahead of the previous 30-day period."
             : "The latest 30 days are behind the previous 30-day period.",
         detail:
-          "This is a performance signal, not a causal conclusion. Nexora can use the connected product, inventory, and supplier context to investigate what changed alongside revenue.",
+          `This is a performance signal, not a causal conclusion. Nexora can use the connected ${t.product.singular.toLowerCase()}, ${t.inventory.singular.toLowerCase()}, and ${t.supplier.singular.toLowerCase()} context to investigate what changed alongside ${t.revenueLabel.toLowerCase()}.`,
         icon: direction === "up" ? TrendingUp : TrendingDown,
         priority: direction === "down" ? "high" : "low",
         evidence: [
-          `Current 30-day revenue: ${formatCurrency(data.currentRevenue, data.currencyCode)}`,
-          `Previous 30-day revenue: ${formatCurrency(data.previousRevenue, data.currencyCode)}`,
-          `Current orders: ${data.currentOrdersCount.toLocaleString("en-IN")}`,
+          `Current 30-day ${t.revenueLabel.toLowerCase()}: ${formatCurrency(data.currentRevenue, data.currencyCode)}`,
+          `Previous 30-day ${t.revenueLabel.toLowerCase()}: ${formatCurrency(data.previousRevenue, data.currencyCode)}`,
+          `Current ${t.order.plural.toLowerCase()}: ${data.currentOrdersCount.toLocaleString("en-IN")}`,
         ],
         href: "/autopsy",
       })
@@ -203,15 +206,15 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
       result.push({
         id: "revenue-baseline",
         category: "performance",
-        title: "Revenue activity has started.",
-        summary: "Nexora has enough current order data to establish a baseline.",
+        title: `${t.revenueLabel} activity has started.`,
+        summary: "Nexora has enough current data to establish a baseline.",
         detail:
           "A previous comparable period is not available yet, so Nexora will avoid inventing a growth rate. More history will make the comparison meaningful.",
         icon: BarChart3,
         priority: "low",
         evidence: [
-          `Current 30-day revenue: ${formatCurrency(data.currentRevenue, data.currencyCode)}`,
-          `Current orders: ${data.currentOrdersCount.toLocaleString("en-IN")}`,
+          `Current 30-day ${t.revenueLabel.toLowerCase()}: ${formatCurrency(data.currentRevenue, data.currencyCode)}`,
+          `Current ${t.order.plural.toLowerCase()}: ${data.currentOrdersCount.toLocaleString("en-IN")}`,
         ],
         href: "/autopsy",
       })
@@ -227,10 +230,10 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
         category: "risk",
         title: `${data.lowStock.length} ${data.lowStock.length === 1 ? "item is" : "items are"} below reorder level.`,
         summary: highestExposure
-          ? `${highestExposure.productName} is the clearest inventory signal right now.`
-          : "Inventory needs attention.",
+          ? `${highestExposure.productName} is the clearest ${t.inventory.singular.toLowerCase()} signal right now.`
+          : `${t.inventory.singular} needs attention.`,
         detail:
-          "Low stock does not automatically mean a stockout is imminent. It is a signal worth investigating against recent demand and supplier lead times.",
+          "Low stock does not automatically mean a stockout is imminent. It is a signal worth investigating against recent demand and lead times.",
         icon: Package,
         priority: "high",
         evidence: data.lowStock.slice(0, 3).map(
@@ -243,15 +246,15 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
       result.push({
         id: "inventory-stable",
         category: "performance",
-        title: "Inventory is above recorded reorder levels.",
-        summary: "No low-stock records were detected in the current inventory snapshot.",
+        title: `${t.inventory.singular} is above recorded reorder levels.`,
+        summary: `No low-stock records were detected in the current ${t.inventory.singular.toLowerCase()} snapshot.`,
         detail:
-          "This does not guarantee healthy inventory. Demand velocity, supplier lead times, and future orders should be considered before making a purchasing decision.",
+          "This does not guarantee health. Demand velocity, lead times, and future orders should be considered before making a purchasing decision.",
         icon: Package,
         priority: "low",
         evidence: [
-          `${data.inventoryCount.toLocaleString("en-IN")} inventory records checked`,
-          `Inventory value: ${formatCurrency(data.inventoryValue, data.currencyCode)}`,
+          `${data.inventoryCount.toLocaleString("en-IN")} ${t.inventory.singular.toLowerCase()} records checked`,
+          `${t.inventory.singular} value: ${formatCurrency(data.inventoryValue, data.currencyCode)}`,
         ],
         href: "/inventory",
       })
@@ -263,12 +266,12 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
       result.push({
         id: "supplier-risk",
         category: "risk",
-        title: `${data.supplierRisks.length} supplier ${data.supplierRisks.length === 1 ? "needs" : "need"} a closer look.`,
+        title: `${data.supplierRisks.length} ${t.supplier.singular.toLowerCase()} ${data.supplierRisks.length === 1 ? "needs" : "need"} a closer look.`,
         summary: supplier
           ? `${supplier.name} has a lead-time or reliability signal.`
-          : "Supplier performance signals need attention.",
+          : `${t.supplier.singular} performance signals need attention.`,
         detail:
-          "Nexora flags suppliers using the lead-time and reliability values currently recorded in your workspace. These are risk indicators, not predictions of failure.",
+          "Nexora flags issues using the lead-time and reliability values currently recorded in your workspace. These are risk indicators, not predictions of failure.",
         icon: Truck,
         priority: "medium",
         evidence: data.supplierRisks.slice(0, 3).map((item) => {
@@ -289,19 +292,19 @@ export default function BusinessBrain({ data }: { data: BrainData }) {
       result.push({
         id: "product-opportunity",
         category: "opportunity",
-        title: `${topProduct.name} is leading current product revenue.`,
+        title: `${topProduct.name} is leading current ${t.product.singular.toLowerCase()} ${t.revenueLabel.toLowerCase()}.`,
         summary: topProduct.lowStock
-          ? "Strong sales and low stock make this product worth watching closely."
-          : "This product currently contributes the most recorded product revenue.",
+          ? "Strong sales and low stock make this worth watching closely."
+          : `This ${t.product.singular.toLowerCase()} currently contributes the most recorded ${t.revenueLabel.toLowerCase()}.`,
         detail: topProduct.lowStock
-          ? "Nexora cannot conclude that low stock caused any revenue movement, but the combination is a useful signal for investigation."
-          : "This is a concentration signal. Understanding what is driving this product can help explain where current business activity is coming from.",
+          ? `Nexora cannot conclude that low stock caused any ${t.revenueLabel.toLowerCase()} movement, but the combination is a useful signal for investigation.`
+          : `This is a concentration signal. Understanding what is driving this ${t.product.singular.toLowerCase()} can help explain where current business activity is coming from.`,
         icon: Target,
         priority: topProduct.lowStock ? "high" : "low",
         evidence: [
-          `Current product revenue: ${formatCurrency(topProduct.revenue, data.currencyCode)}`,
-          `Quantity sold: ${topProduct.quantity.toLocaleString("en-IN")}`,
-          topProduct.lowStock ? "Current inventory is at or below reorder level" : "No low-stock flag for this product",
+          `Current ${t.product.singular.toLowerCase()} ${t.revenueLabel.toLowerCase()}: ${formatCurrency(topProduct.revenue, data.currencyCode)}`,
+          `Quantity: ${topProduct.quantity.toLocaleString("en-IN")}`,
+          topProduct.lowStock ? `Current ${t.inventory.singular.toLowerCase()} is at or below reorder level` : `No low-stock flag for this ${t.product.singular.toLowerCase()}`,
         ],
         href: "/entities",
       })

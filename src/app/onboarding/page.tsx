@@ -2,231 +2,425 @@
 
 import { FormEvent, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, AlertCircle, ChevronDown } from "lucide-react"
-
+import {
+  Loader2, AlertCircle, ChevronDown, Store, UtensilsCrossed,
+  Scissors, Dumbbell, Stethoscope, Car, GraduationCap, Hotel,
+  Building2, Check
+} from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
+type IndustryOption = {
+  id: string
+  name: string
+  shortName: string
+  description: string
+  icon: React.ElementType
+  highlights: string[]
+  tier: 1 | 2 | "general"
+}
+
+const INDUSTRIES: IndustryOption[] = [
+  {
+    id: "retail",
+    name: "Retail / Local Store",
+    shortName: "Retail",
+    description: "Products, inventory, POS sales, and customers.",
+    icon: Store,
+    highlights: ["Barcode scanning & POS", "Stock & reorder alerts", "Supplier management"],
+    tier: 1,
+  },
+  {
+    id: "restaurant",
+    name: "Restaurant / Café",
+    shortName: "Restaurant",
+    description: "Menu, kitchen inventory, guest orders, and billing.",
+    icon: UtensilsCrossed,
+    highlights: ["Menu & order management", "Kitchen inventory", "Table billing via POS"],
+    tier: 1,
+  },
+  {
+    id: "salon",
+    name: "Salon / Spa",
+    shortName: "Salon",
+    description: "Services, appointments, client history, and supplies.",
+    icon: Scissors,
+    highlights: ["Appointment billing via POS", "Client retention tracking", "Supplies inventory"],
+    tier: 1,
+  },
+  {
+    id: "gym",
+    name: "Gym / Fitness",
+    shortName: "Gym",
+    description: "Members, membership plans, classes, and payments.",
+    icon: Dumbbell,
+    highlights: ["Membership billing via POS", "Member retention", "Equipment management"],
+    tier: 1,
+  },
+  {
+    id: "clinic",
+    name: "Clinic / Dental",
+    shortName: "Clinic",
+    description: "Patients, appointments, consultations, and medical supplies.",
+    icon: Stethoscope,
+    highlights: ["Patient billing via POS", "Appointment revenue", "Medical supply management"],
+    tier: 2,
+  },
+  {
+    id: "automotive",
+    name: "Automobile Service",
+    shortName: "Auto Service",
+    description: "Service jobs, vehicle records, parts, and technicians.",
+    icon: Car,
+    highlights: ["Service job billing", "Parts inventory & reorder", "Customer vehicle history"],
+    tier: 2,
+  },
+  {
+    id: "education",
+    name: "Education / Coaching",
+    shortName: "Education",
+    description: "Students, courses, fee collection, and teachers.",
+    icon: GraduationCap,
+    highlights: ["Fee collection via POS", "Enrollment tracking", "Course revenue analytics"],
+    tier: 2,
+  },
+  {
+    id: "hospitality",
+    name: "Hotel / Hospitality",
+    shortName: "Hospitality",
+    description: "Guests, rooms, reservations, and amenities.",
+    icon: Hotel,
+    highlights: ["Guest billing via POS", "Room revenue tracking", "Supply management"],
+    tier: 2,
+  },
+  {
+    id: "general",
+    name: "Other / General Business",
+    shortName: "General",
+    description: "A flexible workspace that works for any business.",
+    icon: Building2,
+    highlights: ["All modules available", "Universal data import", "No restrictions"],
+    tier: "general",
+  },
+]
+
 export default function OnboardingPage() {
-    const router = useRouter()
-    const supabase = createClient()
+  const router = useRouter()
+  const supabase = createClient()
 
-    const [businessName, setBusinessName] = useState("")
-    const [industry, setIndustry] = useState("")
-    const [businessType, setBusinessType] = useState("")
-    const [currency, setCurrency] = useState("USD")
+  const [businessName, setBusinessName] = useState("")
+  const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null)
+  const [currency, setCurrency] = useState("INR")
 
-    const [loading, setLoading] = useState(true)
-    const [submitting, setSubmitting] = useState(false)
-    const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState("")
 
-    useEffect(() => {
-        async function checkUser() {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser()
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-            if (!user) {
-                router.replace("/login")
-                return
-            }
+      if (!user) {
+        router.replace("/login")
+        return
+      }
 
-            setLoading(false)
-        }
-
-        checkUser()
-    }, [router, supabase])
-
-
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault()
-
-        setError("")
-
-        if (!businessName.trim()) {
-            setError("Please enter your business name.")
-            return
-        }
-
-        setSubmitting(true)
-
-        const {
-            data: { user },
-        } = await supabase.auth.getUser()
-
-        if (!user) {
-            router.replace("/login")
-            return
-        }
-
-        const { error: businessError } = await supabase.rpc("create_business", {
-            p_name: businessName.trim(),
-            p_business_type: businessType || null,
-            p_industry: industry.trim() || null,
-        })
-
-        if (businessError) {
-            setError(
-                businessError.message ||
-                "We couldn't create your business. Please try again."
-            )
-            setSubmitting(false)
-            return
-        }
-
-        // Optional: Save currency somewhere if needed, currently create_business doesn't support currency param.
-        
-        router.push("/dashboard")
-        router.refresh()
+      setLoading(false)
     }
 
-    if (loading) {
-        return (
-            <main className="flex min-h-screen items-center justify-center bg-[#F1F0F8]">
-                <Loader2 className="h-8 w-8 animate-spin text-[#433D8B]" />
-            </main>
-        )
+    checkUser()
+  }, [router, supabase])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError("")
+
+    if (!businessName.trim()) {
+      setError("Please enter your business name.")
+      return
     }
 
+    if (!selectedIndustry) {
+      setError("Please select your business type.")
+      return
+    }
+
+    setSubmitting(true)
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.replace("/login")
+      return
+    }
+
+    const { error: businessError } = await supabase.rpc("create_business", {
+      p_name: businessName.trim(),
+      p_business_type: selectedIndustry,
+      p_industry: selectedIndustry,
+    })
+
+    if (businessError) {
+      setError(
+        businessError.message ||
+        "We couldn't create your business. Please try again."
+      )
+      setSubmitting(false)
+      return
+    }
+
+    router.push("/dashboard")
+    router.refresh()
+  }
+
+  if (loading) {
     return (
-        <main className="flex min-h-screen items-center justify-center bg-[#F1F0F8] px-6 py-12">
-            <div className="w-full max-w-xl">
-                <div className="mb-8">
-                    <p className="text-[10px] font-bold tracking-[0.2em] text-[#433D8B] uppercase">
-                        NEXORA
-                    </p>
-
-                    <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#17153B]">
-                        Tell us about your business
-                    </h1>
-
-                    <p className="mt-2 text-sm leading-6 text-[#68647A]">
-                        We need this to set up your workspace and format your metrics correctly. You can change these details later.
-                    </p>
-                </div>
-
-                <div className="rounded-3xl border border-[#E7E4EF] bg-[#FFFFFF] p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)] sm:p-8">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label
-                                htmlFor="business-name"
-                                className="mb-2 block text-sm font-medium text-[#17153B]"
-                            >
-                                Business name
-                            </label>
-
-                            <input
-                                id="business-name"
-                                type="text"
-                                required
-                                value={businessName}
-                                onChange={(event) => setBusinessName(event.target.value)}
-                                placeholder="e.g. Acme Manufacturing"
-                                className="w-full rounded-xl border border-[#E7E4EF] px-4 py-3 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30 placeholder:text-[#68647A]/60"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <div>
-                                <label
-                                    htmlFor="business-type"
-                                    className="mb-2 block text-sm font-medium text-[#17153B]"
-                                >
-                                    Business type
-                                </label>
-
-                                <div className="relative">
-                                    <select
-                                        id="business-type"
-                                        value={businessType}
-                                        onChange={(event) => setBusinessType(event.target.value)}
-                                        className="w-full appearance-none rounded-xl border border-[#E7E4EF] bg-[#FFFFFF] px-4 py-3 pr-10 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30"
-                                    >
-                                        <option value="">Select a type</option>
-                                        <option value="Manufacturing">Manufacturing</option>
-                                        <option value="Trading">Trading</option>
-                                        <option value="Services">Services</option>
-                                        <option value="Construction">Construction</option>
-                                        <option value="Retail">Retail</option>
-                                        <option value="Technology">Technology</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#68647A]" />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="currency"
-                                    className="mb-2 block text-sm font-medium text-[#17153B]"
-                                >
-                                    Primary currency
-                                </label>
-
-                                <div className="relative">
-                                    <select
-                                        id="currency"
-                                        value={currency}
-                                        onChange={(event) => setCurrency(event.target.value)}
-                                        className="w-full appearance-none rounded-xl border border-[#E7E4EF] bg-[#FFFFFF] px-4 py-3 pr-10 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30"
-                                    >
-                                        <option value="USD">USD ($)</option>
-                                        <option value="EUR">EUR (€)</option>
-                                        <option value="GBP">GBP (£)</option>
-                                        <option value="CAD">CAD ($)</option>
-                                        <option value="AUD">AUD ($)</option>
-                                        <option value="INR">INR (₹)</option>
-                                    </select>
-                                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#68647A]" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label
-                                htmlFor="industry"
-                                className="mb-2 block text-sm font-medium text-[#17153B]"
-                            >
-                                Industry
-                            </label>
-
-                            <input
-                                id="industry"
-                                type="text"
-                                value={industry}
-                                onChange={(event) => setIndustry(event.target.value)}
-                                placeholder="e.g. Industrial manufacturing"
-                                className="w-full rounded-xl border border-[#E7E4EF] px-4 py-3 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30 placeholder:text-[#68647A]/60"
-                            />
-                        </div>
-
-                        {error && (
-                            <div className="flex items-center gap-3 rounded-xl border border-[#B85454]/20 bg-[#B85454]/5 px-4 py-3 text-sm text-[#B85454]">
-                                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                                <p>{error}</p>
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={submitting}
-                            className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl bg-[#17153B] px-4 py-3 text-sm font-medium text-[#FFFFFF] transition hover:bg-[#2E236C] disabled:cursor-not-allowed disabled:opacity-70"
-                        >
-                            {submitting ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    <span>Setting up workspace...</span>
-                                </>
-                            ) : (
-                                "Create workspace"
-                            )}
-                        </button>
-                    </form>
-                </div>
-
-                <p className="mt-6 text-center text-xs text-[#68647A]">
-                    You can update your business information later in Settings.
-                </p>
-            </div>
-        </main>
+      <main className="flex min-h-screen items-center justify-center bg-[#F1F0F8]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#433D8B]" />
+      </main>
     )
+  }
+
+  const tier1 = INDUSTRIES.filter((i) => i.tier === 1)
+  const tier2 = INDUSTRIES.filter((i) => i.tier === 2)
+  const general = INDUSTRIES.filter((i) => i.tier === "general")
+
+  return (
+    <main className="min-h-screen bg-[#F1F0F8] px-4 py-12 sm:px-6">
+      <div className="mx-auto w-full max-w-3xl">
+        {/* Header */}
+        <div className="mb-10 text-center">
+          <p className="text-[10px] font-bold tracking-[0.2em] text-[#433D8B] uppercase">
+            NEXORA
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#17153B]">
+            Set up your workspace
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-[#68647A]">
+            Nexora adapts its intelligence, terminology, and workflows to your business.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Business Name */}
+          <div className="rounded-2xl border border-[#E7E4EF] bg-white p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+            <label
+              htmlFor="business-name"
+              className="mb-2 block text-sm font-medium text-[#17153B]"
+            >
+              Business name
+            </label>
+            <input
+              id="business-name"
+              type="text"
+              required
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              placeholder="e.g. Sunrise Store, FitZone Gym"
+              className="w-full rounded-xl border border-[#E7E4EF] px-4 py-3 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30 placeholder:text-[#68647A]/60"
+            />
+
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div>
+                <label
+                  htmlFor="currency"
+                  className="mb-1.5 block text-xs font-medium text-[#68647A]"
+                >
+                  Primary currency
+                </label>
+                <div className="relative">
+                  <select
+                    id="currency"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="w-full appearance-none rounded-xl border border-[#E7E4EF] bg-white px-4 py-2.5 pr-8 text-sm text-[#17153B] outline-none transition focus:border-[#433D8B] focus:ring-2 focus:ring-[#C8ACD6]/30"
+                  >
+                    <option value="INR">INR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="AED">AED (د.إ)</option>
+                    <option value="SGD">SGD ($)</option>
+                    <option value="AUD">AUD ($)</option>
+                    <option value="CAD">CAD ($)</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#68647A]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Industry Selection */}
+          <div className="rounded-2xl border border-[#E7E4EF] bg-white p-6 shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
+            <div className="mb-5">
+              <p className="text-sm font-medium text-[#17153B]">
+                What kind of business do you run?
+              </p>
+              <p className="mt-1 text-xs text-[#68647A]">
+                Nexora will adapt its navigation, terminology, and intelligence to match.
+              </p>
+            </div>
+
+            {/* Tier 1 */}
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9A94A8]">
+              Most common
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {tier1.map((industry) => (
+                <IndustryCard
+                  key={industry.id}
+                  industry={industry}
+                  selected={selectedIndustry === industry.id}
+                  onSelect={() => setSelectedIndustry(industry.id)}
+                />
+              ))}
+            </div>
+
+            {/* Tier 2 */}
+            <p className="mb-3 mt-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9A94A8]">
+              Specialty businesses
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {tier2.map((industry) => (
+                <IndustryCard
+                  key={industry.id}
+                  industry={industry}
+                  selected={selectedIndustry === industry.id}
+                  onSelect={() => setSelectedIndustry(industry.id)}
+                />
+              ))}
+            </div>
+
+            {/* General */}
+            <div className="mt-4">
+              {general.map((industry) => (
+                <IndustryCard
+                  key={industry.id}
+                  industry={industry}
+                  selected={selectedIndustry === industry.id}
+                  onSelect={() => setSelectedIndustry(industry.id)}
+                  compact
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="flex items-center gap-3 rounded-xl border border-[#B85454]/20 bg-[#B85454]/5 px-4 py-3 text-sm text-[#B85454]">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <p>{error}</p>
+            </div>
+          )}
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={submitting || !selectedIndustry}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#17153B] px-4 py-3.5 text-sm font-medium text-white transition hover:bg-[#2E236C] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Creating your workspace...</span>
+              </>
+            ) : (
+              "Create workspace"
+            )}
+          </button>
+
+          <p className="text-center text-xs text-[#68647A]">
+            You can change your business type later in Settings.
+          </p>
+        </form>
+      </div>
+    </main>
+  )
+}
+
+function IndustryCard({
+  industry,
+  selected,
+  onSelect,
+  compact = false,
+}: {
+  industry: IndustryOption
+  selected: boolean
+  onSelect: () => void
+  compact?: boolean
+}) {
+  const Icon = industry.icon
+
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={onSelect}
+        className={[
+          "flex w-full items-center gap-4 rounded-xl border px-4 py-3.5 text-left transition",
+          selected
+            ? "border-[#433D8B] bg-[#F0EEF6] ring-1 ring-[#433D8B]"
+            : "border-[#E7E4EF] hover:border-[#C8ACD6] hover:bg-[#FAFAFA]",
+        ].join(" ")}
+      >
+        <div className={[
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+          selected ? "bg-[#433D8B] text-white" : "bg-[#F1F0F8] text-[#68647A]",
+        ].join(" ")}>
+          <Icon className="h-4 w-4" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-[#17153B]">{industry.name}</p>
+          <p className="mt-0.5 text-xs text-[#68647A]">{industry.description}</p>
+        </div>
+        {selected && (
+          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#433D8B]">
+            <Check className="h-3 w-3 text-white" />
+          </div>
+        )}
+      </button>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={[
+        "group flex flex-col gap-3 rounded-xl border p-4 text-left transition",
+        selected
+          ? "border-[#433D8B] bg-[#F0EEF6] ring-1 ring-[#433D8B]"
+          : "border-[#E7E4EF] hover:border-[#C8ACD6] hover:bg-[#FAFAFA]",
+      ].join(" ")}
+    >
+      <div className="flex items-start justify-between">
+        <div className={[
+          "flex h-9 w-9 items-center justify-center rounded-lg",
+          selected ? "bg-[#433D8B] text-white" : "bg-[#F1F0F8] text-[#68647A] group-hover:bg-[#E7E4EF]",
+        ].join(" ")}>
+          <Icon className="h-4 w-4" />
+        </div>
+        {selected && (
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#433D8B]">
+            <Check className="h-3 w-3 text-white" />
+          </div>
+        )}
+      </div>
+      <div>
+        <p className="text-sm font-medium text-[#17153B]">{industry.shortName}</p>
+        <p className="mt-0.5 text-xs leading-5 text-[#68647A]">{industry.description}</p>
+      </div>
+      <ul className="space-y-1">
+        {industry.highlights.map((h) => (
+          <li key={h} className="flex items-center gap-1.5 text-[10px] text-[#9A94A8]">
+            <span className="h-1 w-1 rounded-full bg-[#C8ACD6]" />
+            {h}
+          </li>
+        ))}
+      </ul>
+    </button>
+  )
 }

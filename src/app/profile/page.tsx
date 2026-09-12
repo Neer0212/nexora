@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import Breadcrumbs from "@/components/layout/Breadcrumbs"
 import { User, Building2, Shield, Mail, Calendar } from "lucide-react"
+import ProfileIndustrySection from "./ProfileIndustrySection"
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -123,22 +124,11 @@ export default async function ProfilePage() {
                     <p className="text-sm text-[#17153B]">{business.name}</p>
                   </div>
                 </div>
-                {business.industry && (
-                  <div className="pl-7">
-                    <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
-                      Industry
-                    </p>
-                    <p className="text-sm text-[#17153B]">{business.industry}</p>
-                  </div>
-                )}
-                {business.business_type && (
-                  <div className="pl-7">
-                    <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
-                      Type
-                    </p>
-                    <p className="text-sm capitalize text-[#17153B]">{business.business_type}</p>
-                  </div>
-                )}
+                <ProfileIndustrySection 
+                  businessId={membership.business_id}
+                  currentIndustry={business.industry || "general"}
+                  currentType={business.business_type}
+                />
                 <div className="pl-7">
                   <p className="text-[10px] font-medium uppercase tracking-widest text-[#9A94A8]">
                     Currency

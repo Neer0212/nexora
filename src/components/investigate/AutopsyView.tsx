@@ -12,10 +12,12 @@ import {
   RefreshCcw,
   AlertTriangle
 } from "lucide-react"
+import type { IndustryConfig } from "@/lib/industries"
 
 type AutopsyData = {
   businessName: string
   currencyCode: string
+  industryConfig: IndustryConfig
   latestDate: string | null
   datasets: string[]
   comparison: {
@@ -51,8 +53,9 @@ type AutopsyData = {
 }
 
 export default function AutopsyView(props: AutopsyData) {
-  const { comparison, orderMetrics, inventoryMetrics, currencyCode } = props
+  const { comparison, orderMetrics, inventoryMetrics, currencyCode, industryConfig } = props
   const revDown = comparison.revenueChange !== null && comparison.revenueChange < 0
+  const t = industryConfig.terminology
 
   return (
     <div className="max-w-[1500px] mx-auto p-8 space-y-12">
@@ -78,19 +81,19 @@ export default function AutopsyView(props: AutopsyData) {
       {/* Health Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-2xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><Activity size={14} /> Total Revenue</p>
+          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><Activity size={14} /> Total {t.revenueLabel}</p>
           <p className="text-3xl font-light text-[#17153B]">{formatCurrency(orderMetrics.revenue, currencyCode)}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><Store size={14} /> Total Orders</p>
+          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><Store size={14} /> Total {t.ordersLabel}</p>
           <p className="text-3xl font-light text-[#17153B]">{orderMetrics.orders}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><Users size={14} /> Customers</p>
+          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><Users size={14} /> {t.customersLabel}</p>
           <p className="text-3xl font-light text-[#17153B]">{props.customerCount}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2">AOV</p>
+          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2">{t.averageOrderValueLabel}</p>
           <p className="text-3xl font-light text-[#17153B]">{formatCurrency(orderMetrics.averageOrderValue, currencyCode)}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
@@ -98,7 +101,7 @@ export default function AutopsyView(props: AutopsyData) {
           <p className="text-3xl font-light text-[#17153B]">{orderMetrics.returns}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-[#E7E4EF] shadow-[0_12px_35px_rgba(23,21,59,0.04)]">
-          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><PackageSearch size={14} /> Inventory Value</p>
+          <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#433D8B] mb-2 flex items-center gap-2"><PackageSearch size={14} /> {t.inventory.singular} Value</p>
           <p className="text-3xl font-light text-[#17153B]">{formatCurrency(inventoryMetrics.totalValue, currencyCode)}</p>
         </div>
       </div>

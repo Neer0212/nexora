@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
+import { getIndustryConfig } from "./industries"
+
+import type { IndustryConfig } from "./industries"
 
 export type BusinessSnapshot = {
   businessName: string
   currencyCode: string
+  industryConfig: IndustryConfig
   datasetCount: number
   rowCount: number
   latestDate: string | null
@@ -99,7 +103,7 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
   if (!membership) throw new Error("BUSINESS_REQUIRED")
 
   const [{ data: business, error: businessError }, { data: datasets, error: datasetsError }] = await Promise.all([
-    supabase.from("businesses").select("name,currency_code").eq("id", membership.business_id).single(),
+    supabase.from("businesses").select("name,currency_code,industry").eq("id", membership.business_id).single(),
     supabase.from("datasets").select("id,name,file_name,row_count,status,created_at").eq("business_id", membership.business_id).eq("status", "ready").order("created_at", { ascending: false }).limit(50),
   ])
 
@@ -311,15 +315,34 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
   const topProductEntry = [...productTotals.entries()].sort((a, b) => b[1] - a[1])[0]
   const topProduct = topProductEntry ? { name: topProductEntry[0], revenue: topProductEntry[1] } : null
 
+  const industryConfig = getIndustryConfig(business.industry)
+  const t = industryConfig.terminology
+  const templates = industryConfig.alertTemplates
+
+  const getTemplate = (id: string, defaultTitle: string, defaultWhy: string, defaultAction: string) => {
+    const template = templates.find((t) => t.id === id)
+    return {
+      title: template?.titleTemplate || defaultTitle,
+      why: template?.whyTemplate || defaultWhy,
+      action: template?.actionTemplate || defaultAction,
+    }
+  }
+
   const signals: BusinessSnapshot["signals"] = []
 
   if (lowStockRows.length > 0) {
+    const inv = getTemplate(
+      "inventory-pressure",
+      "Inventory pressure is building.",
+      "{{count}} inventory records are at or below the low-stock threshold.",
+      "Review replenishment for the affected products."
+    )
     signals.push({
       id: "inventory-pressure",
       priority: outOfStockRows.length > 0 ? "high" : "medium",
-      title: outOfStockRows.length > 0 ? "Stock-outs need attention." : "Inventory pressure is building.",
-      why: `${lowStockRows.length} inventory record${lowStockRows.length === 1 ? "" : "s"} are at or below the low-stock threshold.`,
-      action: "Review replenishment for the affected products.",
+      title: outOfStockRows.length > 0 ? "Stock-outs need attention." : inv.title,
+      why: inv.why.replace("{{count}}", lowStockRows.length.toString()),
+      action: inv.action,
       evidence: `${outOfStockRows.length} out of stock · ${lowStockRows.length} low stock`,
     })
   }
@@ -328,20 +351,26 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
     signals.push({
       id: "supplier-risk",
       priority: "medium",
-      title: "Supplier lead-time risk is visible.",
-      why: `${riskySuppliers} supplier record${riskySuppliers === 1 ? "" : "s"} show a lead time of 10 days or more.`,
-      action: "Review upcoming purchase orders and supplier alternatives.",
-      evidence: `${riskySuppliers} high-lead-time suppliers`,
+      title: `${t.supplier.singular} lead-time risk is visible.`,
+      why: `${riskySuppliers} ${t.supplier.singular.toLowerCase()} record${riskySuppliers === 1 ? "" : "s"} show a lead time of 10 days or more.`,
+      action: `Review upcoming purchase orders and ${t.supplier.singular.toLowerCase()} alternatives.`,
+      evidence: `${riskySuppliers} high-lead-time ${t.supplier.plural.toLowerCase()}`,
     })
   }
 
   if (revenueChange !== null && revenueChange <= -10) {
+    const rev = getTemplate(
+      "revenue-decline",
+      "Revenue has declined materially.",
+      "The latest 30-day revenue is {{pct}}% below the previous 30-day period.",
+      "Investigate product, channel, and customer drivers before the next planning cycle."
+    )
     signals.push({
       id: "revenue-decline",
       priority: "high",
-      title: "Revenue has declined materially.",
-      why: `The latest 30-day revenue is ${Math.abs(revenueChange).toFixed(1)}% below the previous 30-day period.`,
-      action: "Investigate product, channel, and customer drivers before the next planning cycle.",
+      title: rev.title,
+      why: rev.why.replace("{{pct}}", Math.abs(revenueChange).toFixed(1)),
+      action: rev.action,
       evidence: `${Math.abs(revenueChange).toFixed(1)}% decrease`,
     })
   } else if (revenueChange !== null && revenueChange >= 10) {
@@ -350,7 +379,7 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
       priority: "low",
       title: "Revenue momentum is positive.",
       why: `The latest 30-day revenue is ${revenueChange.toFixed(1)}% above the previous 30-day period.`,
-      action: "Check whether inventory and supplier capacity can support the momentum.",
+      action: `Check whether ${t.inventory.singular.toLowerCase()} and ${t.supplier.singular.toLowerCase()} capacity can support the momentum.`,
       evidence: `${revenueChange.toFixed(1)}% increase`,
     })
   }
@@ -359,9 +388,9 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
     signals.push({
       id: "returns",
       priority: returns / Math.max(orderRows.length, 1) >= 0.1 ? "high" : "medium",
-      title: "Returns are affecting order activity.",
-      why: `${returns} connected order row${returns === 1 ? "" : "s"} are marked returned, cancelled, or refunded.`,
-      action: "Review the affected products and return reasons before scaling demand.",
+      title: `Returns are affecting ${t.order.singular.toLowerCase()} activity.`,
+      why: `${returns} connected ${t.order.singular.toLowerCase()} row${returns === 1 ? "" : "s"} are marked returned, cancelled, or refunded.`,
+      action: `Review the affected ${t.product.plural.toLowerCase()} and return reasons before scaling demand.`,
       evidence: `${returns} excluded rows`,
     })
   }
@@ -373,13 +402,14 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
       title: "No high-priority signal detected.",
       why: "The connected data does not currently trigger Nexora's deterministic watch rules.",
       action: "Keep monitoring the next data refresh.",
-      evidence: `${orders} active orders across ${ready.length} dataset${ready.length === 1 ? "" : "s"}`,
+      evidence: `${orders} active ${t.order.plural.toLowerCase()} across ${ready.length} dataset${ready.length === 1 ? "" : "s"}`,
     })
   }
 
   return {
     businessName: business.name,
     currencyCode: business.currency_code || "INR",
+    industryConfig,
     datasetCount: ready.length,
     rowCount: rows.length,
     latestDate,

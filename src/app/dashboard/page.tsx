@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import Breadcrumbs from "@/components/layout/Breadcrumbs"
 import DashboardOverview from "@/components/dashboard/DashboardOverview"
 import { createClient } from "@/lib/supabase/server"
+import { getIndustryConfig } from "@/lib/industries"
 
 type JsonRow = Record<string, unknown>
 
@@ -323,8 +324,11 @@ export default async function DashboardPage() {
     finance: financeRows.length > 0,
   }
 
+  const industryConfig = getIndustryConfig(business.industry)
+
   const data = {
     currencyCode: business.currency_code || "INR",
+    industryConfig,
     hasData: rows.length > 0,
     revenue,
     ordersCount,

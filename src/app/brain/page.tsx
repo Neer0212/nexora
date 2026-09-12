@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
+import { Sparkles, Brain, Loader2 } from "lucide-react"
 
 import BusinessBrain from "@/components/brain/BusinessBrain"
+import { getIndustryConfig } from "@/lib/industries"
 import { createClient } from "@/lib/supabase/server"
 
 type JsonRow = Record<string, unknown>
@@ -112,7 +114,7 @@ export default async function BusinessBrainPage() {
 
   const [{ data: business, error: businessError }, { data: datasets, error: datasetsError }] =
     await Promise.all([
-      supabase.from("businesses").select("name, currency_code").eq("id", businessId).single(),
+      supabase.from("businesses").select("name, currency_code, industry").eq("id", businessId).single(),
       supabase
         .from("datasets")
         .select("id, name, file_name, row_count, status, created_at")
@@ -361,6 +363,7 @@ export default async function BusinessBrainPage() {
   return (
     <BusinessBrain
       data={{
+        industryConfig: getIndustryConfig(business.industry),
         businessName: business.name ?? "Your business",
         currencyCode: business.currency_code ?? "INR",
         currentRevenue,

@@ -49,29 +49,162 @@ export type DatasetSchema = {
 /**
  * Keyword maps used to infer dataset kind from name/filename.
  * Checked in order — first match wins.
+ * Extended with industry-specific aliases for all supported Nexora industries.
  */
 const KIND_KEYWORDS: Array<{ kind: DatasetKind; terms: string[] }> = [
-  { kind: "sales", terms: ["order", "sales", "revenue", "transaction", "invoice"] },
-  { kind: "inventory", terms: ["inventory", "stock", "warehouse", "storage"] },
-  { kind: "suppliers", terms: ["supplier", "vendor", "procurement", "purchase"] },
-  { kind: "customers", terms: ["customer", "client", "account", "buyer"] },
-  { kind: "products", terms: ["product", "catalog", "item", "sku", "merchandise"] },
-  { kind: "finance", terms: ["finance", "expense", "profit", "cost", "budget", "p&l", "pnl"] },
-  { kind: "projects", terms: ["project", "milestone", "phase", "deliverable", "work_order"] },
+  {
+    kind: "sales",
+    terms: [
+      "order", "sales", "revenue", "transaction", "invoice",
+      // Restaurant / Hospitality
+      "billing", "folio", "ticket", "reservation", "booking",
+      // Gym / Education
+      "membership", "enrollment", "fee", "payment", "subscription",
+      // Salon / Clinic
+      "appointment", "consultation", "session",
+      // Automotive
+      "service_job", "work_order", "job_card",
+    ],
+  },
+  {
+    kind: "inventory",
+    terms: [
+      "inventory", "stock", "warehouse", "storage",
+      // Restaurant
+      "kitchen", "ingredient", "recipe",
+      // Automotive
+      "parts", "spares",
+      // Salon / Clinic
+      "supplies", "supply", "medical_supply",
+      // Education
+      "materials", "stationery",
+      // Hospitality
+      "amenities", "housekeeping",
+    ],
+  },
+  {
+    kind: "suppliers",
+    terms: [
+      "supplier", "vendor", "procurement", "purchase",
+      // Restaurant
+      "food_vendor", "food_supplier",
+      // Automotive
+      "parts_supplier",
+    ],
+  },
+  {
+    kind: "customers",
+    terms: [
+      "customer", "client", "account", "buyer",
+      // Gym
+      "member", "subscriber",
+      // Clinic
+      "patient",
+      // Education
+      "student", "learner", "candidate",
+      // Hospitality / Restaurant
+      "guest", "visitor", "traveller",
+    ],
+  },
+  {
+    kind: "products",
+    terms: [
+      "product", "catalog", "item", "sku", "merchandise",
+      // Restaurant
+      "menu", "menu_item", "dish",
+      // Salon / Clinic
+      "service", "treatment", "procedure",
+      // Gym
+      "plan", "membership_plan", "class",
+      // Education
+      "course", "batch", "subject",
+      // Hospitality
+      "room", "room_type", "package",
+      // Automotive
+      "part", "repair_type",
+    ],
+  },
+  {
+    kind: "finance",
+    terms: [
+      "finance", "expense", "profit", "cost", "budget", "p&l", "pnl",
+      // Restaurant
+      "food_cost",
+      // Automotive
+      "labour_cost", "parts_cost",
+      // Gym / Education
+      "tuition", "fee_collection",
+    ],
+  },
+  {
+    kind: "projects",
+    terms: ["project", "milestone", "phase", "deliverable", "work_order"],
+  },
 ]
 
 /**
  * Column-level hints — if a dataset has these columns, it's likely this kind.
+ * Extended with industry-specific column names.
  */
 const KIND_COLUMN_HINTS: Array<{ kind: DatasetKind; columns: string[] }> = [
-  { kind: "sales", columns: ["order_id", "orderid", "order_number", "invoice_number", "total_amount"] },
-  { kind: "inventory", columns: ["stock_qty", "quantity_in_stock", "reorder_level", "warehouse", "on_hand"] },
-  { kind: "suppliers", columns: ["supplier_id", "lead_time", "lead_time_days", "vendor_name", "reliability"] },
-  { kind: "customers", columns: ["customer_id", "customer_name", "client_name", "account_id"] },
-  { kind: "products", columns: ["sku", "unit_cost", "selling_price", "product_category", "unit_price"] },
-  { kind: "finance", columns: ["cogs", "cost_of_goods", "operating_expenses", "gross_profit", "net_income"] },
-  { kind: "projects", columns: ["project_id", "project_name", "deadline", "milestone", "start_date", "expected_end_date"] },
+  {
+    kind: "sales",
+    columns: [
+      "order_id", "orderid", "order_number", "invoice_number", "total_amount",
+      // Industry aliases
+      "appointment_date", "booking_date", "membership_date", "enrollment_date",
+      "check_in", "table_number", "reservation_id", "job_id", "service_order_id",
+    ],
+  },
+  {
+    kind: "inventory",
+    columns: [
+      "stock_qty", "quantity_in_stock", "reorder_level", "warehouse", "on_hand",
+      // Industry aliases
+      "ingredient_qty", "parts_available", "supply_qty", "amenity_stock",
+    ],
+  },
+  {
+    kind: "suppliers",
+    columns: [
+      "supplier_id", "lead_time", "lead_time_days", "vendor_name", "reliability",
+      // Industry aliases
+      "food_supplier", "parts_supplier", "medical_supplier",
+    ],
+  },
+  {
+    kind: "customers",
+    columns: [
+      "customer_id", "customer_name", "client_name", "account_id",
+      // Industry aliases
+      "member_name", "member_id", "patient_name", "patient_id",
+      "student_name", "student_id", "guest_name", "guest_id",
+    ],
+  },
+  {
+    kind: "products",
+    columns: [
+      "sku", "unit_cost", "selling_price", "product_category", "unit_price",
+      // Industry aliases
+      "menu_item", "service_name", "membership_plan", "course_name",
+      "room_type", "room_number", "part_name", "treatment",
+    ],
+  },
+  {
+    kind: "finance",
+    columns: [
+      "cogs", "cost_of_goods", "operating_expenses", "gross_profit", "net_income",
+      // Industry aliases
+      "food_cost", "labour_charge", "tuition_fee", "membership_fee",
+      "consultation_fee", "parts_cost",
+    ],
+  },
+  {
+    kind: "projects",
+    columns: ["project_id", "project_name", "deadline", "milestone", "start_date", "expected_end_date"],
+  },
 ]
+
 
 /**
  * Build a label from a dataset's name + filename for classification.
