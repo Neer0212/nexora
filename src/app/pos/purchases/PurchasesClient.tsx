@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Plus, Search, Filter, X, Trash2, Package, Ban, FileText } from "lucide-react"
 import { createPurchase, cancelPurchase } from "./actions"
 
-type Purchase = {
+export type Purchase = {
   id: string
   purchase_number: string
   order_date: string
@@ -69,11 +69,11 @@ export default function PurchasesClient({ businessId, purchases, products, suppl
     setItems(items.filter((_, i) => i !== index))
   }
 
-  const handleItemChange = (index: number, field: string, value: any) => {
+  const handleItemChange = (index: number, field: string, value: string | number) => {
     const newItems = [...items]
     if (field === "product_id") {
-      const prod = products.find(p => p.id === value)
-      newItems[index] = { ...newItems[index], product_id: value, unit_cost: prod ? prod.unit_cost : 0 }
+      const prod = products.find(p => p.id === String(value))
+      newItems[index] = { ...newItems[index], product_id: String(value), unit_cost: prod ? prod.unit_cost : 0 }
     } else {
       newItems[index] = { ...newItems[index], [field]: value }
     }

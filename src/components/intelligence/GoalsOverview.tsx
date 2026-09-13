@@ -25,7 +25,7 @@ export default function GoalsOverview({ revenue, orders, customers, lowStock, cu
   const [targets, setTargets] = useState<Record<string, number>>(() => Object.fromEntries(defaults.map((goal) => [goal.id, savedTargets[goal.id] ?? goal.target])))
   const [saving, startSaving] = useTransition()
   const [savedKey, setSavedKey] = useState<string | null>(null)
-  const actuals: Record<string, number> = { revenue, orders, customers, "low-stock": lowStock }
+  const actuals: Record<string, number> = useMemo(() => ({ revenue, orders, customers, "low-stock": lowStock }), [revenue, orders, customers, lowStock])
   const format = (value: number, unit: string) => unit === "currency" ? new Intl.NumberFormat("en-IN", { style: "currency", currency: currencyCode || "INR", maximumFractionDigits: 0 }).format(value) : value.toLocaleString("en-IN")
   const completed = useMemo(() => defaults.filter((goal) => goal.inverse ? actuals[goal.id] <= targets[goal.id] : actuals[goal.id] >= targets[goal.id]).length, [actuals, targets])
 

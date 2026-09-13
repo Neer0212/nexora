@@ -2,7 +2,6 @@
 
 import {
   ArrowRight,
-  Boxes,
   CircleDollarSign,
   Factory,
   Package,
@@ -125,7 +124,7 @@ export default function BusinessTypes() {
         {/* Closing statement */}
         <div className="mt-20 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-zinc-200 pt-10">
           <p className="text-lg font-medium text-zinc-950">
-            Your business doesn't operate in departments. <span className="text-zinc-500">Neither should your intelligence.</span>
+            Your business doesn&apos;t operate in departments. <span className="text-zinc-500">Neither should your intelligence.</span>
           </p>
 
           <a

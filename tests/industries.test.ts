@@ -9,7 +9,6 @@ import {
   isValidIndustryId,
   getIndustryTier
 } from "../src/lib/industries/registry"
-import type { IndustryConfig } from "../src/lib/industries/types"
 
 describe("Industry Engine", () => {
   it("resolves valid industries case-insensitively", () => {

@@ -75,7 +75,7 @@ export default function BrainSection() {
               From data to decisions.
             </h2>
             <p className="mt-6 text-lg leading-8 text-zinc-400">
-              Nexora doesn't just show you numbers. It helps you understand
+              Nexora doesn&apos;t just show you numbers. It helps you understand
               what they mean, what caused them, what could happen next, and
               where to go from there.
             </p>

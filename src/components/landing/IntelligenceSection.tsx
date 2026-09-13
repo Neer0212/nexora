@@ -1,6 +1,5 @@
 import {
   ArrowDown,
-  ArrowRight,
   BarChart3,
   Boxes,
   CircleDollarSign,

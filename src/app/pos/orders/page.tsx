@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getWorkspaceContext } from "@/lib/workspace-data"
-import OrdersClient from "./OrdersClient"
+import OrdersClient, { type Order } from "./OrdersClient"
 
 export const metadata: Metadata = {
   title: "POS Orders",
@@ -42,7 +42,7 @@ export default async function POSOrdersPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
       <OrdersClient 
-        orders={(orders as any) || []}
+        orders={(orders as unknown as Order[]) || []}
         businessId={context.businessId}
         businessName={business?.name || "Nexora Business"}
       />

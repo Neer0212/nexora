@@ -127,7 +127,6 @@ export default async function ProfilePage() {
                 <ProfileIndustrySection 
                   businessId={membership.business_id}
                   currentIndustry={business.industry || "general"}
-                  currentType={business.business_type}
                 />
                 <div className="pl-7">
                   <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">

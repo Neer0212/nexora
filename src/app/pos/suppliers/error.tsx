@@ -21,7 +21,7 @@ export default function SuppliersError({
           <span title="Error"><AlertCircle className="w-8 h-8" /></span>
         </div>
         <h2 className="text-2xl font-semibold text-zinc-950 mb-2">Something went wrong!</h2>
-        <p className="text-zinc-500 mb-8">We couldn't load your suppliers. Please try again.</p>
+        <p className="text-zinc-500 mb-8">We couldn&apos;t load your suppliers. Please try again.</p>
         <button
           onClick={() => reset()}
           className="w-full py-3 bg-zinc-950 text-white rounded-xl font-medium hover:bg-blue-800 transition-colors"

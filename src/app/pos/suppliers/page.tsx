@@ -26,13 +26,13 @@ export default async function SuppliersPage() {
     console.error("Error fetching supplier expenses:", expError)
   }
   
-  const purchaseAggregates = (supplierExpenses || []).reduce((acc: any, exp) => {
+  const purchaseAggregates = (supplierExpenses || []).reduce((acc: Record<string, number>, exp) => {
     if (exp.supplier_id) {
       if (!acc[exp.supplier_id]) acc[exp.supplier_id] = 0;
       acc[exp.supplier_id] += Number(exp.amount)
     }
     return acc
-  }, {})
+  }, {} as Record<string, number>)
 
   return (
     <SuppliersClient 

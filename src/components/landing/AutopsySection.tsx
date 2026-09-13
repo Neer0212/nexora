@@ -45,7 +45,7 @@ export default function AutopsySection() {
           </div>
 
           <h2 className="text-4xl font-semibold leading-tight tracking-tight text-zinc-950 sm:text-5xl max-w-2xl">
-            Don't just see what changed. Know why.
+            Don&apos;t just see what changed. Know why.
           </h2>
 
           <p className="mt-6 text-lg leading-8 text-zinc-600 max-w-2xl">

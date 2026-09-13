@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
 const dirs = ['dashboard', 'brain', 'autopsy', 'entities', 'inventory', 'suppliers', 'projects', 'changes', 'data-hub', 'customers', 'products', 'forecasting', 'goals'];

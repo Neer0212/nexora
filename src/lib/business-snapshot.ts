@@ -35,7 +35,6 @@ export type BusinessSnapshot = {
 }
 
 type Row = Record<string, unknown>
-type StoredRow = { dataset_id: string; row_number: number; row_data: unknown }
 type Dataset = { id: string; name: string; file_name: string | null; row_count: number | null; status: string; created_at: string }
 
 const text = (value: unknown) => value == null ? "" : String(value).trim()
@@ -138,10 +137,10 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
 
   if (posOrders) {
     posOrders.forEach(o => {
-      const customerName = (o.customer as any)?.name || "Walk-in"
+      const customerName = (o.customer as { name?: string })?.name || "Walk-in"
       if (o.items && o.items.length > 0) {
         // Create one row per order item so each product gets proper attribution
-        o.items.forEach((item: any) => {
+        o.items.forEach((item: { quantity?: number, unit_price?: number, total_amount?: number, product_name_snapshot?: string }) => {
           const qty = Number(item.quantity) || 0
           const unitPrice = Number(item.unit_price) || 0
           const lineTotal = Number(item.total_amount) || (unitPrice * qty)
@@ -234,7 +233,6 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
   const inventoryRows = rowsFor(ready, rows, ["inventory", "stock", "warehouse"]).concat(rows.filter(r => r.datasetId === "pos-system")).filter(({ row }) => Boolean(keyOf(row, ["product_id", "product", "sku", "item"]) && keyOf(row, ["stock_qty", "stock", "quantity_in_stock", "inventory", "quantity"])))
   const supplierRows = rowsFor(ready, rows, ["supplier", "vendor"]).filter(({ row }) => Boolean(keyOf(row, ["supplier_id", "supplier", "supplier_name", "vendor"])))
   const customerRows = rowsFor(ready, rows, ["customer", "client"]).concat(rows.filter(r => r.datasetId === "pos-system"))
-  const productRows = rowsFor(ready, rows, ["product", "catalog", "items"])
 
   const order = orderRows[0]?.row
   const revenueKey = order ? keyOf(order, ["revenue", "sales", "amount", "total"]) : null
@@ -243,7 +241,6 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
   const productKey = order ? keyOf(order, ["product_id", "product", "sku", "item"]) : null
   const customerKey = order ? keyOf(order, ["customer_id", "customer", "customer_name"]) : null
   const statusKey = order ? keyOf(order, ["order_status", "status"]) : null
-  const channelKey = order ? keyOf(order, ["sales_channel", "channel"]) : null
 
   const excluded = new Set(["cancelled", "canceled", "returned", "refunded"])
   const activeOrders = orderRows.filter(({ row }) => !excluded.has(statusKey ? text(row[statusKey]).toLowerCase() : ""))

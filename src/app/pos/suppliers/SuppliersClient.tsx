@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Plus, Search, Pencil, Mail, Phone, MapPin, ChevronDown, ChevronUp, Package, IndianRupee, X } from "lucide-react"
 import { saveSupplier, getSupplierActivity } from "./actions"
 
-type Supplier = {
+export type Supplier = {
   id: string
   name: string
   code: string | null
@@ -31,7 +31,11 @@ export default function SuppliersClient({
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [supplierActivity, setSupplierActivity] = useState<any>(null)
+  type SupplierActivityData = {
+    purchases: { id: string, description: string, category: string, expense_date: string, amount: number }[],
+    transactions: { id: string, quantity: number, created_at: string, variant: { sku: string, product: { name: string } } }[]
+  }
+  const [supplierActivity, setSupplierActivity] = useState<SupplierActivityData | null>(null)
   const [loadingActivity, setLoadingActivity] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -84,8 +88,9 @@ export default function SuppliersClient({
     try {
       await saveSupplier(businessId, {
         id: editingSupplier?.id,
-        ...formData
-      } as any)
+        ...formData,
+        status: formData.status as "Active" | "Inactive"
+      })
       setIsModalOpen(false)
       router.refresh()
     } catch (error) {
@@ -238,9 +243,9 @@ export default function SuppliersClient({
                               </h4>
                               {loadingActivity ? (
                                 <p className="text-sm text-zinc-500">Loading...</p>
-                              ) : supplierActivity?.purchases?.length > 0 ? (
+                              ) : (supplierActivity?.purchases?.length ?? 0) > 0 ? (
                                 <ul className="space-y-3">
-                                  {supplierActivity.purchases.map((p: any) => (
+                                  {supplierActivity?.purchases.map((p) => (
                                     <li key={p.id} className="bg-white p-3 rounded-xl border border-zinc-200 flex justify-between items-center shadow-sm">
                                       <div>
                                         <p className="text-sm font-medium text-zinc-950">{p.description || p.category}</p>
@@ -261,9 +266,9 @@ export default function SuppliersClient({
                               </h4>
                               {loadingActivity ? (
                                 <p className="text-sm text-zinc-500">Loading...</p>
-                              ) : supplierActivity?.transactions?.length > 0 ? (
+                              ) : (supplierActivity?.transactions?.length ?? 0) > 0 ? (
                                 <ul className="space-y-3">
-                                  {supplierActivity.transactions.map((t: any) => (
+                                  {supplierActivity?.transactions.map((t) => (
                                     <li key={t.id} className="bg-white p-3 rounded-xl border border-zinc-200 flex justify-between items-center shadow-sm">
                                       <div>
                                         <p className="text-sm font-medium text-zinc-950">{t.variant?.product?.name} ({t.variant?.sku})</p>

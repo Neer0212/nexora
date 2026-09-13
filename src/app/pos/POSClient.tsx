@@ -1,9 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo, useTransition } from "react"
-import { Search, Plus, Minus, X, CreditCard, Banknote, UserPlus, Package, Loader2, AlertCircle, Receipt, ShoppingBag, Tag, ExternalLink, CheckCircle2 } from "lucide-react"
+import { Search, Plus, Minus, X, CreditCard, Banknote, UserPlus, Package, Loader2, AlertCircle, Receipt, ShoppingBag, Tag, ExternalLink } from "lucide-react"
 import { getPOSProducts, processCheckout, quickCreateCustomer, type CheckoutPayload } from "./actions"
-import ReceiptTemplate from "@/components/shared/ReceiptTemplate"
 import { calculateCartTotals } from "@/lib/cart"
 
 type Product = {
@@ -43,12 +42,10 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)
   const [discount, setDiscount] = useState<number>(0)
-  
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successOrder, setSuccessOrder] = useState<string | null>(null)
-  const [receiptData, setReceiptData] = useState<any | null>(null)
   const [unknownBarcode, setUnknownBarcode] = useState<UnknownBarcode | null>(null)
   const [showNewCustomer, setShowNewCustomer] = useState(false)
   const [newCustomerName, setNewCustomerName] = useState("")
@@ -57,6 +54,36 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
   const [localCustomers, setLocalCustomers] = useState<Customer[]>(customers)
 
   const barcodeInputRef = useRef<HTMLInputElement>(null)
+
+  const addToCart = (product: Product) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.product.id === product.id)
+      if (existing) {
+        return prev.map(item => item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
+      }
+      return [...prev, { cartId: Math.random().toString(36).substring(2, 9), product, quantity: 1, customPrice: product.selling_price ?? 0 }]
+    })
+    setSuccessOrder(null)
+  }
+
+  const handleBarcodeScan = async (code: string) => {
+    const match = products.find(p => p.barcode === code)
+    if (match) {
+      addToCart(match)
+      return
+    }
+
+    const remote = await getPOSProducts(businessId, code)
+    if (remote.length === 1) {
+      addToCart(remote[0])
+      if (!products.some(p => p.id === remote[0].id)) {
+        setProducts(prev => [remote[0], ...prev])
+      }
+    } else {
+      // Unknown barcode — prompt quick-create
+      setUnknownBarcode({ code })
+    }
+  }
 
   // Barcode scanner keyboard listener
   useEffect(() => {
@@ -89,26 +116,7 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleBarcodeScan = async (code: string) => {
-    const match = products.find(p => p.barcode === code)
-    if (match) {
-      addToCart(match)
-      return
-    }
-
-    const remote = await getPOSProducts(businessId, code)
-    if (remote.length === 1) {
-      addToCart(remote[0])
-      if (!products.some(p => p.id === remote[0].id)) {
-        setProducts(prev => [remote[0], ...prev])
-      }
-    } else {
-      // Unknown barcode — prompt quick-create
-      setUnknownBarcode({ code })
-    }
-  }
+  }, [products, businessId])
 
   useEffect(() => {
     if (search.trim().length > 2) {
@@ -118,20 +126,12 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
       }, 300)
       return () => clearTimeout(timer)
     } else if (search.trim() === "") {
-      setProducts(initialProducts)
+      const timer = setTimeout(() => setProducts(initialProducts), 0)
+      return () => clearTimeout(timer)
     }
   }, [search, businessId, initialProducts])
 
-  const addToCart = (product: Product) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.product.id === product.id)
-      if (existing) {
-        return prev.map(item => item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
-      }
-      return [...prev, { cartId: Math.random().toString(36).substring(2, 9), product, quantity: 1, customPrice: product.selling_price ?? 0 }]
-    })
-    setSuccessOrder(null)
-  }
+
 
   const updateQuantity = (cartId: string, delta: number) => {
     setCart(prev => prev.map(item => {

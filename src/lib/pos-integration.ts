@@ -17,9 +17,9 @@ export async function appendOperationalData(businessId: string, rows: { datasetI
 
   if (posOrders) {
     posOrders.forEach(o => {
-      const customerName = (o.customer as any)?.name || "Walk-in"
+      const customerName = (o.customer as { name?: string })?.name || "Walk-in"
       if (o.items && o.items.length > 0) {
-        o.items.forEach((item: any) => {
+        o.items.forEach((item: { quantity?: number, unit_price?: number, total_amount?: number, product_name_snapshot?: string }) => {
           const qty = Number(item.quantity) || 0
           const unitPrice = Number(item.unit_price) || 0
           const lineTotal = Number(item.total_amount) || (unitPrice * qty)

@@ -17,7 +17,7 @@ type OrderItem = {
   total_amount: number
 }
 
-type Order = {
+export type Order = {
   id: string
   order_number: string
   status: string

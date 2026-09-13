@@ -1,14 +1,30 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useTransition } from "react"
 import { X, Loader2, AlertCircle } from "lucide-react"
 import { saveProduct } from "./actions"
+
+type Product = {
+  id?: string
+  name: string
+  sku: string | null
+  barcode: string | null
+  category: string | null
+  brand: string | null
+  unit: string | null
+  unit_cost: number | null
+  selling_price: number | null
+  tax_rate: number | null
+  stock_quantity: number | null
+  low_stock_threshold: number | null
+  active?: boolean
+}
 
 type ProductModalProps = {
   isOpen: boolean
   onClose: () => void
   businessId: string
-  product: any | null
+  product: Product | null
   prefillBarcode?: string | null
   onSuccess: () => void
 }
@@ -22,7 +38,15 @@ export default function ProductModal({ isOpen, onClose, businessId, product, pre
     unit_cost: "", selling_price: "", tax_rate: "0", stock_quantity: "0", low_stock_threshold: "0"
   })
 
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  const [prevProduct, setPrevProduct] = useState(product)
+  const [prevPrefill, setPrevPrefill] = useState(prefillBarcode)
+
+  if (isOpen !== prevIsOpen || product !== prevProduct || prefillBarcode !== prevPrefill) {
+    setPrevIsOpen(isOpen)
+    setPrevProduct(product)
+    setPrevPrefill(prefillBarcode)
+    
     if (isOpen) {
       setError(null)
       if (product) {
@@ -46,7 +70,7 @@ export default function ProductModal({ isOpen, onClose, businessId, product, pre
         })
       }
     }
-  }, [isOpen, product, prefillBarcode])
+  }
 
   if (!isOpen) return null
 
@@ -67,7 +91,7 @@ export default function ProductModal({ isOpen, onClose, businessId, product, pre
       tax_rate: formData.tax_rate ? Number(formData.tax_rate) : 0,
       stock_quantity: formData.stock_quantity ? Number(formData.stock_quantity) : 0,
       low_stock_threshold: formData.low_stock_threshold ? Number(formData.low_stock_threshold) : 0,
-      active: product ? product.active : true,
+      active: product?.active ?? true,
     }
 
     startTransition(async () => {

@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 
 type Row = Record<string, unknown>
-type StoredRow = { dataset_id: string; row_number: number; row_data: unknown }
 type Dataset = { id: string; name: string; file_name: string | null; row_count: number | null; status: string; created_at: string }
 
 export type CustomerInsight = {
@@ -58,9 +57,7 @@ function parseDate(value: unknown) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString().slice(0, 10)
 }
 
-function datasetLabel(dataset: Dataset) {
-  return `${dataset.name} ${dataset.file_name ?? ""}`.toLowerCase()
-}
+
 
 export async function getEntityInsights(): Promise<EntityInsights> {
   const supabase = await createClient()
@@ -92,7 +89,7 @@ export async function getEntityInsights(): Promise<EntityInsights> {
     
   if (rowsError) throw new Error(rowsError.message)
 
-  const rows = (rawRows || []).map((item: any) => ({ datasetId: item.dataset_id, row: (item.row_data ?? {}) as Row }))
+  const rows = (rawRows || []).map((item: { dataset_id: string, row_data: unknown }) => ({ datasetId: item.dataset_id, row: (item.row_data ?? {}) as Row }))
 
   const { data: posOrders } = await supabase
     .from("orders")
@@ -105,9 +102,9 @@ export async function getEntityInsights(): Promise<EntityInsights> {
 
   if (posOrders) {
     posOrders.forEach(o => {
-      const customerName = (o.customer as any)?.name || "Walk-in"
+      const customerName = (o.customer as { name?: string })?.name || "Walk-in"
       if (o.items && o.items.length > 0) {
-        o.items.forEach((item: any) => {
+        o.items.forEach((item: { quantity?: number, unit_price?: number, total_amount?: number, product_name_snapshot?: string }) => {
           const qty = Number(item.quantity) || 0
           const unitPrice = Number(item.unit_price) || 0
           const lineTotal = Number(item.total_amount) || (unitPrice * qty)
@@ -179,13 +176,13 @@ export async function getEntityInsights(): Promise<EntityInsights> {
   }
 
   const totalRevenue = active.reduce((sum, { row }) => sum + (revenueKey ? num(row[revenueKey]) : 0), 0)
-  const makeList = (map: Map<string, { orders: number; revenue: number; units: number }>, kind: "customer" | "product") => [...map.entries()]
+  const makeList = (map: Map<string, { orders: number; revenue: number; units: number }>) => [...map.entries()]
     .map(([id, value]) => ({ id, name: id, ...value, averageOrderValue: value.orders ? value.revenue / value.orders : 0, share: totalRevenue ? (value.revenue / totalRevenue) * 100 : 0 }))
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 25)
 
-  const customers = makeList(customerMap, "customer").map(({ id, name, orders, revenue, units, averageOrderValue, share }) => ({ id, name, orders, revenue, units, averageOrderValue, share }))
-  const products = makeList(productMap, "product").map(({ id, name, orders, revenue, units, share }) => ({ id, name, orders, revenue, units, share }))
+  const customers = makeList(customerMap).map(({ id, name, orders, revenue, units, averageOrderValue, share }) => ({ id, name, orders, revenue, units, averageOrderValue, share }))
+  const products = makeList(productMap).map(({ id, name, orders, revenue, units, share }) => ({ id, name, orders, revenue, units, share }))
   const dailyRevenue = [...dailyMap.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, revenue]) => ({ date, revenue }))
 
   return { businessName: business.name, currencyCode: business.currency_code || "INR", latestDate: dailyRevenue.at(-1)?.date ?? null, customers, products, dailyRevenue }

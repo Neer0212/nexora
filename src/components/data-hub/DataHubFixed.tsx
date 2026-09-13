@@ -1,15 +1,15 @@
 "use client"
 
-import { useCallback, useMemo, useRef, useState, useTransition } from "react"
+import { useMemo, useRef, useState, useTransition } from "react"
 import { AlertCircle, Check, CheckCircle2, ChevronRight, FileSpreadsheet, Loader2, Upload, X, Trash2, LayoutGrid, Plus, Database, ShieldCheck } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { deleteDataset } from "@/app/data-hub/actions"
 import { useRouter } from "next/navigation"
 
 type Business = { id: string; name: string; currencyCode: string }
-type Dataset = { id: string; name: string; file_name: string | null; row_count: number | null; column_count: number | null; status: string; created_at: string; schema_definition?: any; quality_metrics?: any }
+type Dataset = { id: string; name: string; file_name: string | null; row_count: number | null; column_count: number | null; status: string; created_at: string; schema_definition?: Record<string, unknown>; quality_metrics?: { validPercent?: string | number, missingRows?: number, warnings?: string[] } }
 type DatasetKind = "sales" | "products" | "inventory" | "suppliers" | "customers" | "finance" | "other"
-type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unknown>[]; rowCount: number; columnCount: number; kind: DatasetKind; included: boolean; quality: any }
+type ParsedSheet = { name: string; headers: string[]; rows: Record<string, unknown>[]; rowCount: number; columnCount: number; kind: DatasetKind; included: boolean; quality: { validPercent: string | number, missingRows: number, warnings: string[] } }
 
 const kinds: { value: DatasetKind; label: string; description: string }[] = [
   { value: "sales", label: "Sales / orders", description: "Orders, revenue and transactions" },
@@ -47,7 +47,7 @@ function calculateQuality(rows: Record<string, unknown>[], headers: string[]) {
   if (rows.length === 0) return { validPercent: 0, missingRows: 0, warnings: ["No data rows found"] };
   let missingCount = 0;
   let emptyCells = 0;
-  let totalCells = rows.length * headers.length;
+  const totalCells = rows.length * headers.length;
   
   rows.forEach(row => {
     let rowHasMissing = false;
@@ -146,8 +146,8 @@ export default function DataHub({ business, datasets }: { business: Business; da
               let val = rowVals[i];
               // Handle rich text or formulas
               if (val && typeof val === 'object') {
-                if ('result' in val) val = (val as any).result;
-                else if ('text' in val) val = (val as any).text;
+                if ('result' in val) val = (val as { result: unknown }).result as typeof val;
+                else if ('text' in val) val = (val as { text: unknown }).text as typeof val;
               }
               // Handle dates properly
               if (val instanceof Date) {
@@ -348,7 +348,7 @@ export default function DataHub({ business, datasets }: { business: Business; da
                       <div className="mt-5 space-y-3">
                         <div className="flex justify-between text-sm">
                           <span className="text-zinc-500">Classification</span>
-                          <span className="font-medium text-zinc-950 capitalize">{dataset.schema_definition?.dataset_type || "Unknown"}</span>
+                          <span className="font-medium text-zinc-950 capitalize">{(dataset.schema_definition?.dataset_type as string) || "Unknown"}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-zinc-500">Rows</span>
@@ -357,13 +357,13 @@ export default function DataHub({ business, datasets }: { business: Business; da
                         {dataset.quality_metrics?.validPercent && (
                           <div className="flex justify-between text-sm">
                             <span className="text-zinc-500 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-700" /> Quality</span>
-                            <span className="font-medium text-zinc-950">{dataset.quality_metrics.validPercent}% valid</span>
+                            <span className="font-medium text-zinc-950">{dataset.quality_metrics?.validPercent}% valid</span>
                           </div>
                         )}
-                        {dataset.quality_metrics?.missingRows > 0 && (
+                        {(dataset.quality_metrics?.missingRows ?? 0) > 0 && (
                           <div className="flex justify-between text-sm">
                             <span className="text-rose-600">Missing data</span>
-                            <span className="font-medium text-rose-600">{dataset.quality_metrics.missingRows} rows</span>
+                            <span className="font-medium text-rose-600">{dataset.quality_metrics?.missingRows} rows</span>
                           </div>
                         )}
                         <div className="flex justify-between text-sm">

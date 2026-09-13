@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { PackageOpen, ArrowUpRight, ArrowDownRight, RefreshCw, AlertCircle, Loader2 } from "lucide-react"
 import { submitInventoryTransaction, type AdjustmentPayload } from "./actions"
 
-type Transaction = {
+export type Transaction = {
   id: string
   transaction_type: string
   quantity: number
@@ -70,7 +70,7 @@ export default function InventoryClient({ businessId, transactions, products, su
     const payload: AdjustmentPayload = {
       product_id: formData.product_id,
       supplier_id: formData.supplier_id || null,
-      transaction_type: formData.transaction_type as any,
+      transaction_type: formData.transaction_type as "purchase" | "adjustment" | "return" | "transfer",
       quantity: Number(formData.quantity),
       is_negative: formData.direction === "remove",
       unit_cost: formData.unit_cost ? Number(formData.unit_cost) : undefined,

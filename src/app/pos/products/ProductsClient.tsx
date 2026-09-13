@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Search, Plus, Archive, Edit2, ArchiveRestore, Package, AlertCircle } from "lucide-react"
 import { toggleProductActive } from "./actions"
@@ -32,15 +32,17 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [prefillBarcode, setPrefillBarcode] = useState<string | null>(null)
 
-  // Auto-open create modal with barcode pre-filled when coming from POS unknown barcode flow
-  useEffect(() => {
-    const barcode = searchParams.get("barcode")
-    if (barcode) {
-      setPrefillBarcode(barcode)
+  const barcodeParam = searchParams.get("barcode")
+  const [prevBarcodeParam, setPrevBarcodeParam] = useState(barcodeParam)
+
+  if (barcodeParam !== prevBarcodeParam) {
+    setPrevBarcodeParam(barcodeParam)
+    if (barcodeParam) {
+      setPrefillBarcode(barcodeParam)
       setEditingProduct(null)
       setModalOpen(true)
     }
-  }, [searchParams])
+  }
 
   const filteredProducts = useMemo(() => {
     return products.filter(p => {

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
-import { Sparkles, Brain, Loader2 } from "lucide-react"
 
 import BusinessBrain from "@/components/brain/BusinessBrain"
 import { getIndustryConfig } from "@/lib/industries"

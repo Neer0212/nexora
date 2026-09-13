@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getWorkspaceContext } from "@/lib/workspace-data"
-import InventoryClient from "./InventoryClient"
+import InventoryClient, { type Transaction } from "./InventoryClient"
 
 export const metadata: Metadata = {
   title: "POS Inventory",
@@ -49,7 +49,7 @@ export default async function POSInventoryPage() {
     <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
       <InventoryClient 
         businessId={context.businessId} 
-        transactions={(ledger as any) || []}
+        transactions={(ledger as unknown as Transaction[]) || []}
         products={products || []}
         suppliers={suppliers || []}
       />

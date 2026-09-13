@@ -1,6 +1,6 @@
 import { getWorkspaceContext } from "@/lib/workspace-data"
 import { createClient } from "@/lib/supabase/server"
-import PurchasesClient from "./PurchasesClient"
+import PurchasesClient, { type Purchase } from "./PurchasesClient"
 
 export default async function PurchasesPage() {
   const ctx = await getWorkspaceContext()
@@ -29,7 +29,7 @@ export default async function PurchasesPage() {
   return (
     <PurchasesClient 
       businessId={ctx.businessId} 
-      purchases={purchases as any || []} 
+      purchases={(purchases as unknown as Purchase[]) || []} 
       products={products || []} 
       suppliers={suppliers || []} 
     />

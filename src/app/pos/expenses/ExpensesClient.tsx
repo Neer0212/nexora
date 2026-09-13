@@ -10,7 +10,7 @@ type Supplier = {
   name: string
 }
 
-type Expense = {
+export type Expense = {
   id: string
   category: string
   description: string
@@ -75,7 +75,6 @@ export default function ExpensesClient({
 
   const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || "None"
   
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
   const currentDay = new Date().getDate()
   const averagePerDay = currentDay > 0 ? totalThisMonth / currentDay : 0
 

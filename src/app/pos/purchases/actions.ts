@@ -15,7 +15,7 @@ const createPurchaseSchema = z.object({
   })).min(1)
 })
 
-export async function createPurchase(businessId: string, payload: any) {
+export async function createPurchase(businessId: string, payload: z.infer<typeof createPurchaseSchema>) {
   const supabase = await createClient()
   
   const result = createPurchaseSchema.safeParse(payload)

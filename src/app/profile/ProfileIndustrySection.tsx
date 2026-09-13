@@ -15,11 +15,9 @@ const ALL_INDUSTRIES = [
 export default function ProfileIndustrySection({ 
   businessId, 
   currentIndustry,
-  currentType
 }: { 
   businessId: string; 
   currentIndustry: string;
-  currentType: string | null;
 }) {
   const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
