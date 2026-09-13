@@ -13,6 +13,7 @@ type Customer = {
   type: string
   location: string | null
   created_at: string
+  is_active: boolean
 }
 
 type OrderData = {
@@ -42,7 +43,7 @@ export default function CustomersClient({ businessId, customers, orderData }: { 
   const [loadingHistory, setLoadingHistory] = useState<Record<string, boolean>>({})
 
   const [form, setForm] = useState<CustomerFormValues>({
-    name: "", email: "", phone: "", type: "Individual", location: ""
+    name: "", email: "", phone: "", type: "Individual", location: "", is_active: true
   })
 
   // Stats
@@ -85,14 +86,15 @@ export default function CustomersClient({ businessId, customers, orderData }: { 
       email: c.email || "",
       phone: c.phone || "",
       type: c.type as "Individual" | "Business" | "Wholesale",
-      location: c.location || ""
+      location: c.location || "",
+      is_active: true // Default to active when editing
     })
     setError(null)
     setShowModal(true)
   }
 
   const handleAdd = () => {
-    setForm({ name: "", email: "", phone: "", type: "Individual", location: "" })
+    setForm({ name: "", email: "", phone: "", type: "Individual", location: "", is_active: true })
     setError(null)
     setShowModal(true)
   }

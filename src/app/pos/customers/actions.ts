@@ -11,6 +11,7 @@ const customerSchema = z.object({
   phone: z.string().optional().or(z.literal("")).nullable(),
   type: z.enum(["Individual", "Business", "Wholesale"]).default("Individual"),
   location: z.string().optional().or(z.literal("")).nullable(),
+  is_active: z.boolean().default(true),
 })
 
 export type CustomerFormValues = z.infer<typeof customerSchema>
@@ -30,6 +31,7 @@ export async function saveCustomer(businessId: string, values: CustomerFormValue
     phone: parsed.data.phone || null,
     type: parsed.data.type,
     location: parsed.data.location || null,
+    is_active: parsed.data.is_active ?? true,
   }
 
   if (parsed.data.id) {

@@ -6,11 +6,12 @@ export default async function CustomersPage() {
   const ctx = await getWorkspaceContext()
   const supabase = await createClient()
 
-  // Fetch customers
+  // Fetch active customers only
   const { data: customers } = await supabase
     .from('customers')
     .select('*')
     .eq('business_id', ctx.businessId)
+    .eq('is_active', true)
     .order('name')
 
   // Fetch order counts/totals per customer
