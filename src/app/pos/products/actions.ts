@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { z } from "zod"
 import { revalidatePath } from "next/cache"
+import { getWorkspaceContext } from "@/lib/workspace-data"
 
 const productSchema = z.object({
   id: z.string().optional(),
@@ -23,9 +24,10 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>
 
 export async function saveProduct(businessId: string, values: ProductFormValues) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { success: false, error: "Unauthorized workspace" }
+
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: "Unauthorized" }
 
   const parsed = productSchema.safeParse(values)
   if (!parsed.success) return { success: false, error: "Invalid product data" }
@@ -43,6 +45,20 @@ export async function saveProduct(businessId: string, values: ProductFormValues)
 
     if (existing && existing.id !== data.id) {
       return { success: false, error: "This barcode is already assigned to another product in your workspace." }
+    }
+  }
+
+  // Ensure SKU uniqueness if provided
+  if (data.sku) {
+    const { data: existingSku } = await supabase
+      .from("products")
+      .select("id")
+      .eq("business_id", businessId)
+      .eq("sku", data.sku)
+      .maybeSingle()
+
+    if (existingSku && existingSku.id !== data.id) {
+      return { success: false, error: "This SKU is already assigned to another product in your workspace." }
     }
   }
 
@@ -83,9 +99,10 @@ export async function saveProduct(businessId: string, values: ProductFormValues)
 }
 
 export async function toggleProductActive(businessId: string, productId: string, active: boolean) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { success: false, error: "Unauthorized workspace" }
+
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: "Unauthorized" }
 
   const { error } = await supabase
     .from("products")

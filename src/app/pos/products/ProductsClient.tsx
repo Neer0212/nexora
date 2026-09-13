@@ -197,8 +197,12 @@ export default function ProductsClient({ businessId, initialProducts }: { busine
         prefillBarcode={prefillBarcode}
         onSuccess={() => {
           setModalOpen(false)
-          setPrefillBarcode(null)
-          router.refresh()
+          if (prefillBarcode) {
+            setPrefillBarcode(null)
+            router.push("/pos")
+          } else {
+            router.refresh()
+          }
         }}
       />
     </div>
