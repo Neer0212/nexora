@@ -2,11 +2,13 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { getWorkspaceContext } from "@/lib/workspace-data"
 
 export async function processReturn(businessId: string, originalOrderId: string, reason?: string) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { success: false, error: "Unauthorized workspace" }
+
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: "Unauthorized" }
 
   const { data: returnOrderId, error } = await supabase.rpc("process_pos_return", {
     p_business_id: businessId,

@@ -5,27 +5,22 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache"
 import { getWorkspaceContext } from "@/lib/workspace-data"
 
-const cartItemSchema = z.object({
-  product_id: z.string().optional().nullable(),
-  name: z.string(),
-  sku: z.string().optional().nullable(),
-  barcode: z.string().optional().nullable(),
-  quantity: z.number().min(1),
-  price: z.number().min(0),
-  cost: z.number().min(0),
-  discount: z.number().min(0),
-  tax: z.number().min(0),
-  total: z.number().min(0),
-})
 
 const checkoutSchema = z.object({
-  customer_id: z.string().optional().nullable(),
-  subtotal: z.number().min(0),
-  discount: z.number().min(0),
-  tax: z.number().min(0),
-  total: z.number().min(0),
-  payment_method: z.string().min(1),
-  items: z.array(cartItemSchema).min(1),
+  customer_id: z.string().optional(),
+  discount: z.number().min(0).default(0),
+  payment_method: z.string().min(1, "Payment method required"),
+  idempotency_key: z.string().uuid().optional(),
+  items: z.array(z.object({
+    product_id: z.string().nullable(),
+    name: z.string(),
+    sku: z.string().nullable().optional(),
+    barcode: z.string().nullable().optional(),
+    quantity: z.number().positive(),
+    price: z.number().min(0),
+    cost: z.number().min(0),
+    tax: z.number().min(0),
+  })).min(1, "Cart cannot be empty"),
 })
 
 export type CheckoutPayload = z.infer<typeof checkoutSchema>
@@ -33,18 +28,21 @@ export type CheckoutPayload = z.infer<typeof checkoutSchema>
 export async function processCheckout(businessId: string, payload: CheckoutPayload) {
   const context = await getWorkspaceContext().catch(() => null)
   if (!context || context.businessId !== businessId) return { success: false, error: "Unauthorized workspace" }
-
+  
   const supabase = await createClient()
 
+  // Validate payload structure
   const parsed = checkoutSchema.safeParse(payload)
   if (!parsed.success) return { success: false, error: "Invalid checkout data" }
-
+  
   const data = parsed.data
 
-  // Fetch product data to validate prices and availability server-side
-  const productIds = data.items.filter(i => i.product_id).map(i => i.product_id!)
-  let productMap = new Map()
-  
+  // Calculate totals and validate stock server-side
+  let calcSubtotal = 0
+  let calcTax = 0
+  const productIds = data.items.map(i => i.product_id).filter(Boolean) as string[]
+
+  const productMap = new Map<string, { id: string, name: string, selling_price: number, unit_cost: number, tax_rate: number, stock_quantity: number | null }>()
   if (productIds.length > 0) {
     const { data: products } = await supabase
       .from('products')
@@ -52,46 +50,50 @@ export async function processCheckout(businessId: string, payload: CheckoutPaylo
       .eq('business_id', businessId)
       .in('id', productIds)
     
-    if (products) {
-      productMap = new Map(products.map(p => [p.id, p]))
-    }
+    products?.forEach(p => productMap.set(p.id, p))
   }
-
-  let calcSubtotal = 0
-  let calcTax = 0
 
   const validatedItems = []
   
   for (const item of data.items) {
-    const price = item.price
-    let cost = item.cost
-    let taxRate = 0
-
     if (item.product_id && productMap.has(item.product_id)) {
-      const dbProduct = productMap.get(item.product_id)
+      const dbProduct = productMap.get(item.product_id)!
       
       // Validate stock availability server-side
       if (dbProduct.stock_quantity !== null && dbProduct.stock_quantity < item.quantity) {
-         return { success: false, error: `Insufficient stock for ${item.name}. Available: ${dbProduct.stock_quantity}` }
+        return { success: false, error: `Insufficient stock for ${item.name}. Available: ${dbProduct.stock_quantity}` }
       }
       
       // Use DB cost and tax rate to prevent client tampering
-      cost = dbProduct.unit_cost ?? 0
-      taxRate = dbProduct.tax_rate ?? 0
+      const unitCost = dbProduct.unit_cost || 0
+      const itemSubtotal = dbProduct.selling_price * item.quantity
+      const taxRate = dbProduct.tax_rate || 0
+      const itemTax = (itemSubtotal * taxRate) / 100
+      
+      calcSubtotal += itemSubtotal
+      calcTax += itemTax
+      
+      validatedItems.push({
+        ...item,
+        price: dbProduct.selling_price,
+        cost: unitCost,
+        tax: itemTax,
+        discount: 0,
+        total: itemSubtotal + itemTax
+      })
+    } else if (!item.product_id) {
+      // Custom item
+      const itemSubtotal = item.price * item.quantity
+      calcSubtotal += itemSubtotal
+      calcTax += item.tax
+      validatedItems.push({
+        ...item,
+        discount: 0,
+        total: itemSubtotal + item.tax
+      })
+    } else {
+      return { success: false, error: `Product ${item.name} not found in database.` }
     }
-
-    const lineTotal = price * item.quantity
-    const lineTax = lineTotal * (taxRate / 100)
-    
-    calcSubtotal += lineTotal
-    calcTax += lineTax
-
-    validatedItems.push({
-      ...item,
-      cost,
-      tax: lineTax,
-      total: lineTotal + lineTax
-    })
   }
 
   // Recalculate totals server-side
@@ -114,6 +116,7 @@ export async function processCheckout(businessId: string, payload: CheckoutPaylo
       p_total: calcTotal,
       p_payment_method: data.payment_method,
       p_items: validatedItems,
+      p_idempotency_key: data.idempotency_key || null,
     })
 
     if (error) {

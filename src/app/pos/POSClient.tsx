@@ -46,6 +46,7 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successOrder, setSuccessOrder] = useState<string | null>(null)
+  const idempotencyKeyRef = useRef(crypto.randomUUID())
   const [unknownBarcode, setUnknownBarcode] = useState<UnknownBarcode | null>(null)
   const [showNewCustomer, setShowNewCustomer] = useState(false)
   const [newCustomerName, setNewCustomerName] = useState("")
@@ -172,28 +173,26 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
     setSuccessOrder(null)
 
     const payload: CheckoutPayload = {
-      customer_id: selectedCustomer || null,
-      subtotal: totals.subtotal,
-      discount: totals.discount,
-      tax: totals.tax,
-      total: totals.total,
+      customer_id: selectedCustomer || undefined,
+      discount: discount,
       payment_method: paymentMethod,
+      idempotency_key: idempotencyKeyRef.current,
       items: cart.map(item => {
         const price = item.customPrice
+        const cost = item.product.unit_cost || 0
+        const taxRate = item.product.tax_rate || 0
         const lineTotal = price * item.quantity
-        const taxRate = item.product.tax_rate ?? 0
-        const lineTax = lineTotal * (taxRate / 100)
+        const lineTax = (lineTotal * taxRate) / 100
+
         return {
           product_id: item.product.id,
           name: item.product.name,
           sku: item.product.sku,
           barcode: item.product.barcode,
           quantity: item.quantity,
-          price,
-          cost: item.product.unit_cost ?? 0,
-          discount: 0,
+          price: price,
+          cost: cost,
           tax: lineTax,
-          total: lineTotal + lineTax
         }
       })
     }
@@ -205,6 +204,7 @@ export default function POSClient({ businessId, initialProducts, customers }: { 
         setSelectedCustomer(null)
         setDiscount(0)
         setSuccessOrder(res.orderNumber!)
+        idempotencyKeyRef.current = crypto.randomUUID() // Reset for next order
       } else {
         setError(res.error || "Checkout failed")
       }

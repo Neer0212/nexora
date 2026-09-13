@@ -37,10 +37,10 @@ describe('processCheckout', () => {
 
   it('rejects invalid workspace', async () => {
     const result = await processCheckout('wrong-business', {
-      customer_id: null,
-      subtotal: 100, discount: 0, tax: 0, total: 100,
+      customer_id: undefined,
+      discount: 0,
       payment_method: 'cash',
-      items: [{ product_id: 'p1', name: 'P1', quantity: 1, price: 100, cost: 50, discount: 0, tax: 0, total: 100 }],
+      items: [{ product_id: 'p1', name: 'P1', quantity: 1, price: 100, cost: 50, tax: 0 }],
     });
     expect(result.success).toBe(false);
     expect(result.error).toBe('Unauthorized workspace');
@@ -57,30 +57,30 @@ describe('processCheckout', () => {
 
     const result = await processCheckout('b-123', {
       customer_id: 'c1',
-      subtotal: 0, discount: 10, tax: 0, total: 0, // Client totals are ignored
+      discount: 10,
       payment_method: 'card',
-      items: [{ product_id: 'p1', name: 'Product 1', quantity: 2, price: 90, cost: 0, discount: 0, tax: 0, total: 0 }],
+      items: [{ product_id: 'p1', name: 'Product 1', quantity: 2, price: 90, cost: 0, tax: 0 }],
     });
 
     expect(result.success).toBe(true);
     
     // Check RPC was called with recalculated totals
-    // 2 * 90 = 180 subtotal
-    // Tax = 180 * 0.10 = 18
+    // 2 * 100 = 200 subtotal (price overridden from DB!)
+    // Tax = 200 * 0.10 = 20
     // Discount = 10
-    // Total = 180 + 18 - 10 = 188
+    // Total = 200 + 20 - 10 = 210
     expect(mockRpc).toHaveBeenCalledWith('process_pos_checkout', expect.objectContaining({
-      p_subtotal: 180,
-      p_tax: 18,
+      p_subtotal: 200,
+      p_tax: 20,
       p_discount: 10,
-      p_total: 188,
+      p_total: 210,
       p_items: [expect.objectContaining({
         product_id: 'p1',
         quantity: 2,
-        price: 90,
+        price: 100, // overridden from DB
         cost: 40, // overridden from DB
-        tax: 18,
-        total: 198 // line total + tax
+        tax: 20,
+        total: 220 // line total + tax
       })]
     }));
   });
@@ -93,10 +93,10 @@ describe('processCheckout', () => {
     });
 
     const result = await processCheckout('b-123', {
-      customer_id: null,
-      subtotal: 200, discount: 0, tax: 0, total: 200,
+      customer_id: undefined,
+      discount: 0,
       payment_method: 'cash',
-      items: [{ product_id: 'p1', name: 'Product 1', quantity: 2, price: 100, cost: 40, discount: 0, tax: 0, total: 200 }],
+      items: [{ product_id: 'p1', name: 'Product 1', quantity: 2, price: 100, cost: 40, tax: 0 }],
     });
 
     expect(result.success).toBe(false);
@@ -106,7 +106,7 @@ describe('processCheckout', () => {
 
   it('retries on order number collision', async () => {
     mockIn.mockResolvedValueOnce({
-      data: [{ id: 'p1', name: 'Product 1', stock_quantity: 10 }]
+      data: [{ id: 'p1', name: 'Product 1', selling_price: 100, unit_cost: 40, tax_rate: 10, stock_quantity: 10 }]
     });
 
     // Mock RPC failing once with duplicate error, then succeeding
@@ -115,10 +115,10 @@ describe('processCheckout', () => {
       .mockResolvedValueOnce({ data: 'order-123', error: null });
 
     const result = await processCheckout('b-123', {
-      customer_id: null,
-      subtotal: 100, discount: 0, tax: 0, total: 100,
+      customer_id: undefined,
+      discount: 0,
       payment_method: 'cash',
-      items: [{ product_id: 'p1', name: 'Product 1', quantity: 1, price: 100, cost: 0, discount: 0, tax: 0, total: 100 }],
+      items: [{ product_id: 'p1', name: 'Product 1', quantity: 1, price: 100, cost: 0, tax: 0 }],
     });
 
     expect(result.success).toBe(true);
