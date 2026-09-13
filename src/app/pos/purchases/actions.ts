@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { getWorkspaceContext } from "@/lib/workspace-data"
 
 const createPurchaseSchema = z.object({
   supplier_id: z.string().uuid(),
@@ -16,6 +17,9 @@ const createPurchaseSchema = z.object({
 })
 
 export async function createPurchase(businessId: string, payload: z.infer<typeof createPurchaseSchema>) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { error: "Unauthorized workspace" }
+  
   const supabase = await createClient()
   
   const result = createPurchaseSchema.safeParse(payload)
@@ -72,6 +76,9 @@ export async function createPurchase(businessId: string, payload: z.infer<typeof
 }
 
 export async function receivePurchase(businessId: string, purchaseId: string, items: { product_id: string, quantity_received: number, unit_cost: number }[]) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { error: "Unauthorized workspace" }
+
   const supabase = await createClient()
 
   const { error } = await supabase.rpc('process_stock_in', {
@@ -90,6 +97,9 @@ export async function receivePurchase(businessId: string, purchaseId: string, it
 }
 
 export async function cancelPurchase(businessId: string, purchaseId: string) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { error: "Unauthorized workspace" }
+
   const supabase = await createClient()
 
   const { data: purchase, error: fetchError } = await supabase

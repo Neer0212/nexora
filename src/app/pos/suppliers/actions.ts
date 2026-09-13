@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { getWorkspaceContext } from "@/lib/workspace-data"
 
 const supplierSchema = z.object({
   id: z.string().optional().nullable(),
@@ -16,6 +17,9 @@ const supplierSchema = z.object({
 })
 
 export async function saveSupplier(businessId: string, values: z.infer<typeof supplierSchema>) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) throw new Error("Unauthorized workspace")
+
   const supabase = await createClient()
   
   const parsed = supplierSchema.parse(values)
@@ -51,6 +55,9 @@ export async function saveSupplier(businessId: string, values: z.infer<typeof su
 }
 
 export async function getSupplierActivity(businessId: string, supplierId: string) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { transactions: [], purchases: [] }
+
   const supabase = await createClient()
   
   const { data: inventoryTransactions, error: invError } = await supabase
