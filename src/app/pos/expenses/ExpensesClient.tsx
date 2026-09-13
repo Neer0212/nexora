@@ -122,7 +122,7 @@ export default function ExpensesClient({
     try {
       await saveExpense(businessId, {
         id: editingExpense?.id,
-        category: formData.category as any,
+        category: formData.category as "Other" | "Rent" | "Utilities" | "Salary" | "Marketing" | "Transport" | "Supplies" | "Packaging" | "Maintenance" | "Insurance",
         description: formData.description,
         amount: Number(formData.amount),
         expense_date: formData.expense_date,
