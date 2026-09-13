@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { getWorkspaceContext } from "@/lib/workspace-data"
 
 const adjustmentSchema = z.object({
   product_id: z.string(),
@@ -17,9 +18,10 @@ const adjustmentSchema = z.object({
 export type AdjustmentPayload = z.infer<typeof adjustmentSchema>
 
 export async function submitInventoryTransaction(businessId: string, payload: AdjustmentPayload) {
+  const context = await getWorkspaceContext().catch(() => null)
+  if (!context || context.businessId !== businessId) return { success: false, error: "Unauthorized workspace" }
+  
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: "Unauthorized" }
 
   const parsed = adjustmentSchema.safeParse(payload)
   if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message || "Invalid data" }
@@ -38,7 +40,12 @@ export async function submitInventoryTransaction(businessId: string, payload: Ad
     p_reference: data.reference || null,
   })
 
-  if (error) return { success: false, error: error.message }
+  if (error) {
+    if (error.message.includes("products_stock_quantity_check")) {
+      return { success: false, error: "Insufficient stock to complete this transaction." }
+    }
+    return { success: false, error: error.message }
+  }
 
   revalidatePath("/pos/inventory")
   revalidatePath("/pos/products")
