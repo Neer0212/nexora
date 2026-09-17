@@ -207,10 +207,9 @@ export default async function FinancePage() {
     0
   )
 
-  const cogs = validRows.reduce(
-    (sum, item) => sum + (cogsKey ? numberValue(item.row[cogsKey]) : 0),
-    0
-  )
+  const cogs = cogsKey
+    ? validRows.reduce((sum, item) => sum + numberValue(item.row[cogsKey!]), 0)
+    : null
 
   const operatingExpenses = validRows.reduce((sum, item) => {
     if (opexKey) return sum + numberValue(item.row[opexKey])
@@ -218,10 +217,10 @@ export default async function FinancePage() {
     return sum
   }, 0)
 
-  const grossProfit = revenue - cogs
-  const grossMargin = revenue ? (grossProfit / revenue) * 100 : null
-  const netProfit = grossProfit - operatingExpenses
-  const netMargin = revenue ? (netProfit / revenue) * 100 : null
+  const grossProfit = cogs !== null ? revenue - cogs : null
+  const grossMargin = grossProfit !== null && revenue ? (grossProfit / revenue) * 100 : null
+  const netProfit = grossProfit !== null ? grossProfit - operatingExpenses : null
+  const netMargin = netProfit !== null && revenue ? (netProfit / revenue) * 100 : null
 
   const datedRows = validRows
     .map((item) => ({
@@ -255,21 +254,21 @@ export default async function FinancePage() {
     0
   )
 
-  const currentCogs = currentRows.reduce(
-    (sum, item) => sum + (cogsKey ? numberValue(item.row[cogsKey]) : 0),
-    0
-  )
+  const currentCogs = cogsKey
+    ? currentRows.reduce((sum, item) => sum + numberValue(item.row[cogsKey!]), 0)
+    : null
+
   const currentOpex = currentRows.reduce((sum, item) => {
     if (opexKey) return sum + numberValue(item.row[opexKey])
     if (expenseKey) return sum + numberValue(item.row[expenseKey])
     return sum
   }, 0)
 
-  const currentGrossProfit = currentRevenue - currentCogs
-  const currentGrossMargin = currentRevenue
+  const currentGrossProfit = currentCogs !== null ? currentRevenue - currentCogs : null
+  const currentGrossMargin = currentGrossProfit !== null && currentRevenue
     ? (currentGrossProfit / currentRevenue) * 100
     : null
-  const currentNetProfit = currentGrossProfit - currentOpex
+  const currentNetProfit = currentGrossProfit !== null ? currentGrossProfit - currentOpex : null
 
   const daily = new Map<string, { revenue: number; cogs: number; expenses: number }>()
 

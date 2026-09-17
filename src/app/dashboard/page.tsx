@@ -4,6 +4,7 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs"
 import DashboardOverview from "@/components/dashboard/DashboardOverview"
 import { createClient } from "@/lib/supabase/server"
 import { getIndustryConfig } from "@/lib/industries"
+import { getDashboardSummary } from "@/lib/dashboard-data"
 
 type JsonRow = Record<string, unknown>
 
@@ -40,18 +41,6 @@ function parseDate(value: unknown) {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().slice(0, 10)
 }
 
-function addDays(date: string, days: number) {
-  const result = new Date(`${date}T00:00:00`)
-  result.setDate(result.getDate() + days)
-  return result.toISOString().slice(0, 10)
-}
-
-function formatLabel(date: string) {
-  return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short" }).format(
-    new Date(`${date}T00:00:00`)
-  )
-}
-
 export default async function DashboardPage() {
   const supabase = await createClient()
 
@@ -71,21 +60,27 @@ export default async function DashboardPage() {
   if (membershipError) throw new Error(membershipError.message)
   if (!membership) redirect("/onboarding")
 
-  const [{ data: business, error: businessError }, { data: datasets, error: datasetsError }] =
-    await Promise.all([
-      supabase
-        .from("businesses")
-        .select("id, name, industry, business_type, currency_code")
-        .eq("id", membership.business_id)
-        .single(),
-      supabase
-        .from("datasets")
-        .select("id, name, file_name, row_count, column_count, status, created_at")
-        .eq("business_id", membership.business_id)
-        .eq("status", "ready")
-        .order("created_at", { ascending: false })
-        .limit(20),
-    ])
+  // Run operational summary and data hub queries in parallel
+  const [
+    { data: business, error: businessError },
+    { data: datasets, error: datasetsError },
+    operationalSummary,
+  ] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("id, name, industry, business_type, currency_code")
+      .eq("id", membership.business_id)
+      .single(),
+    supabase
+      .from("datasets")
+      .select("id, name, file_name, row_count, column_count, status, created_at")
+      .eq("business_id", membership.business_id)
+      .eq("status", "ready")
+      .order("created_at", { ascending: false })
+      .limit(20),
+    // Phase 10: Authoritative operational summary
+    getDashboardSummary(membership.business_id).catch(() => null),
+  ])
 
   if (businessError || !business) {
     throw new Error(businessError?.message || "Business could not be loaded.")
@@ -129,207 +124,149 @@ export default async function DashboardPage() {
   const customerKey = orderRows[0] ? findKey(orderRows[0].row, ["customer_id", "customer", "customer_name"]) : null
   const statusKey = orderRows[0] ? findKey(orderRows[0].row, ["order_status", "status"]) : null
 
+  // Exclude returned/cancelled rows from revenue calculations
   const completedRows = orderRows.filter(({ row }) => {
     const status = statusKey ? textValue(row[statusKey]).toLowerCase() : ""
     return !status || !["returned", "cancelled", "canceled", "refunded"].includes(status)
   })
 
-  const revenue = completedRows.reduce((sum, item) => sum + (revenueKey ? numberValue(item.row[revenueKey]) : 0), 0)
-  const ordersCount = completedRows.length
   const unitsSold = completedRows.reduce((sum, item) => sum + (quantityKey ? numberValue(item.row[quantityKey]) : 0), 0)
+
+  // ── Trend ──────────────────────────────────────────────────────────────────
+  // Use authoritative operational trend ONLY.
+  // When operationalSummary is null (getDashboardSummary failed), trend is empty.
+  // We do NOT fall back to the bridge/Data Hub for the live financial chart because
+  // the bridge data provenance and financial semantics cannot be guaranteed to match.
+  // The empty state in DashboardOverview handles the no-data case.
+  const trend: Array<{ label: string; value: number }> = operationalSummary
+    ? operationalSummary.trend.map((p) => ({ label: p.label, value: p.revenue }))
+    : []
+
+  // ── Top Products ───────────────────────────────────────────────────────────
+  // Authoritative if available; fallback to bridge Data Hub scan if not.
+  // The bridge fallback here is acceptable because it is used only for the
+  // "product name → revenue" attribution, not for financial totals.
+  let topProducts: Array<{ name: string; value: number }>
+  if (operationalSummary && operationalSummary.topProducts.length > 0) {
+    topProducts = operationalSummary.topProducts
+  } else {
+    const productTotals = new Map<string, number>()
+    completedRows.forEach(({ row }) => {
+      if (!productKey || !revenueKey) return
+      const product = textValue(row[productKey]) || "Unknown product"
+      productTotals.set(product, (productTotals.get(product) ?? 0) + numberValue(row[revenueKey]))
+    })
+    topProducts = [...productTotals.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name, value]) => ({ name, value }))
+  }
+
+  // ── Recent Orders ──────────────────────────────────────────────────────────
+  // Authoritative if available; fallback to bridge Data Hub scan if not.
+  let recentOrders: Array<{ orderNumber: string; customer: string; amount: number; status: string; date: string }>
+  if (operationalSummary && operationalSummary.recentOrders.length > 0) {
+    recentOrders = operationalSummary.recentOrders
+  } else {
+    const endDate = new Date().toISOString().slice(0, 10)
+    recentOrders = [...completedRows]
+      .sort((a, b) => b.rowNumber - a.rowNumber)
+      .slice(0, 6)
+      .map(({ row, rowNumber }) => ({
+        orderNumber: textValue(orderRows[0] && findKey(row, ["order_id", "orderid", "order"]) ? row[findKey(row, ["order_id", "orderid", "order"])!] : "") || `ROW-${rowNumber}`,
+        customer: customerKey ? textValue(row[customerKey]) || "Unknown customer" : "—",
+        amount: revenueKey ? numberValue(row[revenueKey]) : 0,
+        status: statusKey ? textValue(row[statusKey]) || "Completed" : "Completed",
+        date: dateKey ? parseDate(row[dateKey]) ?? endDate : endDate,
+      }))
+  }
+
+  // ── Core Revenue Metrics ───────────────────────────────────────────────────
+  // Authoritative grossSales from getDashboardSummary (correct Phase 6 semantics).
+  // Fallback from bridge only when operational query failed entirely (operationalSummary === null).
+  const revenue = operationalSummary?.grossSales
+    ?? completedRows.reduce((sum, item) => sum + (revenueKey ? numberValue(item.row[revenueKey]) : 0), 0)
+  const ordersCount = operationalSummary?.orderCount ?? completedRows.length
   const averageOrderValue = ordersCount ? revenue / ordersCount : 0
+  const returnsCount = operationalSummary?.returnCount ?? (orderRows.length - completedRows.length)
+  const customersCount = operationalSummary?.customerCount ?? 0
 
-  const dailyRevenue = new Map<string, number>()
-  completedRows.forEach(({ row }) => {
-    const date = dateKey ? parseDate(row[dateKey]) : null
-    if (date) dailyRevenue.set(date, (dailyRevenue.get(date) ?? 0) + (revenueKey ? numberValue(row[revenueKey]) : 0))
-  })
-
-  const dates = [...dailyRevenue.keys()].sort()
-  const endDate = dates.at(-1) ?? new Date().toISOString().slice(0, 10)
-  const startDate = addDays(endDate, -29)
-  const trend = Array.from({ length: 30 }, (_, index) => {
-    const date = addDays(startDate, index)
-    return { label: formatLabel(date), value: dailyRevenue.get(date) ?? 0 }
-  })
-
-  const productTotals = new Map<string, number>()
-  completedRows.forEach(({ row }) => {
-    if (!productKey || !revenueKey) return
-    const product = textValue(row[productKey]) || "Unknown product"
-    productTotals.set(product, (productTotals.get(product) ?? 0) + numberValue(row[revenueKey]))
-  })
-  const topProducts = [...productTotals.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([name, value]) => ({ name, value }))
-
-  const returnsCount = orderRows.length - completedRows.length
   const topProductShare = revenue && topProducts[0] ? topProducts[0].value / revenue : 0
 
-  const recentOrders = [...completedRows]
-    .sort((a, b) => b.rowNumber - a.rowNumber)
-    .slice(0, 6)
-    .map(({ row, rowNumber }) => ({
-      orderNumber: textValue(orderRows[0] && findKey(row, ["order_id", "orderid", "order"]) ? row[findKey(row, ["order_id", "orderid", "order"])!] : "") || `ROW-${rowNumber}`,
-      customer: customerKey ? textValue(row[customerKey]) || "Unknown customer" : "—",
-      amount: revenueKey ? numberValue(row[revenueKey]) : 0,
-      status: statusKey ? textValue(row[statusKey]) || "Completed" : "Completed",
-      date: dateKey ? parseDate(row[dateKey]) ?? endDate : endDate,
-    }))
+  // ── Inventory ─────────────────────────────────────────────────────────────
+  // Authoritative product count and low-stock counts from getDashboardSummary.
+  // Inventory value is an INDICATIVE estimate (unit_cost × stock_qty) from the
+  // pos-integration bridge — it is NOT accounting-grade FIFO/LIFO valuation.
+  const inventoryRows = rows.filter(({ datasetId }) => datasetId === "pos-inventory")
+  const inventoryCount = operationalSummary?.productCount ?? inventoryRows.length
+  const lowStockCount = operationalSummary?.lowStockCount ?? 0
+  const inventoryValue = inventoryRows.reduce((sum, { row }) => {
+    const qty = numberValue(row["stock_qty"])
+    const cost = numberValue(row["unit_cost"])
+    return sum + qty * cost
+  }, 0)
+
+  // ── Supplier Signals (Data Hub) ────────────────────────────────────────────
+  const supplierRows = rows.filter(({ datasetId, row }) => {
+    const name = datasetId.toLowerCase()
+    const keys = Object.keys(row).join(" ").toLowerCase()
+    return name.includes("supplier") || name.includes("vendor") || keys.includes("supplier") || keys.includes("vendor")
+  })
+  const supplierStatusKey = supplierRows[0] ? findKey(supplierRows[0].row, ["status", "supplier_status"]) : null
+  const supplierLeadKey = supplierRows[0] ? findKey(supplierRows[0].row, ["lead_time", "lead_time_days", "delivery_days"]) : null
+  const atRiskSuppliers = supplierRows.filter(({ row }) => {
+    const status = supplierStatusKey ? textValue(row[supplierStatusKey]).toLowerCase() : ""
+    const leadTime = supplierLeadKey ? numberValue(row[supplierLeadKey]) : 0
+    return ["watch", "at risk", "risk", "delayed", "poor"].some((term) => status.includes(term)) || leadTime >= 10
+  }).length
+  const supplierCount = supplierRows.length
+
+  // ── Finance Aggregates ─────────────────────────────────────────────────────
+  // COGS is not computed — no reliable per-unit cost query in scope for Phase 10.
+  // Labelling grossSales as financeRevenue for the Finance signal card fallback only.
+  const financeRevenue = revenue
+  const cogs = null
+  const operatingExpenses = operationalSummary?.expenses ?? 0
+  const grossProfit = null
+
+  const connected = {
+    products: (operationalSummary?.productCount ?? 0) > 0,
+    inventory: (operationalSummary?.productCount ?? 0) > 0,
+    suppliers: supplierCount > 0,
+    customers: customersCount > 0,
+    finance: operatingExpenses > 0 || revenue > 0,
+  }
 
   const insight = revenue
     ? topProductShare >= 0.35
       ? {
         title: "Revenue is concentrated in a small number of products.",
-        description: `${topProducts[0]?.name ?? "Your top product"} contributes ${Math.round(topProductShare * 100)}% of connected revenue. This is a concentration signal worth watching.`,
-        evidence: `${formatLabel(endDate)} · ${Math.round(topProductShare * 100)}% of revenue`,
+        description: `${topProducts[0]?.name ?? "Your top product"} contributes ${Math.round(topProductShare * 100)}% of revenue. This is a concentration signal worth watching.`,
+        evidence: `${Math.round(topProductShare * 100)}% of revenue from top product`,
       }
       : returnsCount
         ? {
-          title: "Returns are visible in the connected order data.",
-          description: `${returnsCount} of ${orderRows.length} connected order rows are marked as returned, cancelled, or refunded.`,
-          evidence: `${returnsCount} returned / cancelled rows`,
+          title: "Returns are visible in the order data.",
+          description: `${returnsCount} order${returnsCount === 1 ? "" : "s"} returned. Net sales = Gross − Returns.`,
+          evidence: `${returnsCount} returned order${returnsCount === 1 ? "" : "s"}`,
         }
         : {
-          title: "Your connected orders are ready for analysis.",
-          description: `${ordersCount.toLocaleString("en-IN")} completed order rows currently contribute to the dashboard.`,
-          evidence: `${ordersCount.toLocaleString("en-IN")} completed orders`,
+          title: "Orders are being captured and recorded.",
+          description: `${ordersCount.toLocaleString("en-IN")} order${ordersCount === 1 ? "" : "s"} captured this period.`,
+          evidence: `${ordersCount.toLocaleString("en-IN")} order${ordersCount === 1 ? "" : "s"}`,
         }
     : {
-      title: "Connect an orders dataset to unlock the overview.",
-      description: "Nexora will calculate revenue, orders, trends and business signals directly from connected data.",
-      evidence: "No compatible order dataset detected",
+      title: "Connect orders or start using the POS to unlock the overview.",
+      description: "Nexora will calculate revenue, orders, trends and business signals from your operational data.",
+      evidence: "No sales data detected yet",
     }
-
-  const datasetName = (datasetId: string) => {
-    const dataset = readyDatasets.find((item) => item.id === datasetId)
-    return `${dataset?.name ?? ""} ${dataset?.file_name ?? ""}`.toLowerCase()
-  }
-
-  const rowsFor = (terms: string[]) =>
-    rows.filter(({ datasetId, row }) => {
-      const name = datasetName(datasetId)
-      const keys = Object.keys(row).join(" ").toLowerCase()
-      return terms.some((term) => name.includes(term) || keys.includes(term))
-    })
-
-  const inventoryRows = rowsFor(["inventory", "stock", "warehouse"])
-  const supplierRows = rowsFor(["supplier", "vendor"])
-  const customerRows = rowsFor(["customer", "account"])
-  const productRows = rowsFor(["product", "catalog", "sku"])
-  const financeRows = rowsFor(["finance", "expense", "invoice", "profit"])
-
-  const firstRow = (items: typeof rows) => items[0]?.row ?? null
-  const keyFrom = (items: typeof rows, aliases: string[]) => {
-    const sample = firstRow(items)
-    return sample ? findKey(sample, aliases) : null
-  }
-
-  const inventoryQtyKey = keyFrom(inventoryRows, [
-    "quantity",
-    "stock_qty",
-    "stock",
-    "available_qty",
-    "on_hand",
-  ])
-  const inventoryValueKey = keyFrom(inventoryRows, [
-    "inventory_value",
-    "stock_value",
-    "value",
-    "amount",
-  ])
-  const reorderKey = keyFrom(inventoryRows, [
-    "reorder_point",
-    "reorder_level",
-    "minimum_stock",
-    "min_stock",
-  ])
-
-  const inventoryValue = inventoryRows.reduce(
-    (sum, item) =>
-      sum + (inventoryValueKey ? numberValue(item.row[inventoryValueKey]) : 0),
-    0
-  )
-  const inventoryCount = inventoryRows.length
-  const lowStockCount = inventoryRows.filter(({ row }) => {
-    if (!inventoryQtyKey || !reorderKey) return false
-    return numberValue(row[inventoryQtyKey]) <= numberValue(row[reorderKey])
-  }).length
-
-  const supplierStatusKey = keyFrom(supplierRows, ["status", "supplier_status"])
-  const supplierLeadKey = keyFrom(supplierRows, [
-    "lead_time",
-    "lead_time_days",
-    "delivery_days",
-  ])
-  const atRiskSuppliers = supplierRows.filter(({ row }) => {
-    const status = supplierStatusKey
-      ? textValue(row[supplierStatusKey]).toLowerCase()
-      : ""
-    const leadTime = supplierLeadKey ? numberValue(row[supplierLeadKey]) : 0
-    return ["watch", "at risk", "risk", "delayed", "poor"].some((term) =>
-      status.includes(term)
-    ) || leadTime >= 10
-  }).length
-
-  const supplierCount = supplierRows.length
-  const customerIdKey = keyFrom(customerRows, [
-    "customer_id",
-    "customer",
-    "account_id",
-    "account",
-  ])
-  const customersFromOrders = new Set(
-    completedRows
-      .map(({ row }) => (customerKey ? textValue(row[customerKey]) : ""))
-      .filter(Boolean)
-  ).size
-  const customerCount = customerRows.length
-    ? new Set(
-      customerRows
-        .map(({ row }) => (customerIdKey ? textValue(row[customerIdKey]) : ""))
-        .filter(Boolean)
-    ).size || customerRows.length
-    : customersFromOrders
-
-  const financeRevenueKey = keyFrom(financeRows, ["revenue", "sales", "income"])
-  const cogsKey = keyFrom(financeRows, ["cogs", "cost_of_goods", "cost_of_sales"])
-  const expenseKey = keyFrom(financeRows, [
-    "operating_expenses",
-    "operating_expense",
-    "expenses",
-    "expense",
-  ])
-  const financeRevenue = financeRows.reduce(
-    (sum, item) => sum + (financeRevenueKey ? numberValue(item.row[financeRevenueKey]) : 0),
-    0
-  )
-  const cogs = financeRows.reduce(
-    (sum, item) => sum + (cogsKey ? numberValue(item.row[cogsKey]) : 0),
-    0
-  )
-  const operatingExpenses = financeRows.reduce(
-    (sum, item) =>
-      sum + (expenseKey ? numberValue(item.row[expenseKey]) : 0),
-    0
-  )
-  const financeGrossProfit = financeRevenue - cogs
-
-  const connected = {
-    products: productRows.length > 0,
-    inventory: inventoryRows.length > 0,
-    suppliers: supplierRows.length > 0,
-    customers: customerRows.length > 0 || customersFromOrders > 0,
-    finance: financeRows.length > 0,
-  }
 
   const industryConfig = getIndustryConfig(business.industry)
 
   const data = {
     currencyCode: business.currency_code || "INR",
     industryConfig,
-    hasData: rows.length > 0,
+    hasData: revenue > 0 || rows.length > 0,
     revenue,
     ordersCount,
     unitsSold,
@@ -338,7 +275,7 @@ export default async function DashboardPage() {
     inventoryCount,
     lowStockCount,
     suppliersCount: supplierCount,
-    customersCount: customerCount,
+    customersCount,
     datasetCount: readyDatasets.length,
     readyDatasetCount: readyDatasets.length,
     trend,
@@ -350,9 +287,24 @@ export default async function DashboardPage() {
     financeRevenue,
     cogs,
     operatingExpenses,
-    grossProfit: financeRows.length ? financeGrossProfit : 0,
+    grossProfit,
     connected,
     insight,
+    // Phase 10: authoritative operational metrics passed to DashboardOverview
+    ops: operationalSummary
+      ? {
+          netSales: operationalSummary.netSales,
+          returns: operationalSummary.returns,
+          grossPaymentsCollected: operationalSummary.grossPaymentsCollected,
+          refundsIssued: operationalSummary.refundsIssued,
+          netPaymentsCollected: operationalSummary.netPaymentsCollected,
+          expenses: operationalSummary.expenses,
+          outOfStockCount: operationalSummary.outOfStockCount,
+          pendingPurchases: operationalSummary.pendingPurchases,
+          partiallyReceived: operationalSummary.partiallyReceived,
+          receivedPurchases: operationalSummary.receivedPurchases,
+        }
+      : null,
   }
 
   return (

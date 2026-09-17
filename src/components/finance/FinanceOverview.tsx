@@ -37,18 +37,18 @@ type FinanceData = {
   hasRevenue: boolean
   hasFinanceFields: boolean
   revenue: number
-  cogs: number
+  cogs: number | null
   operatingExpenses: number
-  grossProfit: number
+  grossProfit: number | null
   grossMargin: number | null
-  netProfit: number
+  netProfit: number | null
   netMargin: number | null
   currentRevenue: number
   previousRevenue: number
   revenueChange: number | null
-  currentGrossProfit: number
+  currentGrossProfit: number | null
   currentGrossMargin: number | null
-  currentNetProfit: number
+  currentNetProfit: number | null
   trend: TrendPoint[]
   expenseBreakdown: Breakdown[]
   connectedDatasets: number
@@ -190,7 +190,7 @@ export default function FinanceOverview({
 
         <Metric
           label="Gross profit"
-          value={data.hasFinanceFields ? compactMoney(data.grossProfit, data.currencyCode) : "—"}
+          value={data.grossProfit !== null ? compactMoney(data.grossProfit, data.currencyCode) : "—"}
           detail={
             data.grossMargin !== null
               ? `${data.grossMargin.toFixed(1)}% gross margin`
@@ -216,7 +216,7 @@ export default function FinanceOverview({
 
         <Metric
           label="Net profit"
-          value={data.hasFinanceFields ? compactMoney(data.netProfit, data.currencyCode) : "—"}
+          value={data.netProfit !== null ? compactMoney(data.netProfit, data.currencyCode) : "—"}
           detail={
             data.netMargin !== null
               ? `${data.netMargin.toFixed(1)}% net margin`

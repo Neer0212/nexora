@@ -50,9 +50,9 @@ type DashboardData = {
   returnsCount: number
   atRiskSuppliers: number
   financeRevenue: number
-  cogs: number
+  cogs: number | null
   operatingExpenses: number
-  grossProfit: number
+  grossProfit: number | null
   connected: {
     products: boolean
     inventory: boolean
@@ -61,6 +61,19 @@ type DashboardData = {
     finance: boolean
   }
   insight: Insight
+  // Phase 10: authoritative operational metrics
+  ops: {
+    netSales: number
+    returns: number
+    grossPaymentsCollected: number
+    refundsIssued: number
+    netPaymentsCollected: number
+    expenses: number
+    outOfStockCount: number
+    pendingPurchases: number
+    partiallyReceived: number
+    receivedPurchases: number
+  } | null
 }
 
 function currency(value: number, code: string) {
@@ -281,37 +294,59 @@ export default function DashboardOverview({ data }: { data: DashboardData }) {
         <SignalCard
           icon={Package}
           title="Inventory"
-          value={data.inventoryValue ? compactCurrency(data.inventoryValue, data.currencyCode) : "—"}
+          value={data.inventoryValue ? compactCurrency(data.inventoryValue, data.currencyCode) : data.inventoryCount ? String(data.inventoryCount) : "—"}
           detail={
-            data.lowStockCount
-              ? `${data.lowStockCount} item${data.lowStockCount === 1 ? "" : "s"} at or below reorder point`
-              : data.inventoryCount
-                ? `${data.inventoryCount} inventory records connected`
-                : "Connect inventory data"
+            data.ops?.outOfStockCount
+              ? `${data.ops.outOfStockCount} item${data.ops.outOfStockCount === 1 ? "" : "s"} out of stock`
+              : data.lowStockCount
+                ? `${data.lowStockCount} item${data.lowStockCount === 1 ? "" : "s"} low stock`
+                : data.inventoryCount
+                  ? `${data.inventoryCount} product${data.inventoryCount === 1 ? "" : "s"} tracked`
+                  : "No products added yet"
           }
-          warning={data.lowStockCount > 0}
+          warning={(data.ops?.outOfStockCount ?? 0) > 0 || data.lowStockCount > 0}
         />
         <SignalCard
           icon={Truck}
           title="Suppliers"
-          value={data.suppliersCount ? String(data.suppliersCount) : "—"}
+          value={data.suppliersCount ? String(data.suppliersCount) : data.ops?.pendingPurchases ? String(data.ops.pendingPurchases) : "—"}
           detail={
-            data.atRiskSuppliers
-              ? `${data.atRiskSuppliers} supplier${data.atRiskSuppliers === 1 ? "" : "s"} need attention`
-              : data.suppliersCount
-                ? "No risk signals detected"
-                : "Connect supplier data"
+            data.ops
+              ? data.ops.partiallyReceived
+                ? `${data.ops.partiallyReceived} purchase${data.ops.partiallyReceived === 1 ? "" : "s"} in transit · ${data.ops.pendingPurchases} pending`
+                : data.ops.pendingPurchases
+                  ? `${data.ops.pendingPurchases} pending purchase${data.ops.pendingPurchases === 1 ? "" : "s"}`
+                  : data.ops.receivedPurchases
+                    ? `${data.ops.receivedPurchases} received`
+                    : "No purchases recorded"
+              : data.atRiskSuppliers
+                ? `${data.atRiskSuppliers} supplier${data.atRiskSuppliers === 1 ? "" : "s"} need attention`
+                : data.suppliersCount
+                  ? "No risk signals detected"
+                  : "Connect supplier data"
           }
           warning={data.atRiskSuppliers > 0}
         />
         <SignalCard
           icon={CircleAlert}
           title="Finance"
-          value={data.grossProfit ? compactCurrency(data.grossProfit, data.currencyCode) : "—"}
+          value={
+            data.ops
+              ? data.ops.netSales
+                ? compactCurrency(data.ops.netSales, data.currencyCode)
+                : "—"
+              : data.grossProfit !== null
+                ? compactCurrency(data.grossProfit, data.currencyCode)
+                : "—"
+          }
           detail={
-            data.financeRevenue
-              ? `Gross profit from ${compactCurrency(data.financeRevenue, data.currencyCode)} revenue`
-              : "Connect finance data"
+            data.ops
+              ? data.ops.netSales
+                ? `Net sales${data.ops.refundsIssued ? ` · ${compactCurrency(data.ops.refundsIssued, data.currencyCode)} refunded` : ""}${data.ops.expenses ? ` · ${compactCurrency(data.ops.expenses, data.currencyCode)} expenses` : ""}`
+                : "No sales recorded yet"
+              : data.financeRevenue
+                ? `Gross profit from ${compactCurrency(data.financeRevenue, data.currencyCode)} revenue`
+                : "Connect finance data"
           }
           warning={false}
         />
