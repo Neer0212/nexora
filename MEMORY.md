@@ -1,0 +1,1 @@
+- [Phase 8: Customer Management Foundation](phase8_summary.md) — Implemented customer archival/soft delete pattern with is_active flag, updated RLS policies, modified customer actions and UI to handle active/inactive states, created comprehensive test suite
