@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { getWorkspaceData } from "@/lib/workspace-data"
 import { rowsForDomain } from "@/lib/dataset-utils"
+import { text, num } from "@/lib/data-utils"
 import {
   computeOrderMetrics,
   computePeriodComparison,
@@ -12,7 +13,7 @@ import {
 import AutopsyView from "@/components/investigate/AutopsyView"
 
 export default async function AutopsyPage() {
-  let result;
+  let result
   try {
     result = await getWorkspaceData()
   } catch (e: unknown) {
@@ -24,6 +25,7 @@ export default async function AutopsyPage() {
   const salesRows = rowsForDomain(result.rows, "sales")
   const inventoryRows = rowsForDomain(result.rows, "inventory")
   const supplierRows = rowsForDomain(result.rows, "suppliers")
+  const financeRows = rowsForDomain(result.rows, "finance")
 
   const comparison = computePeriodComparison(salesRows)
   const orderMetrics = computeOrderMetrics(salesRows)
@@ -32,12 +34,23 @@ export default async function AutopsyPage() {
   const customerMetrics = computeCustomerMetrics(salesRows)
   const productMetrics = computeProductMetrics(salesRows)
 
+  // Aggregate expenses from finance rows
+  const expenseCategories = new Map<string, number>()
+  let totalExpenses = 0
+  financeRows.forEach((r) => {
+    const amount = num(r.amount ?? r.expense ?? 0)
+    totalExpenses += amount
+    const cat = text(r.expense_category ?? r.category ?? "General") || "General"
+    expenseCategories.set(cat, (expenseCategories.get(cat) ?? 0) + amount)
+  })
+  const topExpenseEntry = [...expenseCategories.entries()].sort((a, b) => b[1] - a[1])[0]
+
   const data = {
     industryConfig: result.context.industryConfig,
     businessName: result.context.businessName,
-    currencyCode: result.context.currencyCode,
+    currencyCode: result.context.currencyCode || "INR",
     latestDate: comparison.latestDate,
-    datasets: result.datasets.map(d => d.name),
+    datasets: result.datasets.map((d) => d.name),
     comparison: {
       currentRevenue: comparison.currentRevenue,
       previousRevenue: comparison.previousRevenue,
@@ -45,29 +58,69 @@ export default async function AutopsyPage() {
       currentOrders: comparison.currentOrders,
       previousOrders: comparison.previousOrders,
       ordersChange: comparison.ordersChange,
+      currentUnits: comparison.currentUnits,
+      previousUnits: comparison.previousUnits,
       currentAOV: comparison.currentAOV,
       previousAOV: comparison.previousAOV,
-      aovChange: comparison.aovChange
+      aovChange: comparison.aovChange,
     },
     orderMetrics: {
       revenue: orderMetrics.revenue,
       orders: orderMetrics.orders,
       units: orderMetrics.units,
       averageOrderValue: orderMetrics.averageOrderValue,
-      returns: orderMetrics.returns
+      returns: orderMetrics.returns,
+      totalRows: orderMetrics.totalRows,
     },
     inventoryMetrics: {
       totalValue: inventoryMetrics.totalValue,
+      recordCount: inventoryMetrics.recordCount,
       lowStockCount: inventoryMetrics.lowStockCount,
-      outOfStockCount: inventoryMetrics.outOfStockCount
+      outOfStockCount: inventoryMetrics.outOfStockCount,
+      hasReorderData: inventoryMetrics.hasReorderData,
+      items: (inventoryMetrics.items || []).map((i) => ({
+        product: i.product,
+        sku: i.sku,
+        currentStock: i.currentStock,
+        reorderLevel: i.reorderLevel,
+        status: i.status,
+        unitCost: i.unitCost,
+        inventoryValue: i.inventoryValue,
+      })),
     },
     supplierMetrics: {
       count: supplierMetrics.count,
-      riskyCount: supplierMetrics.riskyCount
+      riskyCount: supplierMetrics.riskyCount,
+      averageLeadTime: supplierMetrics.averageLeadTime,
+      hasReliabilityData: supplierMetrics.hasReliabilityData,
+      items: (supplierMetrics.items || []).map((s) => ({
+        name: s.name,
+        leadTime: s.leadTime,
+        reliability: s.reliability,
+        status: s.status,
+        riskLevel: s.riskLevel,
+      })),
+    },
+    expenseMetrics: {
+      totalAmount: totalExpenses,
+      count: financeRows.length,
+      topCategory: topExpenseEntry ? { name: topExpenseEntry[0], amount: topExpenseEntry[1] } : null,
     },
     customerCount: customerMetrics.uniqueCount,
-    topProducts: productMetrics.topProducts.map(p => ({ name: p.name, revenue: p.revenue, share: p.share })),
-    topCustomers: customerMetrics.topCustomers.map(c => ({ name: c.name, revenue: c.revenue, share: c.share }))
+    topProducts: productMetrics.topProducts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      revenue: p.revenue,
+      units: p.units,
+      orders: p.orders,
+      share: p.share,
+      category: p.category,
+    })),
+    topCustomers: customerMetrics.topCustomers.map((c) => ({
+      name: c.name,
+      revenue: c.revenue,
+      share: c.share,
+    })),
   }
 
   return <AutopsyView {...data} />

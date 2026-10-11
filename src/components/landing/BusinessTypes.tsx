@@ -1,7 +1,7 @@
 "use client"
 
+import { motion, useReducedMotion } from "motion/react"
 import {
-  ArrowRight,
   CircleDollarSign,
   Factory,
   Package,
@@ -13,127 +13,110 @@ import {
 const areas = [
   {
     id: "sales",
-    label: "Sales",
-    title: "Know what's selling.",
+    label: "POS & Sales Operations",
+    title: "Real-time checkout, receipts, returns",
     description:
-      "Track revenue, orders, products, regions, and customer demand in one connected view.",
+      "Full counter POS with barcode scanning, custom discounts, walk-in customer history, and refund parity.",
     icon: ShoppingCart,
   },
   {
     id: "inventory",
-    label: "Inventory",
-    title: "Know what you have.",
+    label: "Stock & Warehouse",
+    title: "Precision valuation & stockouts",
     description:
-      "Understand stock levels, availability, movement, and the products that need attention.",
+      "Live quantity tracking, multi-warehouse support, automated reorder triggers, and dead-stock identification.",
     icon: Package,
   },
   {
     id: "suppliers",
-    label: "Suppliers",
-    title: "Know who you depend on.",
+    label: "Vendor Intelligence",
+    title: "Lead time & dependency scoring",
     description:
-      "See supplier reliability, lead times, costs, and the relationships affecting your operations.",
+      "Monitor delivery lag, reliability ratings, and cost variances across every active supplier relationship.",
     icon: Truck,
   },
   {
     id: "customers",
-    label: "Customers",
-    title: "Know who drives demand.",
+    label: "Customer Relationships",
+    title: "Purchasing behavior & churn",
     description:
-      "Understand customer activity, purchasing patterns, account value, and changing demand.",
+      "Identify high-value wholesale accounts, repeat store customers, and track individual lifetime value.",
     icon: Users,
   },
   {
     id: "finance",
-    label: "Finance",
-    title: "Know where money moves.",
+    label: "Executive Finance",
+    title: "Net sales & expense tracking",
     description:
-      "Connect revenue, costs, margins, payments, and cash signals to the rest of the business.",
+      "True financial ledger reflecting returns, category expenses, and payment reconciliation without approximations.",
     icon: CircleDollarSign,
   },
   {
-    id: "operations",
-    label: "Operations",
-    title: "Know what's happening underneath.",
+    id: "brain",
+    label: "Autonomous Strategy",
+    title: "Targets, forecasting & AI assistant",
     description:
-      "Bring operational signals together so bottlenecks don't stay hidden inside individual systems.",
+      "Set quarterly performance goals, project period cashflows, and ask questions directly to your store dataset.",
     icon: Factory,
   },
 ]
 
 export default function BusinessTypes() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
-    <section
-      id="business-types"
-      className="relative overflow-hidden bg-white py-24 sm:py-32 border-t border-zinc-200"
-    >
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Intro */}
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="text-xs font-semibold text-blue-600">
-              One business. Many signals.
-            </p>
+    <section className="relative overflow-hidden bg-white py-24 sm:py-32 border-t border-zinc-200/80">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <motion.h2
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-5xl"
+          >
+            Built for modern businesses of every shape.
+          </motion.h2>
 
-            <h2 className="mt-4 text-4xl font-semibold leading-tight tracking-tight text-zinc-950 sm:text-5xl">
-              Everything is connected.
-            </h2>
-          </div>
-
-          <div className="max-w-xl">
-            <p className="text-lg leading-8 text-zinc-600">
-              Nexora connects the parts of your business that are usually
-              looked at separately. Because a change in sales can affect inventory. Inventory can
-              depend on suppliers. Suppliers can affect margins. And all of it
-              ultimately affects your customers.
-            </p>
-          </div>
+          <motion.p
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ delay: 0.1 }}
+            className="mt-4 text-base sm:text-lg leading-relaxed text-zinc-600"
+          >
+            Whether running retail storefronts, wholesale distribution, or direct-to-consumer operations, Nexora connects every moving part.
+          </motion.p>
         </div>
 
-        {/* Connected business map */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {areas.map((area) => {
+        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {areas.map((area, idx) => {
             const Icon = area.icon
-
             return (
-              <div
+              <motion.div
                 key={area.id}
-                className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 sm:p-8"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                className="group rounded-3xl border border-zinc-200/80 bg-zinc-50/50 p-7 transition-all duration-300 hover:border-zinc-300 hover:bg-white hover:shadow-lg hover:-translate-y-1"
               >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white border border-zinc-200 shadow-sm">
-                    <Icon className="h-5 w-5 text-zinc-700" />
-                  </div>
-                  <span className="text-sm font-semibold text-zinc-950">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-zinc-200/80 text-zinc-950 shadow-sm group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="mt-5">
+                  <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
                     {area.label}
                   </span>
+                  <h3 className="mt-1 text-lg font-bold text-zinc-950">
+                    {area.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                    {area.description}
+                  </p>
                 </div>
-
-                <h3 className="text-xl font-semibold text-zinc-950">
-                  {area.title}
-                </h3>
-
-                <p className="mt-3 text-sm leading-6 text-zinc-600">
-                  {area.description}
-                </p>
-              </div>
+              </motion.div>
             )
           })}
-        </div>
-
-        {/* Closing statement */}
-        <div className="mt-20 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-zinc-200 pt-10">
-          <p className="text-lg font-medium text-zinc-950">
-            Your business doesn&apos;t operate in departments. <span className="text-zinc-500">Neither should your intelligence.</span>
-          </p>
-
-          <a
-            href="#final-cta"
-            className="group inline-flex items-center gap-2 text-sm font-medium text-zinc-950 hover:text-blue-600 transition-colors"
-          >
-            See what Nexora can do
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
         </div>
       </div>
     </section>

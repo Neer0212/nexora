@@ -1,80 +1,54 @@
+"use client"
+
 import Link from "next/link"
-import {
-  ArrowRight,
-  Check,
-  Sparkles,
-} from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
+import { ArrowRight, Sparkles } from "lucide-react"
 
 export default function FinalCTA() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
-    <section
-      id="final-cta"
-      className="relative overflow-hidden bg-zinc-950 py-20 text-zinc-50 sm:py-24"
-    >
-      {/* Background atmosphere */}
-      <div className="pointer-events-none absolute -left-48 -top-48 h-[600px] w-[600px] rounded-full bg-blue-600/25 blur-3xl" />
+    <section className="relative overflow-hidden bg-zinc-950 text-white py-24 sm:py-32">
+      {/* Radiant glow effect */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,rgba(37,99,235,0.2),transparent)]" />
 
-      <div className="pointer-events-none absolute -bottom-48 -right-48 h-[600px] w-[600px] rounded-full bg-blue-600/20 blur-3xl" />
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/90 px-4 py-1.5 text-xs font-semibold text-zinc-300 backdrop-blur-md mb-8">
+            <Sparkles className="h-4 w-4 text-blue-400" />
+            Get Started in Under 2 Minutes
+          </div>
 
-      <div className="relative mx-auto max-w-5xl px-6 text-center">
-        {/* Label */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200/15 bg-zinc-50/5 px-3.5 py-2">
-          <Sparkles className="h-3.5 w-3.5 text-blue-200" />
+          <h2 className="text-4xl font-extrabold tracking-tight sm:text-6xl max-w-3xl mx-auto leading-tight">
+            Ready to bring clarity to your business?
+          </h2>
 
-          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-blue-200/65">
-            Your business, understood
-          </span>
-        </div>
+          <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-400 leading-relaxed">
+            Create your account today. Connect your store, inventory, and supplier channels in one unified, intelligent workspace.
+          </p>
 
-        {/* Heading */}
-        <h2 className="mx-auto mt-7 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl lg:text-7xl">
-          Your business is already
-          <span className="block text-blue-200">
-            telling you what to do.
-          </span>
-        </h2>
-
-        <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-blue-200/65 sm:text-lg">
-          Nexora helps you understand what&apos;s happening, why it matters,
-          and what to do next.
-        </p>
-
-        {/* CTA */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            href="/signup"
-            className="group inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-50 px-6 py-3.5 text-sm font-medium text-zinc-950 shadow-sm transition hover:bg-blue-200"
-          >
-            Start with your business
-
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center rounded-xl border border-zinc-50/15 px-6 py-3.5 text-sm font-medium text-zinc-50/80 transition hover:border-zinc-50/25 hover:bg-zinc-50/5 hover:text-zinc-50"
-          >
-            Already have an account?
-          </Link>
-        </div>
-
-        {/* Trust points */}
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-          {[
-            "Connect your existing data",
-            "No complicated setup",
-            "Built around your business",
-          ].map((item) => (
-            <div
-              key={item}
-              className="flex items-center gap-1.5 text-[10px] text-blue-200/50"
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/signup"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-white px-8 py-4 text-sm font-bold text-zinc-950 shadow-lg hover:bg-zinc-100 transition-all active:scale-[0.98]"
             >
-              <Check className="h-3 w-3 text-blue-200/70" />
+              Get Started for Free
+              <ArrowRight className="h-4 w-4" />
+            </Link>
 
-              {item}
-            </div>
-          ))}
-        </div>
+            <Link
+              href="/login"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900/80 px-8 py-4 text-sm font-semibold text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all active:scale-[0.98]"
+            >
+              Sign In to Existing Store
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

@@ -27,14 +27,19 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <div className="p-8 max-w-[1500px] mx-auto w-full">
-      <div className="mb-8">
-        <Breadcrumbs items={[{ label: "Investigate", href: "/dashboard" }, { label: "Projects", href: "/projects" }]} />
-      </div>
-
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-zinc-950 tracking-tight">Project Intelligence</h1>
-        <p className="text-zinc-500 mt-2">Track progress, health, and deadlines across all initiatives.</p>
+    <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 space-y-8">
+      <div>
+        <Breadcrumbs items={[{ label: "Overview", href: "/dashboard" }, { label: "Investigate", href: "/autopsy" }, { label: "Projects" }]} />
+        <div className="mt-4">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+            <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+              Initiatives & Delivery
+            </p>
+          </div>
+          <h1 className="mt-2 text-3xl font-extrabold text-zinc-950 tracking-tight sm:text-4xl">Project Intelligence</h1>
+          <p className="text-zinc-500 mt-1.5 text-sm">Track progress, health, and deadlines across all operational initiatives.</p>
+        </div>
       </div>
 
       <ProjectsView data={viewData} />

@@ -35,10 +35,20 @@ export default function ChangesView({ data }: { data: ChangesData }) {
   const { changes, topProductChanges, topCustomerChanges, currencyCode } = data
 
   return (
-    <div className="space-y-10">
-      <div className="mb-8">
-        <h2 className="text-4xl font-bold text-zinc-950 tracking-tight mb-2">WHAT CHANGED</h2>
-        <p className="text-zinc-500 text-lg">Period-over-period variance analysis across your business</p>
+    <div className="space-y-8">
+      <div>
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+            Variance Tracking
+          </p>
+        </div>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">
+          What Changed
+        </h1>
+        <p className="mt-1.5 text-sm text-zinc-500">
+          Period-over-period variance analysis and delta attribution across your business.
+        </p>
       </div>
 
       {/* Metric Comparison Grid */}

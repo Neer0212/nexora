@@ -47,11 +47,8 @@ export default async function ChangesPage() {
   }
 
   return (
-    <div className="p-8 max-w-[1500px] mx-auto w-full">
-      <div className="mb-8">
-        <Breadcrumbs items={[{ label: "Investigate", href: "/dashboard" }, { label: "What Changed", href: "/changes" }]} />
-      </div>
-
+    <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 space-y-8">
+      <Breadcrumbs items={[{ label: "Overview", href: "/dashboard" }, { label: "Investigate", href: "/autopsy" }, { label: "What Changed" }]} />
       <ChangesView data={viewData} />
     </div>
   )

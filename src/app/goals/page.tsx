@@ -21,11 +21,10 @@ export default async function GoalsPage() {
   if (membershipError) throw new Error(membershipError.message)
   if (!membership) redirect("/onboarding")
 
-  const [snapshot, { data: goals, error: goalsError }] = await Promise.all([
+  const [snapshot, { data: goals }] = await Promise.all([
     getBusinessSnapshot(),
     supabase.from("goals").select("goal_key,target").eq("business_id", membership.business_id),
   ])
-  if (goalsError) throw new Error(goalsError.message)
 
   const savedTargets = Object.fromEntries((goals ?? []).map((goal) => [goal.goal_key, Number(goal.target)]))
 

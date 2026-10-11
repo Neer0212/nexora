@@ -111,13 +111,17 @@ export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
 
   const ready = (datasets ?? []) as Dataset[]
 
-  const { data: rawRows, error: rowsError } = await supabase
-    .from("dataset_rows")
-    .select("row_id, dataset_id, row_data")
-    .in("dataset_id", ready.map(d => d.id))
+  let rawRows: Array<{ row_id?: string; dataset_id: string; row_data: unknown }> = []
+  if (ready.length > 0) {
+    const { data, error: rowsError } = await supabase
+      .from("dataset_rows")
+      .select("row_id, dataset_id, row_data")
+      .in("dataset_id", ready.map(d => d.id))
 
-  if (rowsError) {
-    throw new Error(`Failed to load dataset rows: ${rowsError.message}`)
+    if (rowsError) {
+      throw new Error(`Failed to load dataset rows: ${rowsError.message}`)
+    }
+    rawRows = (data ?? []) as Array<{ row_id?: string; dataset_id: string; row_data: unknown }>
   }
 
   const rows = (rawRows || []).map(item => ({

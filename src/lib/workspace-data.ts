@@ -144,22 +144,20 @@ export async function getWorkspaceData(): Promise<WorkspaceData> {
   const datasets = await getWorkspaceDatasets(context.businessId)
   const datasetIds = datasets.map((d) => d.id)
 
-  if (datasetIds.length === 0) {
-    return { context, datasets, rows: [] }
+  let rawStoredRows: RawStoredRow[] = []
+  if (datasetIds.length > 0) {
+    const supabase = await createClient()
+
+    const { data: stored, error } = await supabase
+      .from("dataset_rows")
+      .select("dataset_id, row_number, row_data")
+      .eq("business_id", context.businessId)
+      .in("dataset_id", datasetIds)
+      .order("row_number", { ascending: true })
+
+    if (error) throw new Error(error.message)
+    rawStoredRows = (stored ?? []) as RawStoredRow[]
   }
-
-  const supabase = await createClient()
-
-  const { data: stored, error } = await supabase
-    .from("dataset_rows")
-    .select("dataset_id, row_number, row_data")
-    .eq("business_id", context.businessId)
-    .in("dataset_id", datasetIds)
-    .order("row_number", { ascending: true })
-
-  if (error) throw new Error(error.message)
-
-  const rawStoredRows = (stored ?? []) as RawStoredRow[]
   
   // Transform format to match what appendOperationalData expects
   let unifiedRows: { datasetId: string; rowNumber: number; row: Record<string, unknown> }[] = rawStoredRows.map((r, i) => ({

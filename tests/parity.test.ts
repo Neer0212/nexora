@@ -7,6 +7,7 @@ const mockSupabaseQuery = {
 }
 const chainBuilder = (overrides: Partial<typeof mockSupabaseQuery> = {}) => {
   const result = { ...mockSupabaseQuery, ...overrides }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chain: any = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
@@ -22,6 +23,7 @@ const chainBuilder = (overrides: Partial<typeof mockSupabaseQuery> = {}) => {
   }
   Object.defineProperty(chain, Symbol.toStringTag, { value: "Promise" })
   chain[Symbol.iterator] = undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(chain as any)[Symbol.for("nodejs.rejection")] = undefined
   const resolved = Promise.resolve(result)
   chain.then = resolved.then.bind(resolved)

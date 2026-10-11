@@ -77,6 +77,7 @@ function NavItem({
   return (
     <Link
       href={href}
+      data-active={isActive ? "true" : undefined}
       className={[
         "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         isActive
@@ -123,8 +124,32 @@ function Section({
   )
 }
 
+import { useEffect, useRef } from "react"
+
 export default function Sidebar({ industryConfig }: { industryConfig: IndustryConfig }) {
   const pathname = usePathname()
+  const navContainerRef = useRef<HTMLDivElement>(null)
+
+  // Preserve and restore scroll position across Next.js route navigation
+  useEffect(() => {
+    const container = navContainerRef.current
+    if (!container) return
+
+    const savedScroll = sessionStorage.getItem("nexora_sidebar_scroll")
+    if (savedScroll !== null) {
+      container.scrollTop = Number(savedScroll)
+    }
+
+    // Ensure the active item is visible in view
+    const activeItem = container.querySelector("[data-active='true']")
+    if (activeItem) {
+      activeItem.scrollIntoView({ block: "nearest", behavior: "instant" })
+    }
+  }, [pathname])
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    sessionStorage.setItem("nexora_sidebar_scroll", String(e.currentTarget.scrollTop))
+  }
 
   // Build operations nav from industry config, resolving icon names to components
   const operationsItems = industryConfig.navigation.operationsItems.map((item) => ({
@@ -146,8 +171,12 @@ export default function Sidebar({ industryConfig }: { industryConfig: IndustryCo
         </Link>
       </div>
 
-      {/* Nav */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
+      {/* Nav with custom sleek scrollbar and scroll restoration */}
+      <div
+        ref={navContainerRef}
+        onScroll={handleScroll}
+        className="min-h-0 flex-1 overflow-y-auto px-3 py-4 [scrollbar-gutter:stable] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-200 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400"
+      >
         {/* Business switcher */}
         <Link
           href="/dashboard"
@@ -176,11 +205,11 @@ export default function Sidebar({ industryConfig }: { industryConfig: IndustryCo
           pathname={pathname}
         />
 
-        {/* Static core sections */}
-        <Section label="" items={understandNav} pathname={pathname} />
-        <Section label="" items={investigateNav} pathname={pathname} />
-        <Section label="" items={intelligenceNav} pathname={pathname} />
-        <Section label="" items={decideNav} pathname={pathname} />
+        {/* Static core sections with visible category names */}
+        <Section label="Understand" items={understandNav} pathname={pathname} />
+        <Section label="Investigate" items={investigateNav} pathname={pathname} />
+        <Section label="Planning & Assets" items={intelligenceNav} pathname={pathname} />
+        <Section label="Decide & Assist" items={decideNav} pathname={pathname} />
       </div>
 
       {/* Footer */}

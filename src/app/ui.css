@@ -1,0 +1,20 @@
+/* Human touch helpers and card component for cohesive UI */
+.nx-card {
+  background: var(--nexora-surface);
+  border: 1px solid var(--nexora-border);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.nx-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.12);
+}
+.nexora-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}

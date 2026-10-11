@@ -1,20 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --nexora-ink: #09090B; /* zinc-950 */
-  --nexora-indigo: #1E40AF; /* blue-800 */
-  --nexora-accent: #2563EB; /* blue-600 */
-  --nexora-lavender: #DBEAFE; /* blue-100 */
-  --nexora-background: #FAFAFA; /* zinc-50 */
-  --nexora-surface: #FFFFFF; /* white */
-  --nexora-border: #E4E4E7; /* zinc-200 */
-  --nexora-muted: #71717A; /* zinc-500 */
-  --nexora-success: #16A34A; /* emerald-600 */
-  --nexora-warning: #F59E0B; /* amber-500 */
-  --nexora-danger: #E11D48; /* rose-600 */
+  --nexora-ink: #09090B;
+  --nexora-cream: #FAFAFC;
+  --nexora-paper: #FFFFFF;
+  --nexora-border: #E4E4E7;
+  --nexora-border-subtle: #F1F1F4;
+  --nexora-muted: #71717A;
+  --nexora-accent: #2563EB;
+  --nexora-accent-hover: #1D4ED8;
+  --nexora-accent-wash: #EFF6FF;
+  --nexora-indigo: #4F46E5;
+  --nexora-cyan: #06B6D4;
+  --nexora-success: #10B981;
+  --nexora-warning: #F59E0B;
+  --nexora-danger: #EF4444;
 
-  --background: var(--nexora-background);
-  --foreground: var(--nexora-ink);
+  --background: #FAFAFC;
+  --foreground: #09090B;
 }
 
 @theme inline {
@@ -22,52 +25,141 @@
   --color-foreground: var(--foreground);
 
   --color-nexora-ink: var(--nexora-ink);
-  --color-nexora-indigo: var(--nexora-indigo);
-  --color-nexora-accent: var(--nexora-accent);
-  --color-nexora-lavender: var(--nexora-lavender);
-  --color-nexora-background: var(--nexora-background);
-  --color-nexora-surface: var(--nexora-surface);
+  --color-nexora-cream: var(--nexora-cream);
+  --color-nexora-paper: var(--nexora-paper);
   --color-nexora-border: var(--nexora-border);
   --color-nexora-muted: var(--nexora-muted);
+  --color-nexora-accent: var(--nexora-accent);
+  --color-nexora-indigo: var(--nexora-indigo);
+  --color-nexora-cyan: var(--nexora-cyan);
   --color-nexora-success: var(--nexora-success);
   --color-nexora-warning: var(--nexora-warning);
   --color-nexora-danger: var(--nexora-danger);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
 html {
   scroll-behavior: smooth;
+  font-family: var(--font-sans);
 }
 
 body {
-  background: var(--nexora-background);
-  color: var(--nexora-ink);
+  background: var(--background);
+  color: var(--foreground);
   margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.nexora-content-enter {
-  animation: nexora-content-enter 220ms ease-out;
+/* Radiant atmospheric background glow */
+.hero-glow {
+  background: radial-gradient(circle 800px at 50% -100px, rgba(59, 130, 246, 0.14), rgba(79, 70, 229, 0.08), transparent 70%);
 }
 
-@keyframes nexora-content-enter {
-  from {
-    opacity: 0.35;
-    transform: translateY(4px);
-  }
-  to {
+.ambient-glow-cyan {
+  background: radial-gradient(circle 600px at 80% 20%, rgba(6, 182, 212, 0.12), transparent 70%);
+}
+
+.ambient-glow-indigo {
+  background: radial-gradient(circle 600px at 20% 80%, rgba(99, 102, 241, 0.12), transparent 70%);
+}
+
+/* Glass panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(228, 228, 231, 0.8);
+}
+
+.dark-glass-panel {
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Text gradients */
+.gradient-heading {
+  background: linear-gradient(135deg, #09090B 0%, #27272A 50%, #2563EB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-heading-vibrant {
+  background: linear-gradient(135deg, #09090B 20%, #4338CA 60%, #2563EB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Sleek interactive cards */
+.interactive-card {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.08);
+}
+
+/* Pulse shimmer effect */
+@keyframes subtle-pulse {
+  0%, 100% {
     opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 4s ease-in-out infinite;
+}
+
+/* Floating animation for hero preview badge */
+@keyframes float-slow {
+  0%, 100% {
     transform: translateY(0);
   }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E4E4E7;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A1A1AA;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-
-  .nexora-content-enter {
+  .animate-subtle-pulse,
+  .animate-float {
     animation: none;
   }
 }

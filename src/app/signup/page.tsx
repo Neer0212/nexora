@@ -2,8 +2,9 @@
 
 import { FormEvent, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react"
 
 import { createClient } from "@/lib/supabase/client"
 
@@ -56,35 +57,53 @@ export default function SignupPage() {
     }
 
     setLoading(false)
-
     router.push("/login?message=check-email")
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-6 py-12">
-      <div className="w-full max-w-md">
-        <div className="mb-8">
-          <p className="text-[10px] font-bold tracking-[0.2em] text-blue-600 uppercase">
-            NEXORA
-          </p>
+    <main className="relative flex min-h-screen items-center justify-center bg-[#FAFAFC] px-4 py-12 sm:px-6">
+      {/* Ambient background glows */}
+      <div className="pointer-events-none absolute top-10 right-1/4 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-10 left-1/4 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
 
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950">
+      <div className="relative w-full max-w-md">
+        {/* Brand header */}
+        <div className="mb-8 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2.5 transition-transform hover:scale-105"
+          >
+            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl shadow-sm">
+              <Image
+                src="/nexora.logo.png"
+                alt="Nexora"
+                width={44}
+                height={44}
+                priority
+                className="h-11 w-11 object-contain"
+              />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-zinc-950">
+              nexora
+            </span>
+          </Link>
+          <h1 className="mt-6 text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950">
             Create your account
           </h1>
-
           <p className="mt-2 text-sm text-zinc-500">
-            Start building your business workspace with Nexora.
+            Set up your intelligent store and business workspace.
           </p>
         </div>
 
-        <div className="rounded-3xl border border-zinc-200 bg-white p-6 sm:p-8 shadow-sm">
-          <form onSubmit={handleSignup} className="space-y-5">
+        {/* Card */}
+        <div className="rounded-3xl border border-zinc-200/80 bg-white p-7 sm:p-9 shadow-xl shadow-zinc-950/5 backdrop-blur-xl">
+          <form onSubmit={handleSignup} className="space-y-4">
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 block text-sm font-medium text-zinc-950"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-zinc-600"
               >
-                Email
+                Business Email
               </label>
 
               <input
@@ -94,7 +113,7 @@ export default function SignupPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200/30 placeholder:text-zinc-500/60"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-500/10 placeholder:text-zinc-400"
                 placeholder="you@company.com"
               />
             </div>
@@ -102,7 +121,7 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-2 block text-sm font-medium text-zinc-950"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-zinc-600"
               >
                 Password
               </label>
@@ -115,13 +134,13 @@ export default function SignupPage() {
                   autoComplete="new-password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 pl-4 pr-11 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200/30 placeholder:text-zinc-500/60"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 pl-4 pr-11 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-500/10 placeholder:text-zinc-400"
                   placeholder="At least 8 characters"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-950 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-700 transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -130,21 +149,29 @@ export default function SignupPage() {
                   )}
                 </button>
               </div>
-              
-              <div className="mt-2 flex flex-col gap-1.5">
-                  <div className={`flex items-center gap-1.5 text-xs ${password.length > 0 ? (passwordMeetsLength ? 'text-emerald-600' : 'text-zinc-500') : 'text-zinc-500'}`}>
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      <span>At least 8 characters</span>
-                  </div>
+
+              <div className="mt-2 flex items-center gap-1.5 text-xs">
+                <CheckCircle2
+                  className={`h-3.5 w-3.5 ${
+                    passwordMeetsLength ? "text-emerald-600" : "text-zinc-400"
+                  }`}
+                />
+                <span
+                  className={
+                    passwordMeetsLength ? "text-emerald-700 font-medium" : "text-zinc-500"
+                  }
+                >
+                  Minimum 8 characters
+                </span>
               </div>
             </div>
 
             <div>
               <label
                 htmlFor="confirm-password"
-                className="mb-2 block text-sm font-medium text-zinc-950"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-zinc-600"
               >
-                Confirm password
+                Confirm Password
               </label>
 
               <div className="relative">
@@ -155,13 +182,13 @@ export default function SignupPage() {
                   autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 pl-4 pr-11 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200/30 placeholder:text-zinc-500/60"
-                  placeholder="Repeat your password"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 pl-4 pr-11 py-3 text-sm text-zinc-950 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-500/10 placeholder:text-zinc-400"
+                  placeholder="Re-enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-950 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-700 transition-colors"
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -173,8 +200,8 @@ export default function SignupPage() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-3 rounded-xl border border-rose-600/20 bg-rose-600/5 px-4 py-3 text-sm text-rose-600">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <div className="flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
                 <p>{error}</p>
               </div>
             )}
@@ -182,28 +209,33 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-5 py-3.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-blue-600 hover:shadow-blue-600/25 disabled:opacity-60 active:scale-[0.99]"
             >
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Creating account...</span>
+                  Creating workspace...
                 </>
               ) : (
-                "Create account"
+                <>
+                  Create Workspace
+                  <ArrowRight className="h-4 w-4" />
+                </>
               )}
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-zinc-500">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-medium text-blue-600 hover:text-blue-800 hover:underline underline-offset-4"
-            >
-              Sign in
-            </Link>
-          </p>
+          <div className="mt-7 text-center border-t border-zinc-100 pt-6">
+            <p className="text-xs text-zinc-500">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="font-semibold text-blue-600 hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </main>

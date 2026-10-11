@@ -27,14 +27,19 @@ export default async function SuppliersPage() {
   }
 
   return (
-    <div className="p-8 max-w-[1500px] mx-auto w-full">
-      <div className="mb-8">
-        <Breadcrumbs items={[{ label: "Investigate", href: "/dashboard" }, { label: "Suppliers", href: "/suppliers" }]} />
-      </div>
-
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-zinc-950 tracking-tight">Suppliers & Vendors</h1>
-        <p className="text-zinc-500 mt-2">Monitor supplier lead times, reliability, and risk across your supply chain.</p>
+    <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 space-y-8">
+      <div>
+        <Breadcrumbs items={[{ label: "Overview", href: "/dashboard" }, { label: "Investigate", href: "/autopsy" }, { label: "Suppliers" }]} />
+        <div className="mt-4">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse" />
+            <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
+              Supply Chain
+            </p>
+          </div>
+          <h1 className="mt-2 text-3xl font-extrabold text-zinc-950 tracking-tight sm:text-4xl">Suppliers & Vendors</h1>
+          <p className="text-zinc-500 mt-1.5 text-sm">Monitor supplier lead times, reliability, and risk across your supply chain.</p>
+        </div>
       </div>
 
       <SuppliersView data={viewData} />

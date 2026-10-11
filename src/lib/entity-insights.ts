@@ -82,12 +82,16 @@ export async function getEntityInsights(): Promise<EntityInsights> {
 
   const ready = (datasets ?? []) as Dataset[]
   
-  const { data: rawRows, error: rowsError } = await supabase
-    .from("dataset_rows")
-    .select("dataset_id, row_data")
-    .in("dataset_id", ready.map(d => d.id))
-    
-  if (rowsError) throw new Error(rowsError.message)
+  let rawRows: Array<{ dataset_id: string; row_data: unknown }> = []
+  if (ready.length > 0) {
+    const { data, error: rowsError } = await supabase
+      .from("dataset_rows")
+      .select("dataset_id, row_data")
+      .in("dataset_id", ready.map(d => d.id))
+      
+    if (rowsError) throw new Error(rowsError.message)
+    rawRows = (data ?? []) as Array<{ dataset_id: string; row_data: unknown }>
+  }
 
   const rows = (rawRows || []).map((item: { dataset_id: string, row_data: unknown }) => ({ datasetId: item.dataset_id, row: (item.row_data ?? {}) as Row }))
 

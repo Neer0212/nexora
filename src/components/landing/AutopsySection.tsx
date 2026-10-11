@@ -1,105 +1,139 @@
 "use client"
 
+import { motion, useReducedMotion } from "motion/react"
 import {
+  AlertTriangle,
   ArrowRight,
-  Search,
+  CheckCircle2,
+  FileSearch,
+  Sparkles,
+  TrendingDown,
+  Truck,
+  Package,
 } from "lucide-react"
+import Link from "next/link"
 
-const factors = [
+const autopsySteps = [
   {
-    title: "Product A availability",
-    impact: "−18.7%",
-    contribution: "42%",
-    description:
-      "Stock availability fell after supplier lead times increased.",
+    stage: "Primary Alert Detected",
+    title: "Net Sales dropped 11.2% in 30 days",
+    detail: "System triggered diagnostic scan across orders, catalogue, and purchase feeds.",
+    status: "critical",
+    icon: TrendingDown,
+    color: "text-rose-600 bg-rose-50 border-rose-200",
   },
   {
-    title: "West region orders",
-    impact: "−11.2%",
-    contribution: "27%",
-    description:
-      "Order volume declined primarily across the West region.",
+    stage: "Volume vs Price Analysis",
+    title: "Order volume stable (+1.1%), but stockout on Top SKU",
+    detail: "Item #005 contributed 42% of revenue last month and spent 14 days out-of-stock.",
+    status: "root-cause",
+    icon: Package,
+    color: "text-amber-600 bg-amber-50 border-amber-200",
   },
   {
-    title: "Supplier lead time",
-    impact: "+2.4 days",
-    contribution: "19%",
-    description:
-      "Average delivery time increased compared with the previous period.",
+    stage: "Supply Chain Trace",
+    title: "Supplier lead time delayed by 3.8 days",
+    detail: "Purchase order PO-20260812 was delayed by vendor, creating the stock depletion.",
+    status: "solution",
+    icon: Truck,
+    color: "text-blue-600 bg-blue-50 border-blue-200",
   },
 ]
 
 export default function AutopsySection() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section
       id="how-it-works"
-      className="relative overflow-hidden bg-zinc-50 py-24 sm:py-32 border-t border-zinc-200"
+      className="relative overflow-hidden bg-zinc-50 py-24 sm:py-32 border-t border-zinc-200/80"
     >
-      <div className="relative mx-auto max-w-5xl px-6">
-        <div className="flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 mb-6">
-            <Search className="h-3.5 w-3.5 text-blue-600" />
-            <span className="text-xs font-medium uppercase tracking-widest text-zinc-950">
-              Business Autopsy
-            </span>
-          </div>
-
-          <h2 className="text-4xl font-semibold leading-tight tracking-tight text-zinc-950 sm:text-5xl max-w-2xl">
-            Don&apos;t just see what changed. Know why.
-          </h2>
-
-          <p className="mt-6 text-lg leading-8 text-zinc-600 max-w-2xl">
-            When an important number moves, Nexora works backwards through
-            your business data to identify the signals that matter. No endless spreadsheet comparisons. No guessing. Just a clear explanation of what is driving the change.
-          </p>
-        </div>
-
-        <div className="mt-16 bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-          <div className="p-6 sm:p-8 border-b border-zinc-200">
-            <h3 className="text-xl font-semibold text-zinc-950">
-              The decline is mainly connected to product availability.
-            </h3>
-            <p className="mt-2 text-sm text-zinc-600">
-              Nexora traced the change across inventory, orders, supplier performance, and regional demand.
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-zinc-50">
-                <tr>
-                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200">Factor</th>
-                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200">Impact</th>
-                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200">Contribution</th>
-                  <th className="px-6 py-4 font-semibold text-zinc-500 border-b border-zinc-200 w-full">Description</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200">
-                {factors.map((factor) => (
-                  <tr key={factor.title} className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-zinc-950">{factor.title}</td>
-                    <td className="px-6 py-4 text-zinc-950 font-medium">{factor.impact}</td>
-                    <td className="px-6 py-4 text-zinc-600">{factor.contribution}</td>
-                    <td className="px-6 py-4 text-zinc-600 truncate max-w-xs md:max-w-md">{factor.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-lg font-medium text-zinc-950">
-            Numbers tell you what happened. <span className="text-zinc-500">Context tells you why.</span>
-          </p>
-
-          <a
-            href="#business-types"
-            className="group inline-flex items-center gap-2 text-sm font-medium text-zinc-950 hover:text-blue-600 transition-colors"
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <motion.div
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="inline-flex items-center gap-2 rounded-full border border-rose-600/20 bg-rose-50 px-4 py-1.5 text-xs font-semibold text-rose-700"
           >
-            See what Nexora can connect
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
+            <FileSearch className="h-4 w-4 text-rose-600" />
+            Deterministic Diagnostic Engine
+          </motion.div>
+
+          <motion.h2
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-4 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-5xl"
+          >
+            Business Autopsy: Root cause, unmasked.
+          </motion.h2>
+
+          <motion.p
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-5 text-base sm:text-lg leading-relaxed text-zinc-600"
+          >
+            When key metrics fluctuate, Nexora works backwards through your transactional ledger to pinpoint the exact operational driver.
+          </motion.p>
+        </div>
+
+        {/* Visual Root-Cause Diagnosis Showcase */}
+        <div className="mt-16 mx-auto max-w-4xl">
+          <div className="relative space-y-4">
+            {autopsySteps.map((step, idx) => {
+              const Icon = step.icon
+              return (
+                <motion.div
+                  key={step.title}
+                  initial={shouldReduceMotion ? false : { opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.5, delay: idx * 0.15 }}
+                  className="relative rounded-3xl border border-zinc-200/80 bg-white p-6 sm:p-7 shadow-sm transition-all hover:shadow-md hover:border-zinc-300"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${step.color}`}>
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                          Step 0{idx + 1} · {step.stage}
+                        </span>
+                        <h4 className="mt-1 text-base sm:text-lg font-bold text-zinc-950">
+                          {step.title}
+                        </h4>
+                        <p className="mt-1 text-sm text-zinc-600 leading-relaxed">
+                          {step.detail}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex items-center">
+                      <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-zinc-100 text-zinc-700">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" />
+                        Verified
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+
+          {/* Action CTA */}
+          <div className="mt-10 text-center">
+            <Link
+              href="/autopsy"
+              className="inline-flex items-center gap-2 rounded-2xl bg-zinc-950 px-7 py-3.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 transition-all active:scale-[0.98]"
+            >
+              Run an Autopsy on Your Store <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

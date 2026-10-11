@@ -31,17 +31,28 @@ export default function InventoryView(props: InventoryData) {
   }
 
   return (
-    <div className="max-w-[1500px] mx-auto p-8 space-y-8">
+    <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 space-y-8">
       {/* Header */}
       <div>
         <Breadcrumbs items={[
-          { label: "Investigate", href: "/investigate" },
-          { label: "Inventory Investigation", href: "/inventory" }
+          { label: "Overview", href: "/dashboard" },
+          { label: "Investigate", href: "/autopsy" },
+          { label: "Inventory Investigation" }
         ]} />
         <div className="mt-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-light text-zinc-950 tracking-tight">Inventory Investigation</h1>
-            <p className="text-zinc-500 mt-2">Analyze stock levels and reorder requirements.</p>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-cyan-600 animate-pulse" />
+              <p className="text-xs font-semibold uppercase tracking-wider text-cyan-600">
+                Stock & Valuation
+              </p>
+            </div>
+            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">
+              Inventory Investigation
+            </h1>
+            <p className="mt-1.5 text-sm text-zinc-500">
+              Analyze stock levels, reorder thresholds, and warehouse valuation.
+            </p>
           </div>
         </div>
       </div>

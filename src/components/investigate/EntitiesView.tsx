@@ -44,27 +44,38 @@ export default function EntitiesView(props: EntitiesData) {
   }
 
   return (
-    <div className="max-w-[1500px] mx-auto p-8 space-y-8">
+    <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 space-y-8">
       {/* Header */}
       <div>
         <Breadcrumbs items={[
-          { label: "Investigate", href: "/investigate" },
-          { label: "Entity Intelligence", href: "/entities" }
+          { label: "Overview", href: "/dashboard" },
+          { label: "Investigate", href: "/autopsy" },
+          { label: "Entity Intelligence" }
         ]} />
         <div className="mt-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-light text-zinc-950 tracking-tight">Entity Intelligence</h1>
-            <p className="text-zinc-500 mt-2">Deep dive into customers and products.</p>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-purple-600 animate-pulse" />
+              <p className="text-xs font-semibold uppercase tracking-wider text-purple-600">
+                Accounts & Catalogue
+              </p>
+            </div>
+            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">
+              Entity Intelligence
+            </h1>
+            <p className="mt-1.5 text-sm text-zinc-500">
+              Deep operational intelligence into accounts, customers, and product catalogue.
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
               <input
                 type="text"
                 placeholder="Search entities..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 pr-4 py-2 rounded-full border border-zinc-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                className="pl-10 pr-4 py-2.5 rounded-xl border border-zinc-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
               />
             </div>
           </div>
